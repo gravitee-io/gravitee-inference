@@ -112,7 +112,7 @@ public class OnnxBertClassifierModel extends OnnxBertInference<ClassifierResults
 
   private TreeSet<ClassifierResult> computeSequenceProb(float[] logit) {
     var result = new TreeSet<>(comparing(ClassifierResult::score, reverseOrder()));
-    float[] probabilities = config.gioMath().softmax(logit);
+    float[] probabilities = config.gioMath().sigmoid(logit);
     for (int j = 0; j < probabilities.length; j++) {
       result.add(new ClassifierResult(computeLabel(probabilities, j), probabilities[j]));
     }

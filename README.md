@@ -72,18 +72,14 @@ var onnxConfig = new OnnxBertConfig(
 var model = new OnnxBertClassifierModel(onnxConfig);
 
 // Single sentence
-List<ClassifierResult> results = model.infer("I am so happy!");
+List<ClassifierResult> results = model.infer("I am so happy!").results();
 results.forEach(result -> {
     System.out.println("Label: " + result.label());
     System.out.println("Score: " + result.score());
 });
 
 // Multiple sentences
-List<List<ClassifierResult>> batchResults = model.infer(List.of("I am so happy!", "I am so sad!"));
-batchResults.stream().flatMap(List::stream).forEach(result -> {
-    System.out.println("Label: " + result.label());
-    System.out.println("Score: " + result.score());
-});
+model.infer(List.of("I am so happy!", "I am so sad!"));
 ```
 
 > Try this with [`distilbert-base-uncased-finetuned-sst-2-english`](https://huggingface.co/distilbert/distilbert-base-uncased-finetuned-sst-2-english).
@@ -111,7 +107,7 @@ var configuration = Map.of(
 var onnxConfig = new OnnxBertConfig(resource, NativeMath.INSTANCE, configuration);
 var model = new OnnxBertClassifierModel(onnxConfig);
 
-List<ClassifierResult> results = model.infer("My name is Laura and I live in Houston, Texas");
+List<ClassifierResult> results = model.infer("My name is Laura and I live in Houston, Texas").results();
 results.forEach(result -> {
     System.out.println("Label: " + result.label());
     System.out.println("Score: " + result.score());
@@ -178,7 +174,7 @@ var onnxConfig = new OnnxBertConfig(resource, NativeMath.INSTANCE, Map.of(
 var model = new OnnxBertEmbeddingModel(onnxConfig);
 EmbeddingTokenCount embedding = model.infer("The big brown fox jumped over the lazy dog");
 
-System.out.println(embedding.embeddings().length); // 384
+System.out.println(embedding.embedding().length); // 384
 System.out.println(embedding.tokenCount()); // 11
 
 // Similarity comparison

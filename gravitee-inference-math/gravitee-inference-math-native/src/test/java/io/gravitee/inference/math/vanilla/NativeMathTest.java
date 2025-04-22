@@ -108,6 +108,13 @@ public class NativeMathTest {
     assertArrayEquals(expected, ceil(INSTANCE.softmax(v1)));
   }
 
+  @Test
+  void must_do_sigmoid() {
+    final float[] v1 = { 2.1f, -0.8f, 0.0f, 4.5f };
+    final float[] expected = { 0.9f, 0.32f, 0.5f, 0.99f };
+    assertArrayEquals(expected, ceil(INSTANCE.sigmoid(v1)));
+  }
+
   private float[] ceil(float[] vector) {
     float[] result = new float[vector.length];
     for (int i = 0; i < vector.length; i++) {

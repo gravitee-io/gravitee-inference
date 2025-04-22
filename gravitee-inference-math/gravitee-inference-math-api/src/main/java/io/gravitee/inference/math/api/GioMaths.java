@@ -30,6 +30,8 @@ public interface GioMaths {
 
   float[] softmax(float[] vector);
 
+  float[] sigmoid(float[] vector);
+
   float[] mean(float[][] vectors);
 
   float[] weightedMean(float[][] vector, float[] weights);

@@ -123,6 +123,15 @@ public class NativeMath implements GioMaths {
   }
 
   @Override
+  public float[] sigmoid(float[] vector) {
+    float[] result = new float[vector.length];
+    for (int i = 0; i < vector.length; i++) {
+      result[i] = (float) (1.0f / (1.0f + FastMath.exp(-vector[i])));
+    }
+    return result;
+  }
+
+  @Override
   public float max(float[] vector) {
     float max = Float.NEGATIVE_INFINITY;
     for (float f : vector) {
