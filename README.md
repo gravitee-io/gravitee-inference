@@ -11,6 +11,30 @@
 
 ---
 
+## Import libraries
+
+In your `pom.xml` add the dependencies
+
+```xml
+<dependency>
+  <groupId>io.gravitee.inference.math.native</groupId>
+  <artifactId>gravitee-inference-math-native</artifactId>
+  <version>${gravitee.inference.version}</version>
+</dependency>
+
+<dependency>
+  <groupId>io.gravitee.inference.api</groupId>
+  <artifactId>gravitee-inference-api</artifactId>
+  <version>${gravitee.inference.version}</version>
+</dependency>
+
+<dependency>
+  <groupId>io.gravitee.inference.onnx</groupId>
+  <artifactId>gravitee-inference-onnx</artifactId>
+  <version${gravitee.inference.version}</version>
+</dependency>
+```
+
 ## Supported AI Models
 
 ### BERT (via ONNX)
@@ -172,10 +196,28 @@ System.out.println(
 
 ### ⚡ SIMD Capabilities
 
-To run Gravitee Gateway with SIMD math acceleration:
+To run with SIMD math acceleration:
 
-Add the following to your JVM arguments:
+1. Add the following to your JVM arguments:
 
 ```sh
 --add-modules jdk.incubator.vector
 ```
+
+2. Import the according dependencies:
+
+```xml
+<dependency>
+    <groupId>io.gravitee.inference.math.simd</groupId>
+    <artifactId>gravitee-inference-math-simd</artifactId>
+    <version>${gravitee.inference.version}</version>
+</dependency>
+```
+
+```java
+import io.gravitee.inference.math.simd.factory.SIMDMathFactory;
+
+GioMaths maths = SIMDMathFactory.gioMaths();
+```
+
+The factory will resolve at runtime which SIMD capability your CPU handles.

@@ -21,14 +21,14 @@
   <parent>
     <artifactId>gravitee-inference-math</artifactId>
     <groupId>io.gravitee.inference.math</groupId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
   </parent>
 
   <groupId>io.gravitee.inference.math.simd</groupId>
   <artifactId>gravitee-inference-math-simd</artifactId>
 
-  <name>Gravitee.io Inference math SIMD</name>
-  <description>Maths and linear algebra using the Vector API</description>
+  <name>Gravitee.io - Inference Math - SIMD</name>
+  <description>Math and linear algebra using the Vector API</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

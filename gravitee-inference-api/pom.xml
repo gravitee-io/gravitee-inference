@@ -21,14 +21,14 @@
   <parent>
     <artifactId>gravitee-inference</artifactId>
     <groupId>io.gravitee.inference</groupId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
   </parent>
 
   <groupId>io.gravitee.inference.api</groupId>
   <artifactId>gravitee-inference-api</artifactId>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
 
-  <name>Gravite.io - Inference API</name>
+  <name>Gravitee.io - Inference API</name>
   <description>Interfaces of inference models</description>
 
 </project>

@@ -21,14 +21,14 @@
   <parent>
     <artifactId>gravitee-inference</artifactId>
     <groupId>io.gravitee.inference</groupId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
   </parent>
 
   <groupId>io.gravitee.inference.onnx</groupId>
   <artifactId>gravitee-inference-onnx</artifactId>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
 
-  <name>Gravitee.io Inference Core ONNX</name>
+  <name>Gravitee.io Inference - ONNX</name>
   <description>ONNX implementation of the Inference API</description>
 
   <properties>
@@ -68,12 +68,6 @@
       <artifactId>gravitee-inference-math-simd</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.gravitee.inference.huggingface</groupId>
-      <artifactId>gravitee-inference-huggingface</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
