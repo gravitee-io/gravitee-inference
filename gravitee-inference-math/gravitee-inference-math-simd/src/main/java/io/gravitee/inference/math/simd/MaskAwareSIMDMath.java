@@ -138,6 +138,12 @@ public class MaskAwareSIMDMath implements GioMaths {
   }
 
   @Override
+  public float[] sigmoid(float[] vector) {
+    //TODO: Actual SIMD implementation
+    return NativeMath.INSTANCE.sigmoid(vector);
+  }
+
+  @Override
   public float max(float[] vector) {
     var maxVector = FloatVector.broadcast(SPECIES, Float.NEGATIVE_INFINITY);
 

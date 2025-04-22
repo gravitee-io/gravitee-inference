@@ -65,12 +65,12 @@ public class OnnxBertSequenceClassificationTest extends OnnxBertBaseTest {
     var positive = SEQUENCE_MODEL.infer("I am so happy!").results().stream().toList();
     assertEquals(2, positive.size());
     assertEquals("Positive", positive.getFirst().label());
-    assertEquals(0.9998733997344971, positive.getFirst().score());
+    assertEquals(0.9905912280082703, positive.getFirst().score());
 
     var negative = SEQUENCE_MODEL.infer("I am so sad!").results().stream().toList();
     assertEquals(2, negative.size());
     assertEquals("Negative", negative.getFirst().label());
-    assertEquals(0.9994364380836487, negative.getFirst().score());
+    assertEquals(0.9839373826980591, negative.getFirst().score());
   }
 
   @Test
@@ -81,12 +81,12 @@ public class OnnxBertSequenceClassificationTest extends OnnxBertBaseTest {
     var positive = sentiments.getFirst().results().stream().toList();
     assertEquals(2, positive.size());
     assertEquals("Positive", positive.getFirst().label());
-    assertEquals(0.9998733997344971, positive.getFirst().score());
+    assertEquals(0.9905912280082703, positive.getFirst().score());
 
     var negative = sentiments.getLast().results().stream().toList();
     assertEquals(2, negative.size());
     assertEquals("Negative", negative.getFirst().label());
-    assertEquals(0.9994364380836487, negative.getFirst().score());
+    assertEquals(0.9839373826980591, negative.getFirst().score());
   }
 
   @AfterAll
