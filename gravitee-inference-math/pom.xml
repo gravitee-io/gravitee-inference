@@ -21,13 +21,13 @@
   <parent>
     <artifactId>gravitee-inference</artifactId>
     <groupId>io.gravitee.inference</groupId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
   </parent>
 
   <groupId>io.gravitee.inference.math</groupId>
   <artifactId>gravitee-inference-math</artifactId>
 
-  <name>Gravitee.io Inference Math</name>
+  <name>Gravitee.io Inference - Math</name>
   <description>Contains tooling for maths and linear algebra operations</description>
   <packaging>pom</packaging>
   <properties>

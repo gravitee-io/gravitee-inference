@@ -21,14 +21,14 @@
   <parent>
     <artifactId>gravitee-inference-math</artifactId>
     <groupId>io.gravitee.inference.math</groupId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
   </parent>
 
   <groupId>io.gravitee.inference.math.native</groupId>
   <artifactId>gravitee-inference-math-native</artifactId>
 
-  <name>Gravitee.io - Inference maths native</name>
-  <description>Maths and Linear algebra using in vanilla Java</description>
+  <name>Gravitee.io - Inference Math - Native</name>
+  <description>Math and Linear algebra using in vanilla Java</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

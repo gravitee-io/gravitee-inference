@@ -21,13 +21,13 @@
   <parent>
     <artifactId>gravitee-inference-math</artifactId>
     <groupId>io.gravitee.inference.math</groupId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
   </parent>
 
   <groupId>io.gravitee.inference.math.api</groupId>
   <artifactId>gravitee-inference-math-api</artifactId>
 
-  <name>Gravitee.io - Inference maths api</name>
+  <name>Gravitee.io - Inference Math - Api</name>
   <description>API interface of io.gravitee.inference.math</description>
 
   <properties>
