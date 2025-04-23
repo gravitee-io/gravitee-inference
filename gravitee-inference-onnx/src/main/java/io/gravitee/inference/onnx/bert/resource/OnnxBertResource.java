@@ -25,13 +25,23 @@ import java.nio.file.Path;
 public final class OnnxBertResource extends OnnxResource {
 
   private final Path tokenizer;
+  private final Path configJson;
 
   public OnnxBertResource(Path model, Path tokenizer) {
+    this(model, tokenizer, null);
+  }
+
+  public OnnxBertResource(Path model, Path tokenizer, Path config) {
     super(model);
     this.tokenizer = tokenizer;
+    this.configJson = config;
   }
 
   public Path getTokenizer() {
     return tokenizer;
+  }
+
+  public Path getConfigJson() {
+    return configJson;
   }
 }

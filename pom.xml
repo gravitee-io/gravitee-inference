@@ -165,12 +165,14 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>@{argLine} --enable-preview --add-opens java.base/java.lang=ALL-UNNAMED --add-opens
+          <argLine>@{argLine} -Xmx2048m --enable-preview --add-opens java.base/java.lang=ALL-UNNAMED --add-opens
             java.base/java.util=ALL-UNNAMED
             --add-opens java.base/java.util.regex=ALL-UNNAMED --add-opens
             java.base/java.util.stream=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED
             --add-modules jdk.incubator.vector
           </argLine>
+          <forkCount>1</forkCount>
+          <reuseForks>true</reuseForks>
         </configuration>
       </plugin>
 

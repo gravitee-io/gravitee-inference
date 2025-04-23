@@ -20,7 +20,6 @@ import static io.gravitee.inference.api.classifier.ClassifierMode.TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import ai.onnxruntime.OrtException;
 import io.gravitee.inference.api.classifier.ClassifierResults;
 import io.gravitee.inference.math.vanilla.NativeMath;
 import io.gravitee.inference.onnx.bert.classifier.OnnxBertClassifierModel;
@@ -31,7 +30,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -40,45 +38,39 @@ import org.junit.jupiter.api.Test;
  */
 public class OnnxBertTokenClassificationTest extends OnnxBertBaseTest {
 
-  protected static final String TOKEN_TOKENIZER_JSON = "bert-NER/tokenizer.json";
-  protected static final String TOKEN_MODEL_ONNX = "bert-NER/model.onnx";
+  protected static final String TOKEN_TOKENIZER_JSON = "tarekziade-distilbert-NER/tokenizer.json";
+  protected static final String TOKEN_MODEL_ONNX = "tarekziade-distilbert-NER/model.onnx";
+  protected static final String TOKEN_CONFIG_JSON = "tarekziade-distilbert-NER/config.json";
 
-  private static final String HF_DISTILBERT_NER_TOKEN_PATH = "dslim/bert-base-NER/resolve/main/onnx/";
+  private static final String DSLIM_BERT_BASE_NER_RESOLVE_MAIN = "tarekziade/distilbert-NER/resolve/main/";
+  private static final String HF_DISTILBERT_NER_TOKEN_PATH = DSLIM_BERT_BASE_NER_RESOLVE_MAIN + "onnx/";
 
-  protected static final String HF_DISTILBERT_NER_ONNX_DOWNLOAD = HF_URL + HF_DISTILBERT_NER_TOKEN_PATH + "model.onnx";
-  protected static final String HF_DISTILBERT_NER_TOKENIZER = HF_URL + HF_DISTILBERT_NER_TOKEN_PATH + "tokenizer.json";
+  protected static final String HF_DISTILBERT_NER_ONNX_DOWNLOAD =
+    HF_URL + HF_DISTILBERT_NER_TOKEN_PATH + "model_quantized.onnx";
+  protected static final String HF_DISTILBERT_NER_TOKENIZER = HF_URL + DSLIM_BERT_BASE_NER_RESOLVE_MAIN + "tokenizer.json";
+  protected static final String HF_DISTILBERT_NER_CONFIG_JSON = HF_URL + DSLIM_BERT_BASE_NER_RESOLVE_MAIN + "config.json";
 
   private static final URI TKN_MODEL_ONNX = getUriIfExist(TOKEN_MODEL_ONNX, HF_DISTILBERT_NER_ONNX_DOWNLOAD);
   private static final URI TKN_HF_TOKENIZER = getUriIfExist(TOKEN_TOKENIZER_JSON, HF_DISTILBERT_NER_TOKENIZER);
+  private static final URI TKN_MODEL_CONFIG_JSON = getUriIfExist(TOKEN_CONFIG_JSON, HF_DISTILBERT_NER_CONFIG_JSON);
 
   private static final OnnxBertResource TOKEN_ONNX_BERT_RESOURCE = new OnnxBertResource(
     Path.of(TKN_MODEL_ONNX),
-    Path.of(TKN_HF_TOKENIZER)
+    Path.of(TKN_HF_TOKENIZER),
+    Path.of(TKN_MODEL_CONFIG_JSON)
   );
 
-  public static final List<String> LABELS = List.of(
-    "O",
-    "B-MISC",
-    "I-MISC",
-    "B-PER",
-    "I-PER",
-    "B-ORG",
-    "I-ORG",
-    "B-LOC",
-    "I-LOC"
-  );
-
-  private static final OnnxBertClassifierModel TOKEN_MODEL = new OnnxBertClassifierModel(
+  private static final OnnxBertClassifierModel tokenModel = new OnnxBertClassifierModel(
     new OnnxBertConfig(
       TOKEN_ONNX_BERT_RESOURCE,
       NativeMath.INSTANCE,
-      Map.of(CLASSIFIER_MODE, TOKEN, CLASSIFIER_LABELS, LABELS, DISCARDED_LABELS, List.of("O", "B-MISC", "I-MISC"))
+      Map.of(CLASSIFIER_MODE, TOKEN, DISCARDED_LABELS, List.of("O", "B-MISC", "I-MISC"))
     )
   );
 
   @Test
   public void must_classify_tokens_in_sentence() {
-    var results = TOKEN_MODEL.infer("My name is Laura and I live in Houston, Texas").results().stream().toList();
+    var results = tokenModel.infer("My name is Laura and I live in Houston, Texas").results().stream().toList();
 
     assertEquals(3, results.size());
 
@@ -106,7 +98,7 @@ public class OnnxBertTokenClassificationTest extends OnnxBertBaseTest {
 
   @Test
   public void must_classify_tokens_in_sentences() {
-    var tokensList = TOKEN_MODEL
+    var tokensList = tokenModel
       .inferAll(
         List.of("My name is Laura and I live in Houston, Texas", "My name is Clara and I live in Berkley, California")
       )
@@ -158,14 +150,14 @@ public class OnnxBertTokenClassificationTest extends OnnxBertBaseTest {
 
     token2 = secondSentence.get(2);
     assertEquals("##rk", token2.token());
-    assertEquals("I-LOC", token2.label());
-    assertTrue(token2.score() >= 0.85 && token2.score() <= 0.86);
+    assertEquals("B-LOC", token2.label());
+    assertTrue(token2.score() >= 0.95);
     assertEquals(33, token2.start());
     assertEquals(35, token2.end());
 
     token2 = secondSentence.get(3);
     assertEquals("##ley", token2.token());
-    assertEquals("I-LOC", token2.label());
+    assertEquals("B-LOC", token2.label());
     assertTrue(token2.score() >= 0.95);
     assertEquals(35, token2.start());
     assertEquals(38, token2.end());
@@ -179,7 +171,7 @@ public class OnnxBertTokenClassificationTest extends OnnxBertBaseTest {
   }
 
   @AfterAll
-  public static void tearDown() {
-    TOKEN_MODEL.close();
+  public static void cleanup() {
+    tokenModel.close();
   }
 }
