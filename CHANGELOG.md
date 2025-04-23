@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/gravitee-io/gravitee-inference/compare/1.1.0...1.1.1) (2025-04-23)
+
+
+### Bug Fixes
+
+* parameter for CONFIG_JSON_PATH ([9405318](https://github.com/gravitee-io/gravitee-inference/commit/9405318f62e82e20ef6be0227bfce9c1e8443ab4))
+
 # [1.1.0](https://github.com/gravitee-io/gravitee-inference/compare/1.0.0...1.1.0) (2025-04-23)
 
 
