@@ -36,6 +36,7 @@ public final class Constants {
   */
   public static final String MODEL_PATH = "modelPath";
   public static final String TOKENIZER_PATH = "tokenizerPath";
+  public static final String CONFIG_JSON_PATH = "configJsonPath";
 
   /*
     ONNX Constants
