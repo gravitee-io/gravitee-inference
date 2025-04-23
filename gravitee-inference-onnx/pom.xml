@@ -34,6 +34,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <onnxruntime.version>1.21.1</onnxruntime.version>
+    <jackson-databind.version>2.18.3</jackson-databind.version>
   </properties>
 
 
@@ -54,6 +55,12 @@
       <groupId>io.gravitee.inference.api</groupId>
       <artifactId>gravitee-inference-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson-databind.version}</version>
     </dependency>
 
     <dependency>

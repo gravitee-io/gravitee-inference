@@ -25,9 +25,13 @@ import ai.djl.huggingface.tokenizers.HuggingFaceTokenizer;
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession.Result;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.gravitee.inference.onnx.OnnxInference;
 import io.gravitee.inference.onnx.bert.config.OnnxBertConfig;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,11 +42,14 @@ import java.util.List;
  */
 public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertConfig, String, OUTPUT> {
 
+  protected static final ObjectMapper objectMapper = new ObjectMapper();
   protected final HuggingFaceTokenizer tokenizer;
+  protected final JsonNode configJson;
 
   protected OnnxBertInference(OnnxBertConfig onnxBertConfig) {
     super(onnxBertConfig);
     this.tokenizer = getTokenizer();
+    this.configJson = getConfigJson();
   }
 
   private HuggingFaceTokenizer getTokenizer() {
@@ -51,6 +58,15 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
         config.getResource().getTokenizer().toAbsolutePath(),
         config.getTokenizerConfig()
       );
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private JsonNode getConfigJson() {
+    try {
+      Path configJson = this.config.getResource().getConfigJson();
+      return configJson == null ? null : objectMapper.readTree(String.join("", Files.readAllLines(configJson)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

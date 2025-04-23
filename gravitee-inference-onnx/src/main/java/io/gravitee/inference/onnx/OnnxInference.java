@@ -22,6 +22,7 @@ import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtProvider;
 import ai.onnxruntime.OrtSession;
 import ai.onnxruntime.OrtSession.SessionOptions;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.gravitee.inference.api.InferenceModel;
 
 /**

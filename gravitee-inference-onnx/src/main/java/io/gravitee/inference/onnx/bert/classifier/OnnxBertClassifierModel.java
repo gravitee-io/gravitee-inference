@@ -29,9 +29,7 @@ import io.gravitee.inference.api.classifier.ClassifierResult;
 import io.gravitee.inference.api.classifier.ClassifierResults;
 import io.gravitee.inference.onnx.bert.OnnxBertInference;
 import io.gravitee.inference.onnx.bert.config.OnnxBertConfig;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
@@ -39,13 +37,22 @@ import java.util.TreeSet;
  */
 public class OnnxBertClassifierModel extends OnnxBertInference<ClassifierResults> {
 
+  private static final String ID_2_LABEL = "id2label";
   private final List<String> labels;
   private final List<String> discarded;
 
   public OnnxBertClassifierModel(OnnxBertConfig config) {
     super(config);
-    this.labels = config.get(CLASSIFIER_LABELS, List.of());
+    this.labels = getLabels(config);
     this.discarded = config.get(DISCARDED_LABELS, List.of());
+  }
+
+  private List<String> getLabels(OnnxBertConfig config) {
+    if (configJson != null) {
+      Map<?, ?> id2label = objectMapper.convertValue(configJson.get(ID_2_LABEL), LinkedHashMap.class);
+      return id2label.values().stream().map(Object::toString).toList();
+    }
+    return config.get(CLASSIFIER_LABELS, List.of());
   }
 
   @Override
