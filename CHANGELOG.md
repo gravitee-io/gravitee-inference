@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/gravitee-io/gravitee-inference/compare/1.0.0...1.1.0) (2025-04-23)
+
+
+### Features
+
+* bring config.json for classification tasks ([#7](https://github.com/gravitee-io/gravitee-inference/issues/7)) ([42030a6](https://github.com/gravitee-io/gravitee-inference/commit/42030a6dbfbcdcbd09d100bb613e786561503ee0))
+
 # 1.0.0 (2025-04-22)
 
 
