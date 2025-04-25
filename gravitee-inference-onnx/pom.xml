@@ -34,7 +34,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <onnxruntime.version>1.22.0</onnxruntime.version>
-    <jackson-databind.version>2.18.3</jackson-databind.version>
+    <jackson-databind.version>2.19.0</jackson-databind.version>
   </properties>
 
 
