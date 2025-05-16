@@ -1,3 +1,14 @@
+## [1.1.2](https://github.com/gravitee-io/gravitee-inference/compare/1.1.1...1.1.2) (2025-05-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency ai.djl.huggingface:tokenizers to v0.33.0 ([e26fa90](https://github.com/gravitee-io/gravitee-inference/commit/e26fa905dad2106f57c6aea46c1bb3e9e14d4642))
+* **deps:** update dependency com.fasterxml.jackson.core:jackson-databind to v2.19.0 ([935ff4c](https://github.com/gravitee-io/gravitee-inference/commit/935ff4cdcfdbebfeabf1efcb7de6af420a37bcca))
+* **deps:** update dependency com.microsoft.onnxruntime:onnxruntime to v1.22.0 ([a2d1b64](https://github.com/gravitee-io/gravitee-inference/commit/a2d1b64e55ddc6442762923ab88a04a715f7144e))
+* **deps:** update dependency io.gravitee:gravitee-bom to v8.3.0 ([176bad0](https://github.com/gravitee-io/gravitee-inference/commit/176bad0c4afdb5cb215a9e8b3bbcd862d65b5c60))
+* **deps:** update dependency io.gravitee:gravitee-parent to v23.2.1 ([8f7be4e](https://github.com/gravitee-io/gravitee-inference/commit/8f7be4e9d359bfd1c9d131a6ae016d2c22267d2b))
+
 ## [1.1.1](https://github.com/gravitee-io/gravitee-inference/compare/1.1.0...1.1.1) (2025-04-23)
 
 
