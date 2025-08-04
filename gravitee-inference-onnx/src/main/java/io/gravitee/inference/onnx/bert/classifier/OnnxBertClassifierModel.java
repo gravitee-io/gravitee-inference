@@ -17,8 +17,6 @@ package io.gravitee.inference.onnx.bert.classifier;
 
 import static io.gravitee.inference.api.Constants.*;
 import static java.lang.String.valueOf;
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.reverseOrder;
 
 import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
@@ -98,13 +96,19 @@ public class OnnxBertClassifierModel extends OnnxBertInference<ClassifierResults
   }
 
   private ClassifierResult computeTokenProb(float[] logit, String token, CharSpan span) {
-    var result = new TreeSet<>(comparing(ClassifierResult::score, reverseOrder()));
     float[] probabilities = config.gioMath().softmax(logit);
-    for (int j = 0; j < probabilities.length; j++) {
-      final String label = computeLabel(probabilities, j);
-      result.add(new ClassifierResult(label, probabilities[j], token, span.getStart(), span.getEnd()));
+
+    int argMax = 0;
+    float maxProb = probabilities[0];
+
+    for (int i = 1; i < probabilities.length; i++) {
+      if (probabilities[i] > maxProb) {
+        argMax = i;
+        maxProb = probabilities[i];
+      }
     }
-    return result.getFirst();
+
+    return new ClassifierResult(computeLabel(probabilities, argMax), maxProb, token, span.getStart(), span.getEnd());
   }
 
   private List<ClassifierResults> getSequenceResults(EncodingResults encodingResult) {
@@ -117,13 +121,26 @@ public class OnnxBertClassifierModel extends OnnxBertInference<ClassifierResults
     return results;
   }
 
-  private TreeSet<ClassifierResult> computeSequenceProb(float[] logit) {
-    var result = new TreeSet<>(comparing(ClassifierResult::score, reverseOrder()));
+  private List<ClassifierResult> computeSequenceProb(float[] logit) {
     float[] probabilities = config.gioMath().sigmoid(logit);
+    List<ClassifierResult> results = new ArrayList<>(probabilities.length);
+
     for (int j = 0; j < probabilities.length; j++) {
-      result.add(new ClassifierResult(computeLabel(probabilities, j), probabilities[j]));
+      results.add(new ClassifierResult(computeLabel(probabilities, j), probabilities[j]));
     }
-    return result;
+
+    if (results.size() == 2) {
+      var result1 = results.getFirst();
+      var result2 = results.getLast();
+      if (result1.score() < result2.score()) {
+        results.set(0, result2);
+        results.set(1, result1);
+      }
+    } else {
+      results.sort(Comparator.comparing(ClassifierResult::score).reversed());
+    }
+
+    return results;
   }
 
   private String computeLabel(float[] probabilities, int j) {

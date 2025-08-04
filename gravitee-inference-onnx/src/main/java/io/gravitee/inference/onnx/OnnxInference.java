@@ -16,20 +16,42 @@
 package io.gravitee.inference.onnx;
 
 import static ai.onnxruntime.OrtEnvironment.getAvailableProviders;
+import static java.lang.System.getProperty;
+import static java.util.Objects.requireNonNull;
 
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtProvider;
 import ai.onnxruntime.OrtSession;
 import ai.onnxruntime.OrtSession.SessionOptions;
-import com.fasterxml.jackson.databind.JsonNode;
 import io.gravitee.inference.api.InferenceModel;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
 public abstract class OnnxInference<C extends OnnxConfig<?>, I, O> extends InferenceModel<C, I, O> {
+
+  private static final String INTRA_OPS_THREADS_KEY = "GRAVITEE_ONNX_INTRA_OPS_NUM_THREADS";
+  private static final List<String> POSSIBLE_KEYS = List.of(INTRA_OPS_THREADS_KEY, INTRA_OPS_THREADS_KEY.toLowerCase());
+
+  private static final int DEFAULT_MAX_INTRA_OPS_THREADS = Runtime.getRuntime().availableProcessors();
+  private static final Pattern NUMBER_PATTERN = Pattern.compile("^[0-9]+$");
+  private static final int MAX_INTRA_OPS_THREADS = getMaxIntraOpsThreads();
+
+  private static int getMaxIntraOpsThreads() {
+    return POSSIBLE_KEYS
+      .stream()
+      .map(System::getenv)
+      .filter(Objects::nonNull)
+      .filter(value -> NUMBER_PATTERN.matcher(value).matches())
+      .map(Integer::valueOf)
+      .findFirst()
+      .orElse(DEFAULT_MAX_INTRA_OPS_THREADS);
+  }
 
   protected final OrtEnvironment environment;
   protected final OrtSession session;
@@ -46,6 +68,8 @@ public abstract class OnnxInference<C extends OnnxConfig<?>, I, O> extends Infer
       if (getAvailableProviders().contains(OrtProvider.CUDA)) {
         options.addCUDA();
       }
+
+      options.setIntraOpNumThreads(MAX_INTRA_OPS_THREADS);
       final String modelPath = config.getResource().getModel().toAbsolutePath().toString();
       return environment.createSession(modelPath, options);
     } catch (OrtException e) {
