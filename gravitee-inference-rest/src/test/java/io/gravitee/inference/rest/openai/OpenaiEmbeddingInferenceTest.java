@@ -22,7 +22,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 
@@ -33,20 +34,27 @@ public class OpenaiEmbeddingInferenceTest {
   public static final String TEST_APIKEY = "TEST_KEY";
 
   public static final String OPENAI_API_ENTRYPOINT = "/v1";
-
+  public static final String THE_BIG_BROWN_FOX_JUMPED_OVER_THE_LAZY_DOG = "The big brown fox jumped over the lazy dog";
   @Mock
   private Vertx vertx;
-
   @Mock
   private WebClient webClient;
-
   @Mock
   private HttpRequest<Buffer> httpRequest;
-
   @Mock
   private HttpResponse<Buffer> httpResponse;
 
-  public static final String THE_BIG_BROWN_FOX_JUMPED_OVER_THE_LAZY_DOG = "The big brown fox jumped over the lazy dog";
+  private static OpenAIEmbeddingConfig getTestConfig() throws URISyntaxException {
+    return new OpenAIEmbeddingConfig(
+            new URI(getTestURI()),
+            TEST_APIKEY,
+            TEST_MODEL_NAME
+    );
+  }
+
+  private static String getTestURI() {
+    return TEST_URL + OPENAI_API_ENTRYPOINT;
+  }
 
   @BeforeEach
   public void setUp() {
@@ -146,17 +154,5 @@ public class OpenaiEmbeddingInferenceTest {
               .assertError(RuntimeException.class)
               .assertError(throwable -> throwable.getMessage().contains("Connection refused"));
     }
-  }
-
-  private static OpenAIEmbeddingConfig getTestConfig() throws URISyntaxException {
-    return new OpenAIEmbeddingConfig(
-            new URI(getTestURI()),
-            TEST_APIKEY,
-            TEST_MODEL_NAME
-    );
-  }
-
-  private static String getTestURI() {
-    return TEST_URL + OPENAI_API_ENTRYPOINT;
   }
 }

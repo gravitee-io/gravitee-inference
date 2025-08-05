@@ -35,13 +35,12 @@ import java.util.Objects;
 
 public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddingConfig, EmbeddingTokenCount> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(OpenaiEmbeddingInference.class);
-
   static final String EMBEDDINGS_ENDPOINT = "/embeddings";
   static final String MEDIA_TYPE = "application/json";
   static final String CONTENT_TYPE = "Content-Type";
   static final String OPEN_AI_ORGANIZATION = "OpenAI-Organization";
   static final String OPEN_AI_PROJECT = "OpenAI-Project";
+  private static final Logger LOGGER = LoggerFactory.getLogger(OpenaiEmbeddingInference.class);
 
   public OpenaiEmbeddingInference(OpenAIEmbeddingConfig config, Vertx vertx) {
     super(config, vertx);

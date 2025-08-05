@@ -6,8 +6,8 @@
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="io.gravitee.inference.rest" level="DEBUG" />
+    <logger name="io.gravitee.inference.rest" level="DEBUG"/>
 </configuration>
