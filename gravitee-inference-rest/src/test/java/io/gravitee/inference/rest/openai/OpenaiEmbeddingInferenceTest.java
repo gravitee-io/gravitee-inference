@@ -15,6 +15,10 @@
  */
 package io.gravitee.inference.rest.openai;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
 import io.gravitee.inference.rest.openai.embedding.OpenAIEmbeddingConfig;
 import io.gravitee.inference.rest.openai.embedding.OpenaiEmbeddingInference;
 import io.reactivex.rxjava3.core.Single;
@@ -25,6 +29,8 @@ import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
 import io.vertx.rxjava3.ext.web.client.HttpResponse;
 import io.vertx.rxjava3.ext.web.client.WebClient;
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,37 +40,30 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-
-
 @ExtendWith(MockitoExtension.class)
 public class OpenaiEmbeddingInferenceTest {
+
   public static final String TEST_URL = "http://somewhere.at.gravitee";
   public static final String TEST_MODEL_NAME = "all-minilm";
   public static final String TEST_APIKEY = "TEST_KEY";
 
   public static final String OPENAI_API_ENTRYPOINT = "/v1";
   public static final String THE_BIG_BROWN_FOX_JUMPED_OVER_THE_LAZY_DOG = "The big brown fox jumped over the lazy dog";
+
   @Mock
   private Vertx vertx;
+
   @Mock
   private WebClient webClient;
+
   @Mock
   private HttpRequest<Buffer> httpRequest;
+
   @Mock
   private HttpResponse<Buffer> httpResponse;
 
   private static OpenAIEmbeddingConfig getTestConfig() throws URISyntaxException {
-    return new OpenAIEmbeddingConfig(
-            new URI(getTestURI()),
-            TEST_APIKEY,
-            TEST_MODEL_NAME
-    );
+    return new OpenAIEmbeddingConfig(new URI(getTestURI()), TEST_APIKEY, TEST_MODEL_NAME);
   }
 
   private static String getTestURI() {
@@ -80,29 +79,29 @@ public class OpenaiEmbeddingInferenceTest {
   }
 
   @AfterEach
-  public void afterEach() {
-  }
+  public void afterEach() {}
 
   @Test
   public void must_return_embedding() throws URISyntaxException {
     var config = getTestConfig();
 
     JsonObject mockResponse = new JsonObject()
-            .put("object", "list")
-            .put("data", new JsonArray()
-                    .add(new JsonObject()
-                            .put("object", "embedding")
-                            .put("index", 0)
-                            .put("embedding", new JsonArray()
-                                    .add(0.1f).add(0.2f).add(0.3f) // Sample embedding values
-                            )
-                    )
-            )
-            .put("model", TEST_MODEL_NAME)
-            .put("usage", new JsonObject()
-                    .put("prompt_tokens", 10)
-                    .put("total_tokens", 10)
-            );
+      .put("object", "list")
+      .put(
+        "data",
+        new JsonArray()
+          .add(
+            new JsonObject()
+              .put("object", "embedding")
+              .put("index", 0)
+              .put(
+                "embedding",
+                new JsonArray().add(0.1f).add(0.2f).add(0.3f) // Sample embedding values
+              )
+          )
+      )
+      .put("model", TEST_MODEL_NAME)
+      .put("usage", new JsonObject().put("prompt_tokens", 10).put("total_tokens", 10));
 
     when(httpResponse.statusCode()).thenReturn(200);
     when(httpResponse.body()).thenReturn(Buffer.buffer(mockResponse.encode()));
@@ -114,15 +113,15 @@ public class OpenaiEmbeddingInferenceTest {
       var testObserver = client.infer(THE_BIG_BROWN_FOX_JUMPED_OVER_THE_LAZY_DOG).test();
 
       testObserver
-              .assertComplete()
-              .assertNoErrors()
-              .assertValue(embeddingTokenCount -> {
-                var correct_length = embeddingTokenCount.embedding().length == 3;
-                var correct_token_number = embeddingTokenCount.tokenCount() == 10;
+        .assertComplete()
+        .assertNoErrors()
+        .assertValue(embeddingTokenCount -> {
+          var correct_length = embeddingTokenCount.embedding().length == 3;
+          var correct_token_number = embeddingTokenCount.tokenCount() == 10;
 
-                return correct_length && correct_token_number;
-              })
-              .assertValueCount(1);
+          return correct_length && correct_token_number;
+        })
+        .assertValueCount(1);
 
       verify(webClient).postAbs(getTestURI() + "/embeddings");
       verify(httpRequest).bearerTokenAuthentication(TEST_APIKEY);
@@ -144,9 +143,8 @@ public class OpenaiEmbeddingInferenceTest {
       var testObserver = client.infer(THE_BIG_BROWN_FOX_JUMPED_OVER_THE_LAZY_DOG).test();
 
       testObserver
-              .assertNotComplete()
-              .assertError(throwable -> throwable.getMessage().contains("401") ||
-                      throwable.getMessage().contains("Unauthorized"));
+        .assertNotComplete()
+        .assertError(throwable -> throwable.getMessage().contains("401") || throwable.getMessage().contains("Unauthorized"));
     }
   }
 
@@ -155,8 +153,7 @@ public class OpenaiEmbeddingInferenceTest {
     var config = getTestConfig();
 
     RuntimeException networkError = new RuntimeException("Connection refused");
-    when(httpRequest.rxSendBuffer(any(Buffer.class)))
-            .thenReturn(Single.error(networkError));
+    when(httpRequest.rxSendBuffer(any(Buffer.class))).thenReturn(Single.error(networkError));
 
     try (MockedStatic<WebClient> webClientMock = Mockito.mockStatic(WebClient.class)) {
       webClientMock.when(() -> WebClient.create(any(Vertx.class))).thenReturn(webClient);
@@ -165,9 +162,9 @@ public class OpenaiEmbeddingInferenceTest {
       var testObserver = client.infer(THE_BIG_BROWN_FOX_JUMPED_OVER_THE_LAZY_DOG).test();
 
       testObserver
-              .assertNotComplete()
-              .assertError(RuntimeException.class)
-              .assertError(throwable -> throwable.getMessage().contains("Connection refused"));
+        .assertNotComplete()
+        .assertError(RuntimeException.class)
+        .assertError(throwable -> throwable.getMessage().contains("Connection refused"));
     }
   }
 }

@@ -27,11 +27,9 @@ import io.vertx.rxjava3.core.Vertx;
 import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
 import io.vertx.rxjava3.ext.web.client.HttpResponse;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Objects;
-
 
 public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddingConfig, EmbeddingTokenCount> {
 
@@ -48,7 +46,6 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
 
   @Override
   protected Maybe<EmbeddingTokenCount> parseResponse(Buffer responseJson) {
-
     LOGGER.debug("Parsing response from OpenAI embedding inference");
 
     return Maybe.fromCallable(() -> {
@@ -64,7 +61,6 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
 
       return new EmbeddingTokenCount(embedding, totalTokens);
     });
-
   }
 
   private void validateBuffer(Buffer buffer) {
@@ -81,13 +77,12 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
 
   @Override
   protected Single<HttpResponse<Buffer>> executeHttpRequest(Buffer requestJson) {
-
     LOGGER.debug("Executing OpenAI embedding inference");
 
     HttpRequest<Buffer> request = webClient
-            .postAbs(getAbsoluteURI())
-            .bearerTokenAuthentication(config.apiKey)
-            .putHeader(CONTENT_TYPE, MEDIA_TYPE);
+      .postAbs(getAbsoluteURI())
+      .bearerTokenAuthentication(config.apiKey)
+      .putHeader(CONTENT_TYPE, MEDIA_TYPE);
 
     if (config.organizationId != null) {
       request.putHeader(OPEN_AI_ORGANIZATION, config.organizationId);
@@ -111,14 +106,19 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
     Objects.requireNonNull(input, "Input cannot be null");
 
     try {
-      return Buffer.buffer(Json.encode(new EmbeddingRequest(
-              config.model,
-              input,
-              config.dimensions,
-              switch (config.encodingFormat) {
-                case FLOAT -> "float";
-                case BASE64 -> "base64";
-              })));
+      return Buffer.buffer(
+        Json.encode(
+          new EmbeddingRequest(
+            config.model,
+            input,
+            config.dimensions,
+            switch (config.encodingFormat) {
+              case FLOAT -> "float";
+              case BASE64 -> "base64";
+            }
+          )
+        )
+      );
     } catch (Exception e) {
       throw new GraviteeOpenaiException("Failed to prepare OpenAI request" + e);
     }

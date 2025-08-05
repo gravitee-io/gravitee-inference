@@ -25,7 +25,6 @@ import io.vertx.rxjava3.ext.web.client.WebClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public abstract class RestInference<C extends RestConfig, I, O> extends InferenceModel<C, I, Maybe<O>> {
 
   public static final int HTTP_CODE_OK = 200;
@@ -43,16 +42,15 @@ public abstract class RestInference<C extends RestConfig, I, O> extends Inferenc
   @Override
   public Maybe<O> infer(I input) {
     LOGGER.debug("Requesting inference model for {}", input);
-    return Maybe.fromCallable(() -> prepareRequest(input))
-            .flatMapSingle(this::executeHttpRequest)
-            .flatMap(response -> {
-              if (response.statusCode() < HTTP_CODE_OK || response.statusCode() >= HTTP_CODE_REDIRECTION) {
-                return Maybe.error(new RuntimeException(
-                        "HTTP request failed" + response.statusCode() + response.bodyAsString()
-                ));
-              }
-              return parseResponse(response.body());
-            });
+    return Maybe
+      .fromCallable(() -> prepareRequest(input))
+      .flatMapSingle(this::executeHttpRequest)
+      .flatMap(response -> {
+        if (response.statusCode() < HTTP_CODE_OK || response.statusCode() >= HTTP_CODE_REDIRECTION) {
+          return Maybe.error(new RuntimeException("HTTP request failed" + response.statusCode() + response.bodyAsString()));
+        }
+        return parseResponse(response.body());
+      });
   }
 
   protected abstract Buffer prepareRequest(I input);

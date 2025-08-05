@@ -16,7 +16,6 @@
 package io.gravitee.inference.rest.openai;
 
 import io.gravitee.inference.rest.RestConfig;
-
 import java.net.URI;
 
 public class OpenaiConfig extends RestConfig {
@@ -29,7 +28,6 @@ public class OpenaiConfig extends RestConfig {
 
   public OpenaiConfig(URI uri, String apiKey, String organizationId, String projectId, String model) {
     super(uri);
-
     this.apiKey = validateAndGetApiKey(apiKey);
     this.model = validateAndGetModel(model);
     this.organizationId = organizationId;

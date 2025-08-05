@@ -18,6 +18,7 @@ package io.gravitee.inference.rest;
 import java.net.URI;
 
 public class RestConfig {
+
   public URI uri;
 
   public RestConfig(URI uri) {
