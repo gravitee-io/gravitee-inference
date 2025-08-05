@@ -15,11 +15,11 @@
  */
 package io.gravitee.inference.rest.openai;
 
-import io.gravitee.inference.rest.GraviteeRestException;
+import io.gravitee.inference.rest.GraviteeInferenceRestException;
 
-public class GraviteeOpenaiException extends GraviteeRestException {
+public class GraviteeInferenceOpenaiException extends GraviteeInferenceRestException {
 
-  public GraviteeOpenaiException(String message) {
+  public GraviteeInferenceOpenaiException(String message) {
     super(message);
   }
 }

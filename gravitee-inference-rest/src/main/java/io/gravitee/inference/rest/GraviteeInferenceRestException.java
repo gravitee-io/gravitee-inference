@@ -15,9 +15,9 @@
  */
 package io.gravitee.inference.rest;
 
-public class GraviteeRestException extends RuntimeException {
+public class GraviteeInferenceRestException extends RuntimeException {
 
-  public GraviteeRestException(String message) {
+  public GraviteeInferenceRestException(String message) {
     super(message);
   }
 }
