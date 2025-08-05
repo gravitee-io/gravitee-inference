@@ -40,12 +40,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.gravitee.inference.math.api</groupId>
-            <artifactId>gravitee-inference-math-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>io.gravitee.inference.api</groupId>
             <artifactId>gravitee-inference-api</artifactId>
             <version>${project.version}</version>
@@ -55,19 +49,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson-databind.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>2.9.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.gravitee.inference.math.native</groupId>
-            <artifactId>gravitee-inference-math-native</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
@@ -86,13 +67,6 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web-client</artifactId>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.gravitee.inference.math.simd</groupId>
-            <artifactId>gravitee-inference-math-simd</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

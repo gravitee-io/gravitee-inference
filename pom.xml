@@ -203,8 +203,6 @@
             --add-opens java.base/java.util.regex=ALL-UNNAMED --add-opens
             java.base/java.util.stream=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED
             --add-modules jdk.incubator.vector
-            -XX:+EnableDynamicAgentLoading
-            -Xshare:off
           </argLine>
           <forkCount>1</forkCount>
           <reuseForks>true</reuseForks>

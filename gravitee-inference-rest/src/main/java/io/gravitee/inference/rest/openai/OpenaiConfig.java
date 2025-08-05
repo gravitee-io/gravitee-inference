@@ -72,9 +72,8 @@ public class OpenaiConfig extends RestConfig {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof OpenaiConfig)) return false;
+    if (!(o instanceof OpenaiConfig that)) return false;
     if (!super.equals(o)) return false;
-    OpenaiConfig that = (OpenaiConfig) o;
     return (
       Objects.equals(apiKey, that.apiKey) &&
       Objects.equals(organizationId, that.organizationId) &&
