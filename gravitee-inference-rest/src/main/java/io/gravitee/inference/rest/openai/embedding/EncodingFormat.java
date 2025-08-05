@@ -16,6 +16,16 @@
 package io.gravitee.inference.rest.openai.embedding;
 
 public enum EncodingFormat {
-  BASE64,
-  FLOAT,
+  BASE64("base64"),
+  FLOAT("float");
+
+  private final String format;
+
+  EncodingFormat(String format) {
+    this.format = format;
+  }
+
+  public String getFormat() {
+    return format;
+  }
 }
