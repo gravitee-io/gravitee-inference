@@ -16,7 +16,7 @@
 package io.gravitee.inference.rest.openai.embedding;
 
 import io.gravitee.inference.api.embedding.EmbeddingTokenCount;
-import io.gravitee.inference.rest.openai.GraviteeOpenaiException;
+import io.gravitee.inference.rest.openai.GraviteeInferenceOpenaiException;
 import io.gravitee.inference.rest.openai.OpenaiRestInference;
 import io.gravitee.inference.rest.openai.embedding.model.EmbeddingRequest;
 import io.gravitee.inference.rest.openai.embedding.model.EmbeddingResponse;
@@ -57,7 +57,7 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
 
       int totalTokens = response.usage().total_tokens();
 
-      LOGGER.info("Total token processed: {}; Embedding dimension: {}", totalTokens, embedding.length);
+      LOGGER.debug("Total token processed: {}; Embedding dimension: {}", totalTokens, embedding.length);
 
       return new EmbeddingTokenCount(embedding, totalTokens);
     });
@@ -65,13 +65,13 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
 
   private void validateBuffer(Buffer buffer) {
     if (buffer == null || buffer.length() == 0) {
-      throw new GraviteeOpenaiException("Response buffer is null or empty");
+      throw new GraviteeInferenceOpenaiException("Response buffer is null or empty");
     }
   }
 
   private void validateResponse(EmbeddingResponse response) {
     if (response == null || response.data() == null) {
-      throw new GraviteeOpenaiException("Invalid embedding response structure");
+      throw new GraviteeInferenceOpenaiException("Invalid embedding response structure");
     }
   }
 
@@ -81,22 +81,22 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
 
     HttpRequest<Buffer> request = webClient
       .postAbs(getAbsoluteURI())
-      .bearerTokenAuthentication(config.apiKey)
+      .bearerTokenAuthentication(config.getApiKey())
       .putHeader(CONTENT_TYPE, MEDIA_TYPE);
 
-    if (config.organizationId != null) {
-      request.putHeader(OPEN_AI_ORGANIZATION, config.organizationId);
+    if (config.getOrganizationId() != null) {
+      request.putHeader(OPEN_AI_ORGANIZATION, config.getOrganizationId());
     }
 
-    if (config.projectId != null) {
-      request.putHeader(OPEN_AI_PROJECT, config.projectId);
+    if (config.getProjectId() != null) {
+      request.putHeader(OPEN_AI_PROJECT, config.getProjectId());
     }
 
     return request.rxSendBuffer(requestJson);
   }
 
   private String getAbsoluteURI() {
-    return config.uri.toASCIIString() + EMBEDDINGS_ENDPOINT;
+    return config.getUri().toASCIIString() + EMBEDDINGS_ENDPOINT;
   }
 
   @Override
@@ -109,18 +109,14 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
       return Buffer.buffer(
         Json.encode(
           new EmbeddingRequest(
-            config.model,
+            config.getModel(),
             input,
-            config.dimensions,
-            switch (config.encodingFormat) {
-              case FLOAT -> "float";
-              case BASE64 -> "base64";
-            }
+            config.dimensions, config.encodingFormat.getFormat()
           )
         )
       );
     } catch (Exception e) {
-      throw new GraviteeOpenaiException("Failed to prepare OpenAI request" + e);
+      throw new GraviteeInferenceOpenaiException("Failed to prepare OpenAI request" + e);
     }
   }
 }
