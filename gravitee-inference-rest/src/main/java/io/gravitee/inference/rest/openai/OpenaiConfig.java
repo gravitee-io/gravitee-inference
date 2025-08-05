@@ -75,11 +75,14 @@ public class OpenaiConfig extends RestConfig {
     if (!(o instanceof OpenaiConfig)) return false;
     if (!super.equals(o)) return false;
     OpenaiConfig that = (OpenaiConfig) o;
-    return Objects.equals(apiKey, that.apiKey) &&
-            Objects.equals(organizationId, that.organizationId) &&
-            Objects.equals(projectId, that.projectId) &&
-            Objects.equals(model, that.model);
+    return (
+      Objects.equals(apiKey, that.apiKey) &&
+      Objects.equals(organizationId, that.organizationId) &&
+      Objects.equals(projectId, that.projectId) &&
+      Objects.equals(model, that.model)
+    );
   }
+
   @Override
   public int hashCode() {
     return Objects.hash(super.hashCode(), apiKey, organizationId, projectId, model);
@@ -87,12 +90,21 @@ public class OpenaiConfig extends RestConfig {
 
   @Override
   public String toString() {
-    return "OpenaiConfig{" +
-            "uri=" + getUri() +
-            ", apiKey='[PROTECTED]'" +
-            ", organizationId='" + organizationId + '\'' +
-            ", projectId='" + projectId + '\'' +
-            ", model='" + model + '\'' +
-            '}';
+    return (
+      "OpenaiConfig{" +
+      "uri=" +
+      getUri() +
+      ", apiKey='[PROTECTED]'" +
+      ", organizationId='" +
+      organizationId +
+      '\'' +
+      ", projectId='" +
+      projectId +
+      '\'' +
+      ", model='" +
+      model +
+      '\'' +
+      '}'
+    );
   }
 }
