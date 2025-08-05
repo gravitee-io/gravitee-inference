@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 public abstract class RestInference<C extends RestConfig, I, O> extends InferenceModel<C, I, Maybe<O>> {
 
-  public static final int HTTP_CODE_OK = 200;
-  public static final int HTTP_CODE_REDIRECTION = 300;
+  private static final int HTTP_CODE_OK = 200;
+  private static final int HTTP_CODE_REDIRECTION = 300;
   private static final Logger LOGGER = LoggerFactory.getLogger(RestInference.class);
   protected final Vertx vertx;
   protected final WebClient webClient;
