@@ -17,14 +17,15 @@ package io.gravitee.inference.rest.openai;
 
 import io.gravitee.inference.rest.RestConfig;
 import java.net.URI;
+import java.util.Objects;
 
 public class OpenaiConfig extends RestConfig {
 
-  public String apiKey;
-  public String organizationId;
-  public String projectId;
+  private final String apiKey;
+  private final String organizationId;
+  private final String projectId;
 
-  public String model;
+  private final String model;
 
   public OpenaiConfig(URI uri, String apiKey, String organizationId, String projectId, String model) {
     super(uri);
@@ -40,15 +41,58 @@ public class OpenaiConfig extends RestConfig {
 
   private String validateAndGetApiKey(String apiKey) {
     if (apiKey == null || apiKey.trim().isEmpty()) {
-      throw new GraviteeOpenaiException("API key cannot be null or blank");
+      throw new GraviteeInferenceOpenaiException("API key cannot be null or blank");
     }
     return apiKey.trim();
   }
 
   private String validateAndGetModel(String model) {
     if (model == null || model.trim().isEmpty()) {
-      throw new GraviteeOpenaiException("Model cannot be null or blank");
+      throw new GraviteeInferenceOpenaiException("Model cannot be null or blank");
     }
     return model.trim();
+  }
+
+  public String getApiKey() {
+    return apiKey;
+  }
+
+  public String getOrganizationId() {
+    return organizationId;
+  }
+
+  public String getProjectId() {
+    return projectId;
+  }
+
+  public String getModel() {
+    return model;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof OpenaiConfig)) return false;
+    if (!super.equals(o)) return false;
+    OpenaiConfig that = (OpenaiConfig) o;
+    return Objects.equals(apiKey, that.apiKey) &&
+            Objects.equals(organizationId, that.organizationId) &&
+            Objects.equals(projectId, that.projectId) &&
+            Objects.equals(model, that.model);
+  }
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), apiKey, organizationId, projectId, model);
+  }
+
+  @Override
+  public String toString() {
+    return "OpenaiConfig{" +
+            "uri=" + getUri() +
+            ", apiKey='[PROTECTED]'" +
+            ", organizationId='" + organizationId + '\'' +
+            ", projectId='" + projectId + '\'' +
+            ", model='" + model + '\'' +
+            '}';
   }
 }
