@@ -47,32 +47,39 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
   @Override
   protected Maybe<EmbeddingTokenCount> parseResponse(Buffer responseJson) {
     LOGGER.debug("Parsing response from OpenAI embedding inference");
-
-    return Maybe.fromCallable(() -> {
-      validateBuffer(responseJson);
-      EmbeddingResponse response = Json.decodeValue(responseJson.toString(), EmbeddingResponse.class);
-      validateResponse(response);
-
-      var embedding = response.data().getFirst().embedding();
-
-      int totalTokens = response.usage().total_tokens();
-
-      LOGGER.debug("Total token processed: {}; Embedding dimension: {}", totalTokens, embedding.length);
-
-      return new EmbeddingTokenCount(embedding, totalTokens);
-    });
+    return Maybe
+      .just(responseJson)
+      .flatMap(this::validateBuffer)
+      .map(response -> Json.decodeValue(responseJson.toString(), EmbeddingResponse.class))
+      .flatMap(this::validateResponse)
+      .flatMap(this::extractEmbeddingTokenCount)
+      .doOnSuccess(embeddingTokenCount -> {
+        LOGGER.debug(
+          "Total token processed: {}; Embedding dimension: {}",
+          embeddingTokenCount.tokenCount(),
+          embeddingTokenCount.embedding().length
+        );
+      });
   }
 
-  private void validateBuffer(Buffer buffer) {
+  private Maybe<Buffer> validateBuffer(Buffer buffer) {
     if (buffer == null || buffer.length() == 0) {
-      throw new GraviteeInferenceOpenaiException("Response buffer is null or empty");
+      return Maybe.error(new GraviteeInferenceOpenaiException("Response buffer is null or empty"));
     }
+    return Maybe.just(buffer);
   }
 
-  private void validateResponse(EmbeddingResponse response) {
+  private Maybe<EmbeddingResponse> validateResponse(EmbeddingResponse response) {
     if (response == null || response.data() == null) {
-      throw new GraviteeInferenceOpenaiException("Invalid embedding response structure");
+      return Maybe.error(new GraviteeInferenceOpenaiException("Invalid embedding response structure"));
     }
+    return Maybe.just(response);
+  }
+
+  private Maybe<EmbeddingTokenCount> extractEmbeddingTokenCount(EmbeddingResponse response) {
+    var embedding = response.data().getFirst().embedding();
+    int totalTokens = response.usage().total_tokens();
+    return Maybe.just(new EmbeddingTokenCount(embedding, totalTokens));
   }
 
   @Override
@@ -100,19 +107,21 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
   }
 
   @Override
-  protected Buffer prepareRequest(String input) {
+  protected Single<Buffer> prepareRequest(String input) {
     LOGGER.debug("Preparing OpenAI embedding inference");
 
     Objects.requireNonNull(input, "Input cannot be null");
 
     try {
-      return Buffer.buffer(
-        Json.encode(
-          new EmbeddingRequest(config.getModel(), input, config.getDimensions(), config.getEncodingFormat().getFormat())
+      return Single.just(
+        Buffer.buffer(
+          Json.encode(
+            new EmbeddingRequest(config.getModel(), input, config.getDimensions(), config.getEncodingFormat().getFormat())
+          )
         )
       );
     } catch (Exception e) {
-      throw new GraviteeInferenceOpenaiException("Failed to prepare OpenAI request" + e);
+      return Single.error(new GraviteeInferenceOpenaiException("Failed to prepare OpenAI request" + e));
     }
   }
 }

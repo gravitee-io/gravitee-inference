@@ -42,10 +42,10 @@ public abstract class RestInference<C extends RestConfig, I, O> extends Inferenc
   @Override
   public Maybe<O> infer(I input) {
     LOGGER.debug("Requesting inference model for \"{}\"", input);
-    return Maybe
-      .fromCallable(() -> prepareRequest(input))
-      .flatMapSingle(this::executeHttpRequest)
-      .flatMap(response -> {
+
+    return prepareRequest(input)
+      .flatMap(this::executeHttpRequest)
+      .flatMapMaybe(response -> {
         if (response.statusCode() < HTTP_CODE_OK || response.statusCode() >= HTTP_CODE_REDIRECTION) {
           return Maybe.error(new RuntimeException("HTTP request failed" + response.statusCode() + response.bodyAsString()));
         }
@@ -53,7 +53,7 @@ public abstract class RestInference<C extends RestConfig, I, O> extends Inferenc
       });
   }
 
-  protected abstract Buffer prepareRequest(I input);
+  protected abstract Single<Buffer> prepareRequest(I input);
 
   protected abstract Maybe<O> parseResponse(Buffer responseJson);
 
