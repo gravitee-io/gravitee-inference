@@ -41,7 +41,7 @@ public abstract class RestInference<C extends RestConfig, I, O> extends Inferenc
 
   @Override
   public Maybe<O> infer(I input) {
-    LOGGER.debug("Requesting inference model for {}", input);
+    LOGGER.debug("Requesting inference model for \"{}\"", input);
     return Maybe
       .fromCallable(() -> prepareRequest(input))
       .flatMapSingle(this::executeHttpRequest)
