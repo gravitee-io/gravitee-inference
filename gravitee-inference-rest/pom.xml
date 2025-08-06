@@ -22,12 +22,12 @@
     <parent>
         <artifactId>gravitee-inference</artifactId>
         <groupId>io.gravitee.inference</groupId>
-        <version>1.1.2</version>
+        <version>1.2.0</version>
     </parent>
 
     <groupId>io.gravitee.inference.rest</groupId>
     <artifactId>gravitee-inference-rest</artifactId>
-    <version>1.1.2</version>
+    <version>1.2.0</version>
 
     <name>Gravitee.io Inference - REST</name>
     <description>REST implementation of the Inference API</description>

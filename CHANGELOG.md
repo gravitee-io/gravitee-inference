@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/gravitee-io/gravitee-inference/compare/1.1.2...1.2.0) (2025-08-06)
+
+
+### Features
+
+* OpenAI rest inference ([#20](https://github.com/gravitee-io/gravitee-inference/issues/20)) ([24a1ed0](https://github.com/gravitee-io/gravitee-inference/commit/24a1ed0ad60196c81d88198fc4db32a8fa33dd9f))
+
 ## [1.1.2](https://github.com/gravitee-io/gravitee-inference/compare/1.1.1...1.1.2) (2025-05-16)
 
 
