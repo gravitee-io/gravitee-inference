@@ -17,11 +17,12 @@ package io.gravitee.inference.rest.openai.embedding;
 
 import io.gravitee.inference.rest.openai.OpenaiConfig;
 import java.net.URI;
+import java.util.Objects;
 
 public class OpenAIEmbeddingConfig extends OpenaiConfig {
 
-  public Integer dimensions;
-  public EncodingFormat encodingFormat = EncodingFormat.FLOAT;
+  private Integer dimensions;
+  private EncodingFormat encodingFormat = EncodingFormat.FLOAT;
 
   public OpenAIEmbeddingConfig(
     URI uri,
@@ -65,5 +66,50 @@ public class OpenAIEmbeddingConfig extends OpenaiConfig {
       throw new IllegalArgumentException("Dimensions must be positive when specified");
     }
     return dimensions;
+  }
+
+  public Integer getDimensions() {
+    return dimensions;
+  }
+
+  public EncodingFormat getEncodingFormat() {
+    return encodingFormat;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof OpenAIEmbeddingConfig that)) return false;
+    if (!super.equals(o)) return false;
+    return Objects.equals(dimensions, that.dimensions) && encodingFormat == that.encodingFormat;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), dimensions, encodingFormat);
+  }
+
+  @Override
+  public String toString() {
+    return (
+      "OpenAIEmbeddingConfig{" +
+      "uri=" +
+      getUri() +
+      ", apiKey='[PROTECTED]'" +
+      ", organizationId='" +
+      getOrganizationId() +
+      '\'' +
+      ", projectId='" +
+      getProjectId() +
+      '\'' +
+      ", model='" +
+      getModel() +
+      '\'' +
+      ", dimensions=" +
+      dimensions +
+      ", encodingFormat=" +
+      encodingFormat +
+      '}'
+    );
   }
 }

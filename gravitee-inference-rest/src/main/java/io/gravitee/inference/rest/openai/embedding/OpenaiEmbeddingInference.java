@@ -107,7 +107,9 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
 
     try {
       return Buffer.buffer(
-        Json.encode(new EmbeddingRequest(config.getModel(), input, config.dimensions, config.encodingFormat.getFormat()))
+        Json.encode(
+          new EmbeddingRequest(config.getModel(), input, config.getDimensions(), config.getEncodingFormat().getFormat())
+        )
       );
     } catch (Exception e) {
       throw new GraviteeInferenceOpenaiException("Failed to prepare OpenAI request" + e);
