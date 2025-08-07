@@ -25,7 +25,6 @@ import io.vertx.rxjava3.ext.web.client.WebClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public abstract class RestInference<C extends RestConfig, I, O> extends InferenceModel<C, I, Maybe<O>> {
 
   private static final int HTTP_CODE_OK = 200;

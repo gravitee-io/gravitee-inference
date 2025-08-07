@@ -12,10 +12,8 @@ import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
 import io.vertx.rxjava3.ext.web.client.HttpResponse;
 import io.vertx.rxjava3.ext.web.client.WebClient;
-
 import java.net.URI;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,21 +43,21 @@ public class CustomHttpEmbeddingInferenceTest {
   @ParameterizedTest
   @CsvFileSource(resources = "/embedding-test-data.csv", numLinesToSkip = 1)
   void testEmbeddingInferenceWithJsonPath(
-          String inputLocation,
-          String requestBodyTemplate,
-          String jsonResponse,
-          String outputJsonPath,
-          int expectedEmbeddingLength,
-          String description
+    String inputLocation,
+    String requestBodyTemplate,
+    String jsonResponse,
+    String outputJsonPath,
+    int expectedEmbeddingLength,
+    String description
   ) {
     CustomHttpEmbeddingConfig config = new CustomHttpEmbeddingConfig(
-            URI.create("http://localhost:8000/embed/"),
-            HttpMethod.POST,
-            Map.of("Content-Type", "application/json"),
-            "application/json",
-            requestBodyTemplate,
-            inputLocation,
-            outputJsonPath
+      URI.create("http://localhost:8000/embed/"),
+      HttpMethod.POST,
+      Map.of("Content-Type", "application/json"),
+      "application/json",
+      requestBodyTemplate,
+      inputLocation,
+      outputJsonPath
     );
 
     CustomHttpEmbeddingInference inference = new CustomHttpEmbeddingInference(config, vertx);
@@ -84,9 +82,9 @@ public class CustomHttpEmbeddingInferenceTest {
     var testObserver = inference.infer(inputText).test();
 
     testObserver
-            .assertComplete()
-            .assertNoErrors()
-            .assertValue(embeddingTokenCount -> expectedEmbeddingLength == embeddingTokenCount.embedding().length);
+      .assertComplete()
+      .assertNoErrors()
+      .assertValue(embeddingTokenCount -> expectedEmbeddingLength == embeddingTokenCount.embedding().length);
 
     verify(mockHttpRequest, times(2)).putHeader("Content-Type", "application/json");
     verify(mockHttpRequest).rxSendBuffer(any(Buffer.class));

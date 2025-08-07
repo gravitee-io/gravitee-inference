@@ -10,14 +10,12 @@ import io.vertx.rxjava3.core.Vertx;
 import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
 import io.vertx.rxjava3.ext.web.client.HttpResponse;
-
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CustomHttpEmbeddingInference
-        extends CustomHttpInference<CustomHttpEmbeddingConfig, String, EmbeddingTokenCount> {
+  extends CustomHttpInference<CustomHttpEmbeddingConfig, String, EmbeddingTokenCount> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CustomHttpEmbeddingInference.class);
 
@@ -77,8 +75,8 @@ public class CustomHttpEmbeddingInference
 
       LOGGER.debug("Extracting response from location: {}", outputLocation);
       LOGGER.debug(
-              "Extracting response from input: {}",
-              responseJson.toString().substring(0, Math.min(60, responseJson.toString().length()))
+        "Extracting response from input: {}",
+        responseJson.toString().substring(0, Math.min(60, responseJson.toString().length()))
       );
 
       DocumentContext responseContext = JsonPath.parse(responseJson.toString());
@@ -107,7 +105,7 @@ public class CustomHttpEmbeddingInference
 
   private String getOutputLocation() {
     return config.getOutputEmbeddingLocation() != null
-            ? config.getOutputEmbeddingLocation()
-            : DEFAULT_OUTPUT_EMBEDDING_LOCATION;
+      ? config.getOutputEmbeddingLocation()
+      : DEFAULT_OUTPUT_EMBEDDING_LOCATION;
   }
 }
