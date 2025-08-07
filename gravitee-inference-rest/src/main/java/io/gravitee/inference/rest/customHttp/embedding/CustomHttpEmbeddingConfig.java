@@ -21,6 +21,9 @@ public class CustomHttpEmbeddingConfig extends CustomHttpConfig {
     String outputEmbeddingLocation
   ) {
     super(uri, method, headers, contentType, requestBodyTemplate);
+    Objects.requireNonNull(inputLocation, "Input location cannot be null");
+    Objects.requireNonNull(outputEmbeddingLocation, "Output embedding location cannot be null");
+
     this.inputLocation = inputLocation;
     this.outputEmbeddingLocation = outputEmbeddingLocation;
   }

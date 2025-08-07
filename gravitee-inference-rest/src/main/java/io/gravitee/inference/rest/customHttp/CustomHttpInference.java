@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 
 public abstract class CustomHttpInference<C extends CustomHttpConfig, I, O> extends RestInference<C, I, O> {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(CustomHttpInference.class);
-
   public CustomHttpInference(C config, Vertx vertx) {
     super(config, vertx);
   }

@@ -19,9 +19,6 @@ public class CustomHttpEmbeddingInference
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CustomHttpEmbeddingInference.class);
 
-  private static final String DEFAULT_INPUT_LOCATION = "$";
-  private static final String DEFAULT_OUTPUT_EMBEDDING_LOCATION = "$";
-
   public CustomHttpEmbeddingInference(CustomHttpEmbeddingConfig config, Vertx vertx) {
     super(config, vertx);
   }
@@ -33,10 +30,6 @@ public class CustomHttpEmbeddingInference
       String requestBodyTemplate = getRequestBodyTemplate();
 
       LOGGER.debug("Preparing request with input location: {} with template {}", inputLocation, requestBodyTemplate);
-
-      if ("$".equals(inputLocation)) {
-        return Single.just(Buffer.buffer(input));
-      }
 
       DocumentContext templateContext = JsonPath.parse(requestBodyTemplate);
       DocumentContext resultContext = templateContext.set(inputLocation, input);
@@ -100,12 +93,10 @@ public class CustomHttpEmbeddingInference
   }
 
   private String getInputLocation() {
-    return config.getInputLocation() != null ? config.getInputLocation() : DEFAULT_INPUT_LOCATION;
+    return config.getInputLocation();
   }
 
   private String getOutputLocation() {
-    return config.getOutputEmbeddingLocation() != null
-      ? config.getOutputEmbeddingLocation()
-      : DEFAULT_OUTPUT_EMBEDDING_LOCATION;
+    return config.getOutputEmbeddingLocation();
   }
 }
