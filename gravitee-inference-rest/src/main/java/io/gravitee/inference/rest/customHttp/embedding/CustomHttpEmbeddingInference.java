@@ -25,24 +25,17 @@ public class CustomHttpEmbeddingInference
 
   @Override
   protected Single<Buffer> prepareRequest(String input) {
-    try {
-      String inputLocation = getInputLocation();
-      String requestBodyTemplate = getRequestBodyTemplate();
+    String inputLocation = getInputLocation();
+    String requestBodyTemplate = getRequestBodyTemplate();
 
-      LOGGER.debug("Preparing request with input location: {} with template {}", inputLocation, requestBodyTemplate);
+    LOGGER.debug("Preparing request with input location: {} with template {}", inputLocation, requestBodyTemplate);
 
-      DocumentContext templateContext = JsonPath.parse(requestBodyTemplate);
-      DocumentContext resultContext = templateContext.set(inputLocation, input);
-
-      String requestBody = resultContext.jsonString();
-
-      LOGGER.debug("Prepared request body: {}", requestBody);
-
-      return Single.just(Buffer.buffer(requestBody));
-    } catch (Exception e) {
-      LOGGER.error("Error preparing request for input location: {}", config.getInputLocation(), e);
-      return Single.error(new RuntimeException("Failed to prepare request", e));
-    }
+    return Single
+      .fromCallable(() -> JsonPath.parse(requestBodyTemplate))
+      .map(ctx -> ctx.set(inputLocation, input))
+      .map(DocumentContext::jsonString)
+      .doOnSuccess(json -> LOGGER.debug("Prepared request body: {}", json))
+      .map(Buffer::buffer);
   }
 
   @Override
@@ -63,29 +56,22 @@ public class CustomHttpEmbeddingInference
 
   @Override
   protected Maybe<EmbeddingTokenCount> parseResponse(Buffer responseJson) {
-    try {
-      String outputLocation = getOutputLocation();
+    return Maybe
+      .fromCallable(() -> {
+        String outputLocation = getOutputLocation();
 
-      LOGGER.debug("Extracting response from location: {}", outputLocation);
-      LOGGER.debug(
-        "Extracting response from input: {}",
-        responseJson.toString().substring(0, Math.min(60, responseJson.toString().length()))
-      );
+        LOGGER.debug("Extracting response from location: {}", outputLocation);
+        LOGGER.debug(
+          "Extracting response from input: {}",
+          responseJson.toString().substring(0, Math.min(60, responseJson.toString().length()))
+        );
 
-      DocumentContext responseContext = JsonPath.parse(responseJson.toString());
-      List<Number> embeddingResponse = responseContext.read(outputLocation);
-      float[] embedding = new float[embeddingResponse.size()];
-
-      for (int i = 0; i < embeddingResponse.size(); i++) {
-        Number value = embeddingResponse.get(i);
-        embedding[i] = value.floatValue();
-      }
-
-      return Maybe.just(new EmbeddingTokenCount(embedding, -1));
-    } catch (Exception e) {
-      LOGGER.error("Error extracting response from location: {}", getOutputLocation(), e);
-      throw new RuntimeException("Failed to extract response", e);
-    }
+        DocumentContext responseContext = JsonPath.parse(responseJson.toString());
+        return responseContext.read(outputLocation, float[].class);
+      })
+      .map(embedding -> {
+        return new EmbeddingTokenCount(embedding, -1);
+      });
   }
 
   private String getRequestBodyTemplate() {
