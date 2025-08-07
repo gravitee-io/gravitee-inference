@@ -1,5 +1,6 @@
 package io.gravitee.inference.rest.customHttp;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -7,6 +8,7 @@ import io.gravitee.inference.rest.customHttp.embedding.CustomHttpEmbeddingConfig
 import io.gravitee.inference.rest.customHttp.embedding.CustomHttpEmbeddingInference;
 import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.Json;
 import io.vertx.rxjava3.core.Vertx;
 import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -40,7 +43,7 @@ public class CustomHttpEmbeddingInferenceTest {
     vertx = Vertx.vertx();
   }
 
-  @ParameterizedTest
+  @ParameterizedTest(name = "Test {6}")
   @CsvFileSource(resources = "/embedding-test-data.csv", numLinesToSkip = 1)
   void testEmbeddingInferenceWithJsonPath(
     String inputLocation,
@@ -48,6 +51,7 @@ public class CustomHttpEmbeddingInferenceTest {
     String jsonResponse,
     String outputJsonPath,
     int expectedEmbeddingLength,
+    String expectedRequestBody,
     String description
   ) {
     CustomHttpEmbeddingConfig config = new CustomHttpEmbeddingConfig(
@@ -62,10 +66,12 @@ public class CustomHttpEmbeddingInferenceTest {
 
     CustomHttpEmbeddingInference inference = new CustomHttpEmbeddingInference(config, vertx);
 
+    ArgumentCaptor<Buffer> requestBodyCaptor = ArgumentCaptor.forClass(Buffer.class);
+
     when(mockWebClient.requestAbs(config.getMethod(), config.getUri().toString())).thenReturn(mockHttpRequest);
     when(mockHttpRequest.followRedirects(true)).thenReturn(mockHttpRequest);
     when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(mockHttpRequest);
-    when(mockHttpRequest.rxSendBuffer(any(Buffer.class))).thenReturn(Single.just(mockHttpResponse));
+    when(mockHttpRequest.rxSendBuffer(requestBodyCaptor.capture())).thenReturn(Single.just(mockHttpResponse));
     when(mockHttpResponse.statusCode()).thenReturn(200);
     when(mockHttpResponse.body()).thenReturn(Buffer.buffer(jsonResponse));
 
@@ -85,6 +91,15 @@ public class CustomHttpEmbeddingInferenceTest {
       .assertComplete()
       .assertNoErrors()
       .assertValue(embeddingTokenCount -> expectedEmbeddingLength == embeddingTokenCount.embedding().length);
+
+    Buffer capturedRequestBody = requestBodyCaptor.getValue();
+    String actualRequestBody = capturedRequestBody.toString();
+
+    assertEquals(
+      Json.decodeValue(expectedRequestBody),
+      Json.decodeValue(actualRequestBody),
+      "Request body should match the expected fulfilled template for: " + description
+    );
 
     verify(mockHttpRequest, times(2)).putHeader("Content-Type", "application/json");
     verify(mockHttpRequest).rxSendBuffer(any(Buffer.class));

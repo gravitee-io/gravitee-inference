@@ -39,6 +39,12 @@ public abstract class RestInference<C extends RestConfig, I, O> extends Inferenc
     this.webClient = WebClient.create(this.vertx);
   }
 
+  protected RestInference(C config, WebClient webClient) {
+    super(config);
+    this.vertx = null;
+    this.webClient = webClient;
+  }
+
   @Override
   public Maybe<O> infer(I input) {
     LOGGER.debug("Requesting inference model for \"{}\"", input);
