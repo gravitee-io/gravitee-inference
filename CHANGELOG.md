@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/gravitee-io/gravitee-inference/compare/1.2.0...1.2.1) (2025-08-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency com.github.oshi:oshi-core to v6.8.2 ([8dfd293](https://github.com/gravitee-io/gravitee-inference/commit/8dfd2937472f50f4f650734cf400e5fe1ddf1752))
+* **deps:** update dependency io.gravitee:gravitee-bom to v8.3.27 ([5f97cae](https://github.com/gravitee-io/gravitee-inference/commit/5f97cae119d68858882089832a0c7f5ddfe5d577))
+
 # [1.2.0](https://github.com/gravitee-io/gravitee-inference/compare/1.1.2...1.2.0) (2025-08-06)
 
 

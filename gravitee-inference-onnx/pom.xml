@@ -21,12 +21,12 @@
   <parent>
     <artifactId>gravitee-inference</artifactId>
     <groupId>io.gravitee.inference</groupId>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
   </parent>
 
   <groupId>io.gravitee.inference.onnx</groupId>
   <artifactId>gravitee-inference-onnx</artifactId>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
 
   <name>Gravitee.io Inference - ONNX</name>
   <description>ONNX implementation of the Inference API</description>
