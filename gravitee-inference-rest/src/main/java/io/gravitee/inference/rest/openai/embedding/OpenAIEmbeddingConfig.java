@@ -16,22 +16,23 @@
 package io.gravitee.inference.rest.openai.embedding;
 
 import io.gravitee.inference.rest.openai.OpenaiConfig;
+
 import java.net.URI;
 import java.util.Objects;
 
 public class OpenAIEmbeddingConfig extends OpenaiConfig {
 
-  private Integer dimensions;
-  private EncodingFormat encodingFormat = EncodingFormat.FLOAT;
+  private final Integer dimensions;
+  private final EncodingFormat encodingFormat;
 
   public OpenAIEmbeddingConfig(
-    URI uri,
-    String apiKey,
-    String organizationId,
-    String projectId,
-    String model,
-    Integer dimensions,
-    EncodingFormat encodingFormat
+          URI uri,
+          String apiKey,
+          String organizationId,
+          String projectId,
+          String model,
+          Integer dimensions,
+          EncodingFormat encodingFormat
   ) {
     super(uri, apiKey, organizationId, projectId, model);
     this.dimensions = validateDimensions(dimensions);
@@ -39,12 +40,12 @@ public class OpenAIEmbeddingConfig extends OpenaiConfig {
   }
 
   public OpenAIEmbeddingConfig(
-    URI uri,
-    String apiKey,
-    String organizationId,
-    String projectId,
-    String model,
-    Integer dimensions
+          URI uri,
+          String apiKey,
+          String organizationId,
+          String projectId,
+          String model,
+          Integer dimensions
   ) {
     this(uri, apiKey, organizationId, projectId, model, dimensions, EncodingFormat.FLOAT);
   }
@@ -92,24 +93,24 @@ public class OpenAIEmbeddingConfig extends OpenaiConfig {
   @Override
   public String toString() {
     return (
-      "OpenAIEmbeddingConfig{" +
-      "uri=" +
-      getUri() +
-      ", apiKey='[PROTECTED]'" +
-      ", organizationId='" +
-      getOrganizationId() +
-      '\'' +
-      ", projectId='" +
-      getProjectId() +
-      '\'' +
-      ", model='" +
-      getModel() +
-      '\'' +
-      ", dimensions=" +
-      dimensions +
-      ", encodingFormat=" +
-      encodingFormat +
-      '}'
+            "OpenAIEmbeddingConfig{" +
+                    "uri=" +
+                    getUri() +
+                    ", apiKey='[PROTECTED]'" +
+                    ", organizationId='" +
+                    getOrganizationId() +
+                    '\'' +
+                    ", projectId='" +
+                    getProjectId() +
+                    '\'' +
+                    ", model='" +
+                    getModel() +
+                    '\'' +
+                    ", dimensions=" +
+                    dimensions +
+                    ", encodingFormat=" +
+                    encodingFormat +
+                    '}'
     );
   }
 }
