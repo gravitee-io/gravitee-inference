@@ -56,19 +56,21 @@ public class HttpEmbeddingInference extends HttpInference<HttpEmbeddingConfig, S
     LOGGER.debug("Preparing request with input location: {} with template {}", inputLocation, requestBodyTemplate);
     try {
       return Single
-        .fromCallable(() -> {
+        .defer(() -> {
           try {
-            return JsonPath.parse(requestBodyTemplate);
+            return Single.just(JsonPath.parse(requestBodyTemplate));
           } catch (JsonPathException e) {
-            throw new GraviteeInferenceHttpException("Invalid JSON template: " + e.getMessage());
+            return Single.error(new GraviteeInferenceHttpException("Invalid JSON template: " + e.getMessage()));
           }
         })
-        .map(ctx -> {
+        .flatMap(ctx -> {
           try {
-            return ctx.set(inputLocation, input);
+            return Single.just(ctx.set(inputLocation, input));
           } catch (JsonPathException e) {
-            throw new GraviteeInferenceHttpException(
-              String.format("Cannot set input at location '%s': %s", inputLocation, e.getMessage())
+            return Single.error(
+              new GraviteeInferenceHttpException(
+                String.format("Cannot set input at location '%s': %s", inputLocation, e.getMessage())
+              )
             );
           }
         })
@@ -110,11 +112,11 @@ public class HttpEmbeddingInference extends HttpInference<HttpEmbeddingConfig, S
   @Override
   protected Maybe<EmbeddingTokenCount> parseResponse(Buffer responseJson) {
     return Maybe
-      .fromCallable(() -> {
+      .defer(() -> {
         String outputLocation = getOutputLocation();
 
         if (outputLocation == null || outputLocation.trim().isEmpty()) {
-          throw new IllegalStateException("Output location is not configured");
+          return Maybe.error(new IllegalStateException("Output location is not configured"));
         }
 
         String responseBody = responseJson.toString();
@@ -127,19 +129,22 @@ public class HttpEmbeddingInference extends HttpInference<HttpEmbeddingConfig, S
           float[] embedding = responseContext.read(outputLocation, float[].class);
 
           if (embedding == null || embedding.length == 0) {
-            throw new GraviteeInferenceHttpException(
-              String.format("No embedding data found at location: %s", outputLocation)
+            return Maybe.error(
+              new GraviteeInferenceHttpException(String.format("No embedding data found at location: %s", outputLocation))
             );
           }
-
-          return new EmbeddingTokenCount(embedding, -1);
+          return Maybe.just(new EmbeddingTokenCount(embedding, -1));
         } catch (JsonPathException e) {
-          throw new GraviteeInferenceHttpException(
-            String.format("Failed to extract embedding from location '%s': %s", outputLocation, e.getMessage())
+          return Maybe.error(
+            new GraviteeInferenceHttpException(
+              String.format("Failed to extract embedding from location '%s': %s", outputLocation, e.getMessage())
+            )
           );
         } catch (ClassCastException e) {
-          throw new GraviteeInferenceHttpException(
-            String.format("Data at location '%s' is not a valid float array: %s", outputLocation, e.getMessage())
+          return Maybe.error(
+            new GraviteeInferenceHttpException(
+              String.format("Data at location '%s' is not a valid float array: %s", outputLocation, e.getMessage())
+            )
           );
         }
       })
