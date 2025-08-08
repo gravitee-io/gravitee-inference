@@ -42,7 +42,7 @@ public class HttpEmbeddingInference extends HttpInference<HttpEmbeddingConfig, S
 
   @Override
   protected Single<Buffer> prepareRequest(String input) {
-    if (input == null || input.trim().isEmpty()) {
+    if (input == null || input.isBlank()) {
       return Single.error(new IllegalArgumentException("Input cannot be null or empty"));
     }
 
