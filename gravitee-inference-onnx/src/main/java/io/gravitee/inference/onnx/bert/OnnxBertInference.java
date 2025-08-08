@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
@@ -45,11 +46,13 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
   protected static final ObjectMapper objectMapper = new ObjectMapper();
   protected final HuggingFaceTokenizer tokenizer;
   protected final JsonNode configJson;
+  private boolean hasTokenTypeIds;
 
   protected OnnxBertInference(OnnxBertConfig onnxBertConfig) {
     super(onnxBertConfig);
     this.tokenizer = getTokenizer();
     this.configJson = getConfigJson();
+    hasTokenTypeIds = session.getInputNames().contains(TOKEN_TYPE_IDS);
   }
 
   private HuggingFaceTokenizer getTokenizer() {
@@ -77,20 +80,19 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
 
     long[] inputIds = encoding.getIds();
     long[] attentionMask = encoding.getAttentionMask();
-    long[] tokenTypeIds = encoding.getTypeIds();
 
     long[] shape = { 1, inputIds.length };
 
     try (
       var inputIdsTensor = createTensor(environment, wrap(inputIds), shape);
       var attentionMaskTensor = createTensor(environment, wrap(attentionMask), shape);
-      var tokenTypeIdsTensor = createTensor(environment, wrap(tokenTypeIds), shape)
     ) {
       var inputs = new HashMap<String, OnnxTensor>();
       inputs.put(INPUT_IDS, inputIdsTensor);
       inputs.put(ATTENTION_MASK, attentionMaskTensor);
 
-      if (session.getInputNames().contains(TOKEN_TYPE_IDS)) {
+      if (hasTokenTypeIds) {
+        var tokenTypeIdsTensor = createTensor(environment, wrap(encoding.getTypeIds()), shape);
         inputs.put(TOKEN_TYPE_IDS, tokenTypeIdsTensor);
       }
       return new EncodingResults(List.of(encoding), session.run(inputs));
@@ -124,7 +126,9 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
       int startIndex = i * maxTokens;
       arraycopy(sentenceInputIds, 0, inputIds, startIndex, sentenceInputIds.length);
       arraycopy(sentenceAttentionMask, 0, attentionMask, startIndex, sentenceAttentionMask.length);
-      arraycopy(sentenceTokenTypeIds, 0, tokenTypeIds, startIndex, sentenceTokenTypeIds.length);
+      if (hasTokenTypeIds) {
+        arraycopy(sentenceTokenTypeIds, 0, tokenTypeIds, startIndex, sentenceTokenTypeIds.length);
+      }
     }
 
     long[] shape = { sentences.size(), maxTokens };
@@ -132,13 +136,13 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
     try (
       var inputIdsTensor = createTensor(environment, wrap(inputIds), shape);
       var attentionMaskTensor = createTensor(environment, wrap(attentionMask), shape);
-      var tokenTypeIdsTensor = createTensor(environment, wrap(tokenTypeIds), shape)
     ) {
       var inputs = new HashMap<String, OnnxTensor>();
       inputs.put(INPUT_IDS, inputIdsTensor);
       inputs.put(ATTENTION_MASK, attentionMaskTensor);
 
       if (session.getInputNames().contains(TOKEN_TYPE_IDS)) {
+        var tokenTypeIdsTensor = createTensor(environment, wrap(tokenTypeIds), shape);
         inputs.put(TOKEN_TYPE_IDS, tokenTypeIdsTensor);
       }
       return new EncodingResults(encodings, session.run(inputs));

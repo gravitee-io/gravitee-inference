@@ -23,8 +23,6 @@ import org.slf4j.LoggerFactory;
 
 public abstract class OpenaiRestInference<C extends RestConfig, O> extends RestInference<C, String, O> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(OpenaiRestInference.class);
-
   public OpenaiRestInference(C config, Vertx vertx) {
     super(config, vertx);
   }
