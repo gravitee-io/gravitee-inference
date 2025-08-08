@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/gravitee-io/gravitee-inference/compare/1.3.0...1.4.0) (2025-08-08)
+
+
+### Features
+
+* http inference ([#22](https://github.com/gravitee-io/gravitee-inference/issues/22)) ([7fc5e11](https://github.com/gravitee-io/gravitee-inference/commit/7fc5e11e960b3b2afa4ad3e556adca839bf365cf))
+
 # [1.3.0](https://github.com/gravitee-io/gravitee-inference/compare/1.2.1...1.3.0) (2025-08-08)
 
 

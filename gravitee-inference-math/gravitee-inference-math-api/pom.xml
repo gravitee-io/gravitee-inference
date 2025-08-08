@@ -21,7 +21,7 @@
   <parent>
     <artifactId>gravitee-inference-math</artifactId>
     <groupId>io.gravitee.inference.math</groupId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
   </parent>
 
   <groupId>io.gravitee.inference.math.api</groupId>

@@ -28,7 +28,7 @@
 
     <groupId>io.gravitee.inference</groupId>
     <artifactId>gravitee-inference</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
 
     <name>Gravitee.io - Inference</name>
     <description>A set of libraries to load models and perform inference</description>
