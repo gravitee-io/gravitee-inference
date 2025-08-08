@@ -21,8 +21,8 @@ import java.util.Objects;
 
 public class OpenAIEmbeddingConfig extends OpenaiConfig {
 
-  private Integer dimensions;
-  private EncodingFormat encodingFormat = EncodingFormat.FLOAT;
+  private final Integer dimensions;
+  private final EncodingFormat encodingFormat;
 
   public OpenAIEmbeddingConfig(
     URI uri,

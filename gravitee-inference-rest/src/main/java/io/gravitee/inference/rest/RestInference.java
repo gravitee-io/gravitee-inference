@@ -30,13 +30,18 @@ public abstract class RestInference<C extends RestConfig, I, O> extends Inferenc
   private static final int HTTP_CODE_OK = 200;
   private static final int HTTP_CODE_REDIRECTION = 300;
   private static final Logger LOGGER = LoggerFactory.getLogger(RestInference.class);
-  protected final Vertx vertx;
+  protected Vertx vertx;
   protected final WebClient webClient;
 
   protected RestInference(C config, Vertx vertx) {
     super(config);
     this.vertx = vertx;
     this.webClient = WebClient.create(this.vertx);
+  }
+
+  protected RestInference(C config, WebClient webClient) {
+    super(config);
+    this.webClient = webClient;
   }
 
   @Override
