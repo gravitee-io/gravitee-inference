@@ -21,13 +21,13 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 
-public class CustomHttpConfig extends RestConfig {
+public class HttpConfig extends RestConfig {
 
   private final HttpMethod method;
   private final Map<String, String> headers;
   private final String requestBodyTemplate;
 
-  public CustomHttpConfig(URI uri, HttpMethod method, Map<String, String> headers, String requestBodyTemplate) {
+  public HttpConfig(URI uri, HttpMethod method, Map<String, String> headers, String requestBodyTemplate) {
     super(uri);
     this.method = method;
     this.headers = headers;
@@ -50,7 +50,7 @@ public class CustomHttpConfig extends RestConfig {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof CustomHttpConfig that)) return false;
+    if (!(o instanceof HttpConfig that)) return false;
     if (!super.equals(o)) return false;
     return (
       Objects.equals(method, that.method) &&

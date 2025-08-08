@@ -15,18 +15,18 @@
  */
 package io.gravitee.inference.rest.http.embedding;
 
-import io.gravitee.inference.rest.http.CustomHttpConfig;
+import io.gravitee.inference.rest.http.HttpConfig;
 import io.vertx.core.http.HttpMethod;
 import java.net.URI;
 import java.util.Map;
 import java.util.Objects;
 
-public class CustomHttpEmbeddingConfig extends CustomHttpConfig {
+public class HttpEmbeddingConfig extends HttpConfig {
 
   private final String inputLocation;
   private final String outputEmbeddingLocation;
 
-  public CustomHttpEmbeddingConfig(
+  public HttpEmbeddingConfig(
     URI uri,
     HttpMethod method,
     Map<String, String> headers,
@@ -53,7 +53,7 @@ public class CustomHttpEmbeddingConfig extends CustomHttpConfig {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof CustomHttpEmbeddingConfig that)) return false;
+    if (!(o instanceof HttpEmbeddingConfig that)) return false;
     if (!super.equals(o)) return false;
     return (
       Objects.equals(inputLocation, that.inputLocation) &&

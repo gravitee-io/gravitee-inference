@@ -15,9 +15,12 @@
  */
 package io.gravitee.inference.rest.http;
 
-public class GraviteeInferenceCustomHttpException extends RuntimeException {
+import io.gravitee.inference.rest.RestInference;
+import io.vertx.rxjava3.core.Vertx;
 
-  public GraviteeInferenceCustomHttpException(String message) {
-    super(message);
+public abstract class HttpInference<C extends HttpConfig, I, O> extends RestInference<C, I, O> {
+
+  public HttpInference(C config, Vertx vertx) {
+    super(config, vertx);
   }
 }
