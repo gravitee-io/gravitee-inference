@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/gravitee-io/gravitee-inference/compare/1.2.1...1.3.0) (2025-08-08)
+
+
+### Features
+
+* improve performance on classifiers ([#23](https://github.com/gravitee-io/gravitee-inference/issues/23)) ([955d411](https://github.com/gravitee-io/gravitee-inference/commit/955d4112cb1ce97f1c13268a6c48d5b597fa60c8))
+
 ## [1.2.1](https://github.com/gravitee-io/gravitee-inference/compare/1.2.0...1.2.1) (2025-08-07)
 
 
