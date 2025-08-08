@@ -75,14 +75,12 @@ public class CustomHttpEmbeddingInference
     return Maybe
       .fromCallable(() -> {
         String outputLocation = getOutputLocation();
+        String responseBody = responseJson.toString();
 
         LOGGER.debug("Extracting response from location: {}", outputLocation);
-        LOGGER.debug(
-          "Extracting response from input: {}",
-          responseJson.toString().substring(0, Math.min(60, responseJson.toString().length()))
-        );
+        LOGGER.debug("Extracting response from input: {}", responseBody.substring(0, Math.min(60, responseBody.length())));
 
-        DocumentContext responseContext = JsonPath.parse(responseJson.toString());
+        DocumentContext responseContext = JsonPath.parse(responseBody);
         return responseContext.read(outputLocation, float[].class);
       })
       .map(embedding -> new EmbeddingTokenCount(embedding, -1));
