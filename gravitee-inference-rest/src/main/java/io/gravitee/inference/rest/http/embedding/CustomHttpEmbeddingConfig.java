@@ -1,6 +1,6 @@
-package io.gravitee.inference.rest.customHttp.embedding;
+package io.gravitee.inference.rest.http.embedding;
 
-import io.gravitee.inference.rest.customHttp.CustomHttpConfig;
+import io.gravitee.inference.rest.http.CustomHttpConfig;
 import io.vertx.core.http.HttpMethod;
 import java.net.URI;
 import java.util.Map;
@@ -15,12 +15,11 @@ public class CustomHttpEmbeddingConfig extends CustomHttpConfig {
     URI uri,
     HttpMethod method,
     Map<String, String> headers,
-    String contentType,
     String requestBodyTemplate,
     String inputLocation,
     String outputEmbeddingLocation
   ) {
-    super(uri, method, headers, contentType, requestBodyTemplate);
+    super(uri, method, headers, requestBodyTemplate);
     Objects.requireNonNull(inputLocation, "Input location cannot be null");
     Objects.requireNonNull(outputEmbeddingLocation, "Output embedding location cannot be null");
 

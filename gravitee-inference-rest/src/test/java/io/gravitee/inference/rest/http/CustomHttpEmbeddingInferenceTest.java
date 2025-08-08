@@ -1,11 +1,11 @@
-package io.gravitee.inference.rest.customHttp;
+package io.gravitee.inference.rest.http;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import io.gravitee.inference.rest.customHttp.embedding.CustomHttpEmbeddingConfig;
-import io.gravitee.inference.rest.customHttp.embedding.CustomHttpEmbeddingInference;
+import io.gravitee.inference.rest.http.embedding.CustomHttpEmbeddingConfig;
+import io.gravitee.inference.rest.http.embedding.CustomHttpEmbeddingInference;
 import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.Json;
@@ -57,8 +57,7 @@ public class CustomHttpEmbeddingInferenceTest {
     CustomHttpEmbeddingConfig config = new CustomHttpEmbeddingConfig(
       URI.create("http://localhost:8000/embed/"),
       HttpMethod.POST,
-      Map.of("Content-Type", "application/json"),
-      "application/json",
+      null,
       requestBodyTemplate,
       inputLocation,
       outputJsonPath
@@ -101,7 +100,6 @@ public class CustomHttpEmbeddingInferenceTest {
       "Request body should match the expected fulfilled template for: " + description
     );
 
-    verify(mockHttpRequest, times(2)).putHeader("Content-Type", "application/json");
     verify(mockHttpRequest).rxSendBuffer(any(Buffer.class));
   }
 }

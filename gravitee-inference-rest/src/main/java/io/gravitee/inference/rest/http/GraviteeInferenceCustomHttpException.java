@@ -1,4 +1,4 @@
-package io.gravitee.inference.rest.customHttp;
+package io.gravitee.inference.rest.http;
 
 public class GraviteeInferenceCustomHttpException extends RuntimeException {
 

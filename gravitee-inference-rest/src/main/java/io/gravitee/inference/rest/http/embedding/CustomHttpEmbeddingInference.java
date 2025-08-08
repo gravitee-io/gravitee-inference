@@ -1,16 +1,15 @@
-package io.gravitee.inference.rest.customHttp.embedding;
+package io.gravitee.inference.rest.http.embedding;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import io.gravitee.inference.api.embedding.EmbeddingTokenCount;
-import io.gravitee.inference.rest.customHttp.CustomHttpInference;
+import io.gravitee.inference.rest.http.CustomHttpInference;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
 import io.vertx.rxjava3.core.Vertx;
 import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
 import io.vertx.rxjava3.ext.web.client.HttpResponse;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +17,8 @@ public class CustomHttpEmbeddingInference
   extends CustomHttpInference<CustomHttpEmbeddingConfig, String, EmbeddingTokenCount> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CustomHttpEmbeddingInference.class);
+  public static final String MEDIA_TYPE_JSON = "application/json";
+  public static final String CONTENT_TYPE = "Content-Type";
 
   public CustomHttpEmbeddingInference(CustomHttpEmbeddingConfig config, Vertx vertx) {
     super(config, vertx);
@@ -40,14 +41,14 @@ public class CustomHttpEmbeddingInference
 
   @Override
   protected Single<HttpResponse<Buffer>> executeHttpRequest(Buffer requestJson) {
-    HttpRequest<Buffer> request = webClient.requestAbs(config.getMethod(), config.getUri().toString()).followRedirects(true);
+    HttpRequest<Buffer> request = webClient
+      .requestAbs(config.getMethod(), config.getUri().toASCIIString())
+      .followRedirects(true);
     if (config.getHeaders() != null) {
       config.getHeaders().forEach(request::putHeader);
     }
 
-    if (config.getContentType() != null) {
-      request.putHeader("Content-Type", config.getContentType());
-    }
+    request.putHeader(CONTENT_TYPE, MEDIA_TYPE_JSON);
 
     LOGGER.debug("Executing HTTP request:\n{} {}\n\n{}\n", config.getMethod(), config.getUri(), request.headers());
 
@@ -69,9 +70,7 @@ public class CustomHttpEmbeddingInference
         DocumentContext responseContext = JsonPath.parse(responseJson.toString());
         return responseContext.read(outputLocation, float[].class);
       })
-      .map(embedding -> {
-        return new EmbeddingTokenCount(embedding, -1);
-      });
+      .map(embedding -> new EmbeddingTokenCount(embedding, -1));
   }
 
   private String getRequestBodyTemplate() {

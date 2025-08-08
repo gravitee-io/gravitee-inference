@@ -1,9 +1,7 @@
-package io.gravitee.inference.rest.customHttp;
+package io.gravitee.inference.rest.http;
 
 import io.gravitee.inference.rest.RestInference;
 import io.vertx.rxjava3.core.Vertx;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class CustomHttpInference<C extends CustomHttpConfig, I, O> extends RestInference<C, I, O> {
 
