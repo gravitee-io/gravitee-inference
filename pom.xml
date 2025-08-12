@@ -42,7 +42,7 @@
         <commons-math3.version>3.6.1</commons-math3.version>
         <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-        <ai.djl.version>0.33.0</ai.djl.version>
+        <ai.djl.version>0.34.0</ai.djl.version>
         <json-path.version>2.9.0</json-path.version>
     </properties>
     <modules>
