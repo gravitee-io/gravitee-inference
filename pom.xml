@@ -36,7 +36,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <gravitee-bom.version>8.3.27</gravitee-bom.version>
+        <gravitee-bom.version>8.3.32</gravitee-bom.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <commons-math3.version>3.6.1</commons-math3.version>
