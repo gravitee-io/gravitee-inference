@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/gravitee-io/gravitee-inference/compare/1.4.0...1.5.0) (2025-08-18)
+
+
+### Features
+
+* add new inference formats ([#24](https://github.com/gravitee-io/gravitee-inference/issues/24)) ([276c8b2](https://github.com/gravitee-io/gravitee-inference/commit/276c8b28f88a77d69b6d08016c0b07731fea4c1b))
+
 # [1.4.0](https://github.com/gravitee-io/gravitee-inference/compare/1.3.0...1.4.0) (2025-08-08)
 
 
