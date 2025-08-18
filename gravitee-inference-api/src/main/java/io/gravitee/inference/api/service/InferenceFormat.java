@@ -21,4 +21,6 @@ package io.gravitee.inference.api.service;
  */
 public enum InferenceFormat {
   ONNX_BERT,
+  OPENAI,
+  HTTP,
 }
