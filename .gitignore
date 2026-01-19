@@ -27,3 +27,13 @@ target/
 models/
 distribution/
 .DS_Store
+*/.classpath
+*/.project
+*/.settings/
+*/.settings/**
+*/*/.settings/
+*/*/.classpath/
+*/*/.classpath
+*/*/.project
+.java-version
+gravitee-inference-llama-cpp/gravitee-inference-llama-cpp.iml

@@ -22,4 +22,5 @@ package io.gravitee.inference.api.service;
 public enum InferenceType {
   CLASSIFIER,
   EMBEDDING,
+  TEXT_GENERATION,
 }

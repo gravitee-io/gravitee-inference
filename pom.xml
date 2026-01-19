@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>23.4.1</version>
+        <version>24.0.2</version>
     </parent>
 
     <groupId>io.gravitee.inference</groupId>
@@ -36,12 +36,12 @@
     <packaging>pom</packaging>
 
     <properties>
-        <gravitee-bom.version>8.3.27</gravitee-bom.version>
+        <gravitee-bom.version>8.3.49</gravitee-bom.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
         <commons-math3.version>3.6.1</commons-math3.version>
         <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
         <ai.djl.version>0.33.0</ai.djl.version>
         <json-path.version>2.9.0</json-path.version>
     </properties>
@@ -50,6 +50,8 @@
         <module>gravitee-inference-api</module>
         <module>gravitee-inference-onnx</module>
         <module>gravitee-inference-rest</module>
+        <module>gravitee-inference-llama-cpp</module>
+        <module>gravitee-inference-vllm</module>
     </modules>
     <dependencyManagement>
         <dependencies>
@@ -87,12 +89,30 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
+                </exclusion>
+            </exclusions>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.18.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.bytebuddy</groupId>
+                    <artifactId>byte-buddy</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
@@ -113,8 +133,8 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
-                        <source>21</source>
-                        <target>21</target>
+                        <source>25</source>
+                        <target>25</target>
                         <compilerArgs>
                             <arg>--enable-preview</arg>
                             <arg>--add-modules</arg>
@@ -243,8 +263,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <source>21</source>
-                    <additionalOptions>--add-modules jdk.incubator.vector</additionalOptions>
+                    <source>25</source>
+                    <additionalOptions>--enable-preview --add-modules jdk.incubator.vector</additionalOptions>
                 </configuration>
             </plugin>
         </plugins>

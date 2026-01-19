@@ -55,14 +55,13 @@ public class HttpEmbeddingInference extends HttpInference<HttpEmbeddingConfig, S
 
     LOGGER.debug("Preparing request with input location: {} with template {}", inputLocation, requestBodyTemplate);
     try {
-      return Single
-        .defer(() -> {
-          try {
-            return Single.just(JsonPath.parse(requestBodyTemplate));
-          } catch (JsonPathException e) {
-            return Single.error(new GraviteeInferenceHttpException("Invalid JSON template: " + e.getMessage()));
-          }
-        })
+      return Single.defer(() -> {
+        try {
+          return Single.just(JsonPath.parse(requestBodyTemplate));
+        } catch (JsonPathException e) {
+          return Single.error(new GraviteeInferenceHttpException("Invalid JSON template: " + e.getMessage()));
+        }
+      })
         .flatMap(ctx -> {
           try {
             return Single.just(ctx.set(inputLocation, input));
@@ -111,44 +110,42 @@ public class HttpEmbeddingInference extends HttpInference<HttpEmbeddingConfig, S
 
   @Override
   protected Maybe<EmbeddingTokenCount> parseResponse(Buffer responseJson) {
-    return Maybe
-      .defer(() -> {
-        String outputLocation = getOutputLocation();
+    return Maybe.defer(() -> {
+      String outputLocation = getOutputLocation();
 
-        if (outputLocation == null || outputLocation.trim().isEmpty()) {
-          return Maybe.error(new IllegalStateException("Output location is not configured"));
-        }
+      if (outputLocation == null || outputLocation.trim().isEmpty()) {
+        return Maybe.error(new IllegalStateException("Output location is not configured"));
+      }
 
-        String responseBody = responseJson.toString();
+      String responseBody = responseJson.toString();
 
-        LOGGER.debug("Extracting response from location: {}", outputLocation);
-        LOGGER.debug("Extracting response from input: {}", responseBody.substring(0, Math.min(60, responseBody.length())));
+      LOGGER.debug("Extracting response from location: {}", outputLocation);
+      LOGGER.debug("Extracting response from input: {}", responseBody.substring(0, Math.min(60, responseBody.length())));
 
-        try {
-          DocumentContext responseContext = JsonPath.parse(responseBody);
-          float[] embedding = responseContext.read(outputLocation, float[].class);
+      try {
+        DocumentContext responseContext = JsonPath.parse(responseBody);
+        float[] embedding = responseContext.read(outputLocation, float[].class);
 
-          if (embedding == null || embedding.length == 0) {
-            return Maybe.error(
-              new GraviteeInferenceHttpException(String.format("No embedding data found at location: %s", outputLocation))
-            );
-          }
-          return Maybe.just(new EmbeddingTokenCount(embedding, -1));
-        } catch (JsonPathException e) {
+        if (embedding == null || embedding.length == 0) {
           return Maybe.error(
-            new GraviteeInferenceHttpException(
-              String.format("Failed to extract embedding from location '%s': %s", outputLocation, e.getMessage())
-            )
-          );
-        } catch (ClassCastException e) {
-          return Maybe.error(
-            new GraviteeInferenceHttpException(
-              String.format("Data at location '%s' is not a valid float array: %s", outputLocation, e.getMessage())
-            )
+            new GraviteeInferenceHttpException(String.format("No embedding data found at location: %s", outputLocation))
           );
         }
-      })
-      .doOnError(error -> LOGGER.error("Failed to parse response", error));
+        return Maybe.just(new EmbeddingTokenCount(embedding, -1));
+      } catch (JsonPathException e) {
+        return Maybe.error(
+          new GraviteeInferenceHttpException(
+            String.format("Failed to extract embedding from location '%s': %s", outputLocation, e.getMessage())
+          )
+        );
+      } catch (ClassCastException e) {
+        return Maybe.error(
+          new GraviteeInferenceHttpException(
+            String.format("Data at location '%s' is not a valid float array: %s", outputLocation, e.getMessage())
+          )
+        );
+      }
+    }).doOnError(error -> LOGGER.error("Failed to parse response", error));
   }
 
   private String getRequestBodyTemplate() {
