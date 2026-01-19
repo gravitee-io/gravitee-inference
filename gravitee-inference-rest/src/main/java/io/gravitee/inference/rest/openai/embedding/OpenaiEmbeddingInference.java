@@ -47,8 +47,7 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
   @Override
   protected Maybe<EmbeddingTokenCount> parseResponse(Buffer responseJson) {
     LOGGER.debug("Parsing response from OpenAI embedding inference");
-    return Maybe
-      .just(responseJson)
+    return Maybe.just(responseJson)
       .flatMap(this::validateBuffer)
       .map(response -> Json.decodeValue(responseJson.toString(), EmbeddingResponse.class))
       .flatMap(this::validateResponse)

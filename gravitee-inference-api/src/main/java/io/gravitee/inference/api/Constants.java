@@ -37,6 +37,46 @@ public final class Constants {
   public static final String MODEL_PATH = "modelPath";
   public static final String TOKENIZER_PATH = "tokenizerPath";
   public static final String CONFIG_JSON_PATH = "configJsonPath";
+  public static final String MODEL_NAME = "modelName";
+
+  /*
+    Llama.cpp payload keys
+  */
+  public static final String CONTEXT = "context";
+  public static final String CONTEXT_N_CTX = "nCtx";
+  public static final String CONTEXT_N_BATCH = "nBatch";
+  public static final String CONTEXT_N_UBATCH = "nUBatch";
+  public static final String CONTEXT_N_SEQ_MAX = "nSeqMax";
+  public static final String CONTEXT_N_THREADS = "nThreads";
+  public static final String CONTEXT_N_THREADS_BATCH = "nThreadsBatch";
+  public static final String CONTEXT_POOLING_TYPE = "poolingType";
+  public static final String CONTEXT_ATTENTION_TYPE = "attentionType";
+  public static final String CONTEXT_FLASH_ATTN_TYPE = "flashAttnType";
+  public static final String CONTEXT_OFFLOAD_KQV = "offloadKQV";
+  public static final String CONTEXT_NO_PERF = "noPerf";
+  public static final String MODEL_PARAMS = "modelParams";
+  public static final String MODEL_N_GPU_LAYERS = "nGpuLayers";
+  public static final String MODEL_USE_MLOCK = "useMlock";
+  public static final String MODEL_USE_MMAP = "useMmap";
+  public static final String MODEL_SPLIT_MODE = "splitMode";
+  public static final String MODEL_MAIN_GPU = "mainGpu";
+  public static final String MODEL_LOG_LEVEL = "logLevel";
+  public static final String MODEL_LORA_REPO = "loraRepo";
+  public static final String MODEL_LORA_REPO_PATH = "loraPath";
+  public static final String MODEL_MMPROJ_PATH = "mmprojPath";
+  public static final String MODEL_MULTIMODALITY = "multimodality";
+  public static final String MODEL_RPC_SERVERS = "rpcServers";
+  public static final String MEDIA = "media";
+  public static final String SEQ_ID = "seqId";
+  public static final String PROMPT = "prompt";
+  public static final String MESSAGES = "messages";
+  public static final String MAX_TOKENS = "maxTokens";
+  public static final String TEMPERATURE = "temperature";
+  public static final String TOP_P = "topP";
+  public static final String PRESENCE_PENALTY = "presencePenalty";
+  public static final String FREQUENCY_PENALTY = "frequencyPenalty";
+  public static final String STOP = "stop";
+  public static final String SEED = "seed";
 
   /*
     ONNX Constants

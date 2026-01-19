@@ -285,8 +285,9 @@ public class HttpEmbeddingInferenceTest {
     when(mockWebClient.requestAbs(any(), anyString())).thenReturn(mockHttpRequest);
     when(mockHttpRequest.followRedirects(true)).thenReturn(mockHttpRequest);
     when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(mockHttpRequest);
-    when(mockHttpRequest.rxSendBuffer(any(Buffer.class)))
-      .thenReturn(Single.error(new RuntimeException("Connection failed")));
+    when(mockHttpRequest.rxSendBuffer(any(Buffer.class))).thenReturn(
+      Single.error(new RuntimeException("Connection failed"))
+    );
 
     try {
       var webClientField = inference.getClass().getSuperclass().getSuperclass().getDeclaredField("webClient");

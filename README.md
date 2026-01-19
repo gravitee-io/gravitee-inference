@@ -217,3 +217,137 @@ GioMaths maths = SIMDMathFactory.gioMaths();
 ```
 
 The factory will resolve at runtime which SIMD capability your CPU handles.
+
+---
+
+## Llama.cpp Inference (GGUF)
+
+`gravitee-inference-llama-cpp` runs local LLM inference using [llama.cpp](https://github.com/ggml-org/llama.cpp) via Java's Foreign Function & Memory API. Models must be in **GGUF** format.
+
+### ModelConfig Reference
+
+All parameters are set through the `ModelConfig` record:
+
+| Parameter | Type | Description |
+|---|---|---|
+| `modelPath` | `Path` | Absolute path to the `.gguf` model file. **Required.** |
+| `nCtx` | `int` | Context window size (tokens). Larger values use more memory. Typical: `2048`–`8192`. |
+| `nBatch` | `int` | Maximum tokens processed per batch during prompt evaluation. Higher = faster prompt ingestion but more memory. Typical: `512`–`2048`. |
+| `nUBatch` | `int` | Micro-batch size (tokens per internal compute step). Usually same as `nBatch` or smaller. |
+| `nSeqMax` | `int` | Maximum concurrent sequences (conversations) in the batch engine. |
+| `nThreads` | `int` | CPU threads for inference. Use physical core count (not hyperthreads). |
+| `nThreadsBatch` | `int` | CPU threads for batch prompt processing. Can be higher than `nThreads`. |
+| `nGpuLayers` | `int` | Number of transformer layers offloaded to GPU. `0` = CPU-only, `99` = offload all. |
+| `useMlock` | `boolean` | Lock model weights in RAM (prevents OS paging). Recommended for production. |
+| `useMmap` | `boolean` | Memory-map model weights from disk. Faster loading, shared across processes. |
+| `splitMode` | `SplitMode` | Multi-GPU split strategy: `NONE` (single GPU), `LAYER` (split by layers), `ROW` (tensor parallelism). |
+| `mainGpu` | `int` | Primary GPU index for single-GPU or scratch buffer allocation. |
+| `flashAttnType` | `FlashAttentionType` | Flash Attention: `AUTO` (let llama.cpp decide), `ENABLED`, or `DISABLED`. |
+| `offloadKQV` | `boolean` | Offload KV-cache to GPU. Strongly recommended when using GPU layers. |
+| `noPerf` | `boolean` | Disable performance counters. Set `false` to collect timing metrics. |
+| `logLevel` | `LlamaLogLevel` | Native llama.cpp log verbosity. `null` to disable native logging. |
+| `loraPath` | `Path` | Path to a LoRA adapter `.gguf` file, or `null`. |
+| `mmprojPath` | `Path` | Path to a multimodal projector `.gguf` file (for vision/audio models), or `null`. |
+| `rpcServers` | `List<String>` | RPC server endpoints (`"host:port"`) for distributed inference. Empty or `null` for local-only. |
+| `memoryCheckPolicy` | `MemoryCheckPolicy` | Pre-flight memory check: `FAIL` (abort if model won't fit), `WARN` (log and continue), `DISABLED` (skip). |
+
+### Memory Tuning
+
+The engine runs a pre-flight memory check before loading weights. The log output looks like:
+
+```
+INFO  EngineAdapter - Running memory pre-flight check for Qwen3-0.6B-Q8_0.gguf (policy=WARN)
+INFO  EngineAdapter - Memory pre-flight: VRAM estimate (exact): required=0.65 GiB, available=25.47 GiB — fits. Model fits with 97% headroom.
+```
+
+If the model doesn't fit, the estimator suggests a reduced `nGpuLayers` value:
+
+```
+INFO  EngineAdapter - Memory pre-flight: VRAM estimate (exact): required=14.20 GiB, available=8.00 GiB — does NOT fit.
+                      Try nGpuLayers=12 (requested 99) to fit within available VRAM.
+```
+
+**What the estimator accounts for:**
+- Model weights (proportional to `nGpuLayers` / total layers)
+- KV-cache (`nCtx` x layers x heads x head_dim x 4 bytes per token)
+- Multimodal projector weights (if `mmprojPath` is set)
+- LoRA adapter weights (if `loraPath` is set)
+- 10% GPU safety margin for driver/OS overhead
+
+**What it does NOT account for:**
+- Compute graph scratch buffers (allocated at first inference)
+- Vision encoder activation memory (temporary, varies with image resolution)
+- System memory used by the GGUF file mapping
+
+#### Choosing `nGpuLayers`
+
+| Scenario | Recommendation |
+|---|---|
+| Model fits entirely in VRAM | Set `nGpuLayers` to `99` (offload all layers) |
+| Model partially fits | Use the suggested layer count from the memory check log |
+| No GPU / CPU-only | Set `nGpuLayers` to `0` |
+| Distributed (RPC) | Set `nGpuLayers` to `99` — layers are distributed across RPC servers |
+
+#### Choosing `nCtx`
+
+The context window directly impacts KV-cache memory. Each token costs:
+
+```
+bytes_per_token = nLayers x nHeadKv x headDim x 4
+```
+
+For a typical 1B model (16 layers, 8 KV-heads, 64 head_dim): **16 KB per token**.
+For a 7B model (32 layers, 8 KV-heads, 128 head_dim): **128 KB per token**.
+
+| `nCtx` | KV-cache (1B model) | KV-cache (7B model) |
+|---|---|---|
+| 2048 | 32 MiB | 256 MiB |
+| 4096 | 64 MiB | 512 MiB |
+| 8192 | 128 MiB | 1 GiB |
+| 32768 | 512 MiB | 4 GiB |
+
+Start with `nCtx=4096` and increase only if your use case requires long conversations.
+
+#### Choosing `nBatch` and `nUBatch`
+
+- `nBatch` controls how many tokens are processed per prompt evaluation step. Larger batches = faster prompt ingestion but more memory.
+- `nUBatch` is the micro-batch size used internally. Set equal to `nBatch` unless memory-constrained.
+
+| Scenario | `nBatch` | `nUBatch` |
+|---|---|---|
+| Low memory | `256` | `256` |
+| Balanced | `512` | `512` |
+| Maximum throughput | `2048` | `2048` |
+
+#### Threading
+
+- `nThreads`: set to the number of **physical** CPU cores (not hyperthreads). Over-subscribing hurts performance.
+- `nThreadsBatch`: can be higher than `nThreads` since batch processing is less latency-sensitive.
+
+#### Flash Attention
+
+Flash Attention reduces memory usage for the KV-cache and improves throughput. Use `AUTO` (default) to let llama.cpp decide based on the model architecture and hardware. Force `ENABLED` if you want to ensure it's on.
+
+#### `useMlock` vs `useMmap`
+
+| Setting | Behavior | When to use |
+|---|---|---|
+| `useMmap=true` | Memory-maps the model file; pages loaded on demand | Default. Good for development and shared environments. |
+| `useMlock=true` | Locks all model pages in physical RAM after loading | Production. Prevents OS from paging out weights under memory pressure. |
+| Both `true` | Model is memory-mapped then locked | Best for production with large models — fast loading + guaranteed resident memory. |
+
+#### RPC (Distributed Inference)
+
+When `rpcServers` is configured, model layers are distributed across remote GPU servers:
+
+1. Set `nGpuLayers=99` — layers are split across all servers proportionally to their free VRAM.
+2. The memory estimator queries each server's free memory via the RPC protocol (no backend registration needed).
+3. The bottleneck is the server with the **least free VRAM** — the estimator reports this as available memory.
+
+#### Memory Check Policy
+
+| Policy | Behavior |
+|---|---|
+| `WARN` | Log estimate at INFO, warn if model won't fit, continue loading. **Recommended for production.** |
+| `FAIL` | Log estimate at INFO, throw `InsufficientVramException` if model won't fit. Use in CI or strict environments. |
+| `DISABLED` | Skip the check entirely. Use when you know the model fits or the estimator is not needed. |
