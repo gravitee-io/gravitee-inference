@@ -55,13 +55,12 @@ public class OnnxBertEmbeddingModel extends OnnxBertInference<EmbeddingTokenCoun
     var embeddings = new float[nbPartitions][];
 
     // we ignore first token (CLS) and last token (SEP)
-    iterate(1, from -> from < lastIndex, from -> from + partitionSize)
-      .forEach(from -> {
-        int to = min(lastIndex, from + partitionSize);
-        var partition = encode(String.join("", tokens.subList(from, to))).result();
-        embeddings[from - 1] = toEmbedding(partition);
-        weights[from - 1] = partition.size();
-      });
+    iterate(1, from -> from < lastIndex, from -> from + partitionSize).forEach(from -> {
+      int to = min(lastIndex, from + partitionSize);
+      var partition = encode(String.join("", tokens.subList(from, to))).result();
+      embeddings[from - 1] = toEmbedding(partition);
+      weights[from - 1] = partition.size();
+    });
 
     return new EmbeddingsWithWeights(embeddings, weights);
   }

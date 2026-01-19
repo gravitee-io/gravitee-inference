@@ -23,4 +23,6 @@ public enum InferenceFormat {
   ONNX_BERT,
   OPENAI,
   HTTP,
+  LLAMA_CPP,
+  VLLM,
 }

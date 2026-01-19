@@ -89,16 +89,15 @@ public class OpenaiEmbeddingInferenceTest {
       .put("object", "list")
       .put(
         "data",
-        new JsonArray()
-          .add(
-            new JsonObject()
-              .put("object", "embedding")
-              .put("index", 0)
-              .put(
-                "embedding",
-                new JsonArray().add(0.1f).add(0.2f).add(0.3f) // Sample embedding values
-              )
-          )
+        new JsonArray().add(
+          new JsonObject()
+            .put("object", "embedding")
+            .put("index", 0)
+            .put(
+              "embedding",
+              new JsonArray().add(0.1f).add(0.2f).add(0.3f) // Sample embedding values
+            )
+        )
       )
       .put("model", TEST_MODEL_NAME)
       .put("usage", new JsonObject().put("prompt_tokens", 10).put("total_tokens", 10));
