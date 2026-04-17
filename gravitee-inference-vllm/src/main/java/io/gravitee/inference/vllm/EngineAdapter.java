@@ -35,10 +35,6 @@ import io.gravitee.vllm.iterator.VllmIterator;
 import io.gravitee.vllm.iterator.VllmOutput;
 import io.gravitee.vllm.runtime.PythonRuntime;
 import io.gravitee.vllm.state.ConversationState;
-import io.gravitee.vllm.template.ChatMessage;
-import io.gravitee.vllm.template.ChatTemplate;
-import io.gravitee.vllm.template.Tool;
-import io.gravitee.vllm.template.ToolFunction;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +63,6 @@ public class EngineAdapter
 
   private final VllmEngine engine;
   private final VllmIterator iterator;
-  private final ChatTemplate chatTemplate;
 
   /** Tracks per-sequence state keyed by internal ID. */
   private final Map<Integer, VllmSequenceState> states = new ConcurrentHashMap<>();
@@ -120,7 +115,19 @@ public class EngineAdapter
     runMemoryCheck(config);
     this.engine = builder.build();
     this.iterator = new VllmIterator(engine);
-    this.chatTemplate = new ChatTemplate(engine);
+  }
+
+  /** Returns the raw chat template string from the HuggingFace tokenizer. */
+  public String chatTemplateString() {
+    return engine.getChatTemplate();
+  }
+
+  public String bosToken() {
+    return engine.getBosToken();
+  }
+
+  public String eosToken() {
+    return engine.getEosToken();
   }
 
   private static void runMemoryCheck(VllmConfig config) {
@@ -184,43 +191,19 @@ public class EngineAdapter
 
   @Override
   public VllmSequenceState createSequenceState(int internalId, VllmRequest request) throws Exception {
-    // Render prompt using chat template if messages are present
+    // Prompt must be pre-rendered by the caller — this adapter does not template.
     String prompt = request.prompt();
     MultiModalData multiModalData = null;
 
     if (request.hasMessages() && request.messages() != null) {
-      // Collect multimodal data (images, audio) from all messages
       multiModalData = extractMultiModalData(request.messages());
-
-      List<ChatMessage> vllmMessages = request
-        .messages()
-        .stream()
-        .map(msg -> {
-          String content = msg.content();
-          // For multimodal messages, build content parts list for the Jinja2 template
-          if (msg.hasMedia()) {
-            List<Map<String, Object>> contentParts = buildContentParts(msg);
-            return ChatMessage.userWithParts(content, contentParts);
-          }
-          return switch (msg.role()) {
-            case SYSTEM -> ChatMessage.system(content);
-            case ASSISTANT -> ChatMessage.assistant(content);
-            default -> ChatMessage.user(content);
-          };
-        })
-        .toList();
-
-      // Convert tools from OpenAI format (Map) to vLLM4J Tool DSL
-      List<Tool> vllmTools = convertTools(request.tools());
-      if (vllmTools != null && !vllmTools.isEmpty()) {
-        prompt = chatTemplate.render(vllmMessages, vllmTools, true);
-      } else {
-        prompt = chatTemplate.render(vllmMessages, true);
-      }
     }
 
     if (prompt == null || prompt.isBlank()) {
-      LOGGER.error("Cannot create sequence state: prompt is empty for internalId {}", internalId);
+      LOGGER.error(
+        "Cannot create sequence state: prompt is empty for internalId {} — vLLM requires a pre-rendered prompt",
+        internalId
+      );
       return null;
     }
 
@@ -422,43 +405,6 @@ public class EngineAdapter
   }
 
   /**
-   * Builds OpenAI-format content parts list for a multimodal message.
-   *
-   * <p>Converts the Gravitee API {@link io.gravitee.inference.api.textgen.ChatMessage}
-   * into the format that VLM Jinja2 templates expect:
-   * <pre>{@code
-   * [{"type": "text", "text": "Describe this image"},
-   *  {"type": "image"}]
-   * }</pre>
-   *
-   * <p>The image/audio binary data is passed separately via {@link MultiModalData},
-   * not embedded in the content parts. The template just needs to know that an
-   * image is present (via {@code {"type": "image"}}) to insert placeholder tokens.
-   *
-   * @param msg a message with media content
-   * @return list of content part maps in OpenAI format
-   */
-  private static List<Map<String, Object>> buildContentParts(io.gravitee.inference.api.textgen.ChatMessage msg) {
-    List<Map<String, Object>> parts = new java.util.ArrayList<>();
-
-    // Add text part if present
-    if (msg.hasText()) {
-      parts.add(Map.of("type", "text", "text", msg.content()));
-    }
-
-    // Add media placeholders — the actual bytes are in MultiModalData
-    for (Content content : msg.media()) {
-      if (content instanceof ImageContent) {
-        parts.add(Map.of("type", "image"));
-      } else if (content instanceof AudioContent) {
-        parts.add(Map.of("type", "audio"));
-      }
-    }
-
-    return parts;
-  }
-
-  /**
    * Extracts multimodal data (images, audio) from chat messages.
    *
    * <p>Iterates over all messages, collecting any {@link ImageContent} or
@@ -500,38 +446,6 @@ public class EngineAdapter
     }
 
     return mmData;
-  }
-
-  /**
-   * Converts OpenAI-format tools (List of Maps) to vLLM4J {@link Tool} DSL objects.
-   *
-   * <p>Each tool map follows the OpenAI format:
-   * <pre>{@code
-   * {"type": "function", "function": {"name": "...", "description": "...", "parameters": {...}}}
-   * }</pre>
-   *
-   * @param tools the raw OpenAI tools from the request payload, or null
-   * @return list of vLLM4J Tool objects, or null if input is null/empty
-   */
-  @SuppressWarnings("unchecked")
-  private static List<Tool> convertTools(List<Map<String, Object>> tools) {
-    if (tools == null || tools.isEmpty()) {
-      return null;
-    }
-    List<Tool> result = new java.util.ArrayList<>();
-    for (Map<String, Object> toolMap : tools) {
-      Object functionObj = toolMap.get("function");
-      if (!(functionObj instanceof Map<?, ?> functionMap)) {
-        continue;
-      }
-      String name = functionMap.get("name") instanceof String s ? s : null;
-      String description = functionMap.get("description") instanceof String s ? s : null;
-      Map<String, Object> parameters = functionMap.get("parameters") instanceof Map<?, ?> p ? (Map<String, Object>) p : null;
-      if (name != null) {
-        result.add(Tool.function(name, description != null ? description : "", parameters));
-      }
-    }
-    return result.isEmpty() ? null : result;
   }
 
   /**

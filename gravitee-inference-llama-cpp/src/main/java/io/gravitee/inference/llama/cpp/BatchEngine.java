@@ -30,6 +30,8 @@ import java.util.function.Consumer;
  */
 public class BatchEngine extends AbstractBatchEngine<ModelConfig, Request, String, io.gravitee.llama.cpp.ConversationState> {
 
+  private final EngineAdapter engineAdapter;
+
   /**
    * Creates a new llama.cpp batch engine with default configuration.
    *
@@ -46,7 +48,25 @@ public class BatchEngine extends AbstractBatchEngine<ModelConfig, Request, Strin
    * @param modelConfig The model configuration
    */
   public BatchEngine(BatchEngineConfig engineConfig, ModelConfig modelConfig) {
-    super(engineConfig, new EngineAdapter(modelConfig));
+    this(engineConfig, new EngineAdapter(modelConfig));
+  }
+
+  private BatchEngine(BatchEngineConfig engineConfig, EngineAdapter adapter) {
+    super(engineConfig, adapter);
+    this.engineAdapter = adapter;
+  }
+
+  /** Returns the raw chat template string from the GGUF model. */
+  public String chatTemplateString() {
+    return engineAdapter.model().chatTemplateString();
+  }
+
+  public String bosToken() {
+    return engineAdapter.model().bosToken();
+  }
+
+  public String eosToken() {
+    return engineAdapter.model().eosToken();
   }
 
   /**

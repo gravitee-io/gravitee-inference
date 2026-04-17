@@ -351,3 +351,75 @@ When `rpcServers` is configured, model layers are distributed across remote GPU 
 | `WARN` | Log estimate at INFO, warn if model won't fit, continue loading. **Recommended for production.** |
 | `FAIL` | Log estimate at INFO, throw `InsufficientVramException` if model won't fit. Use in CI or strict environments. |
 | `DISABLED` | Skip the check entirely. Use when you know the model fits or the estimator is not needed. |
+
+---
+
+## vLLM Inference (HuggingFace models)
+
+`gravitee-inference-vllm` runs LLM inference using [vLLM](https://github.com/vllm-project/vllm) through an embedded CPython interpreter (via [vLLM4j](https://github.com/gravitee-io/vLLM4j)). Models are loaded directly from HuggingFace Hub — no GGUF conversion required.
+
+### Requirements
+
+- Linux with CUDA GPU (Metal not supported)
+- A Python virtual environment with vLLM installed:
+  ```sh
+  python -m venv .venv
+  source .venv/bin/activate
+  pip install vllm
+  ```
+- Pass the venv path via `-Dvllm4j.venv=/path/to/.venv` or `VLLM_VENV_PATH` env var
+
+### VllmConfig Reference
+
+| Parameter | Type | Description |
+|---|---|---|
+| `model` | `String` | HuggingFace model name (e.g. `Qwen/Qwen3-0.6B`). **Required.** |
+| `dtype` | `String` | Weight data type: `auto`, `float16`, `bfloat16`, `float32`. |
+| `quantization` | `String` | Quantization method: `gptq`, `awq`, `fp8`, or `null` (no quant). |
+| `maxModelLen` | `int` | Maximum sequence length (context window). |
+| `maxNumSeqs` | `int` | Maximum concurrent sequences. |
+| `gpuMemoryUtilization` | `float` | Fraction of GPU memory to use (0.0–1.0). |
+| `enforceEager` | `boolean` | Disable CUDA graphs for reduced memory. |
+| `trustRemoteCode` | `boolean` | Allow executing model-provided Python code. |
+| `enableChunkedPrefill` | `boolean` | Enable chunked prefill for long prompts. |
+| `enablePrefixCaching` | `boolean` | Cache shared prefixes across requests. |
+| `enableSleepMode` | `boolean` | Put the engine to sleep when idle. |
+| `memoryCheckPolicy` | `MemoryCheckPolicy` | Pre-flight memory check: `FAIL`, `WARN`, or `DISABLED`. |
+
+### Quick Start
+
+```java
+var config = VllmConfig.builder()
+    .model("Qwen/Qwen3-0.6B")
+    .dtype("auto")
+    .maxModelLen(4096)
+    .maxNumSeqs(1)
+    .gpuMemoryUtilization(0.35f)
+    .enforceEager(true)
+    .trustRemoteCode(true)
+    .build();
+
+var engine = new BatchEngine(config);
+engine.start(token -> {
+    System.out.print(token.token());
+    if (token.isFinal()) System.out.println();
+});
+
+var request = VllmRequest.builder()
+    .prompt("Hello, how are you?")
+    .maxTokens(256)
+    .temperature(0.7f)
+    .build();
+
+engine.addSequence(0, request);
+```
+
+### Chat Template
+
+The model's Jinja2 chat template is accessible via:
+
+```java
+String template = engine.chatTemplateString(); // from HuggingFace tokenizer_config.json
+String bos = engine.bosToken();
+String eos = engine.eosToken();
+```

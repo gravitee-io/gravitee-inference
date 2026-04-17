@@ -51,6 +51,11 @@ public class EngineAdapter
     this.iterator = model.newBatchIterator();
   }
 
+  /** Returns the underlying model instance. */
+  public Model model() {
+    return model;
+  }
+
   private static void runMemoryCheck(ModelConfig config) {
     MemoryCheckPolicy policy = config.memoryCheckPolicy();
     if (policy == null || policy == MemoryCheckPolicy.DISABLED) {

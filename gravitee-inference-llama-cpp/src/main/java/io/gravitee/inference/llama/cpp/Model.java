@@ -50,6 +50,10 @@ public final class Model implements AutoCloseable {
   private final LlamaLogger logger;
   private final MtmdContext mtmdContext;
 
+  // Memoized chat template string — read once from GGUF metadata.
+  private volatile String chatTemplateString;
+  private volatile boolean chatTemplateResolved;
+
   public Model(ModelConfig config) {
     this.arena = Arena.ofAuto();
 
@@ -158,6 +162,32 @@ public final class Model implements AutoCloseable {
     return mtmdContext;
   }
 
+  /** Returns the chat template from GGUF metadata, or {@code null}. */
+  public String chatTemplateString() {
+    if (!chatTemplateResolved) {
+      synchronized (this) {
+        if (!chatTemplateResolved) {
+          try {
+            chatTemplateString = new LlamaTemplate(model).templateString();
+          } catch (Exception e) {
+            LOGGER.debug("Could not read chat template from model: {}", e.getMessage());
+            chatTemplateString = null;
+          }
+          chatTemplateResolved = true;
+        }
+      }
+    }
+    return chatTemplateString;
+  }
+
+  public String bosToken() {
+    return vocab.bosTokenText();
+  }
+
+  public String eosToken() {
+    return vocab.eosTokenText();
+  }
+
   public ConversationState newConversation(int seqId, Request request) {
     Objects.requireNonNull(request, "request is required");
     String prompt = promptFor(request);
@@ -220,10 +250,15 @@ public final class Model implements AutoCloseable {
   }
 
   public String promptFor(Request request) {
+    // Pre-rendered prompt takes precedence over native template application.
+    if (request.prompt() != null && !request.prompt().isBlank()) {
+      return request.prompt();
+    }
+    // Fallback: apply the native chat template (direct model path).
     if (request.hasMessages()) {
       return buildChatPrompt(request.messages());
     }
-    return Objects.requireNonNullElse(request.prompt(), "");
+    return "";
   }
 
   public PromptStats promptStats(Request request) {
