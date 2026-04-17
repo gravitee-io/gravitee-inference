@@ -1,3 +1,15 @@
+# [2.0.0-alpha.1](https://github.com/gravitee-io/gravitee-inference/compare/1.5.0...2.0.0-alpha.1) (2026-04-17)
+
+
+### Features
+
+* llama.cpp and vLLM library handlers ([ce41983](https://github.com/gravitee-io/gravitee-inference/commit/ce419838937ea0f8018accc2a4c3e9229d128c56))
+
+
+### BREAKING CHANGES
+
+* java 25 required
+
 ## [1.5.1](https://github.com/gravitee-io/gravitee-inference/compare/1.5.0...1.5.1) (2026-04-23)
 
 
