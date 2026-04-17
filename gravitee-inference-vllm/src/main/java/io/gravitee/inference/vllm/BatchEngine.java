@@ -33,6 +33,8 @@ import java.util.function.Consumer;
  */
 public class BatchEngine extends AbstractBatchEngine<VllmConfig, VllmRequest, String, EngineAdapter.VllmSequenceState> {
 
+  private final EngineAdapter engineAdapter;
+
   /**
    * Creates a new vLLM batch engine with default configuration.
    *
@@ -49,7 +51,25 @@ public class BatchEngine extends AbstractBatchEngine<VllmConfig, VllmRequest, St
    * @param vllmConfig The vLLM configuration
    */
   public BatchEngine(BatchEngineConfig engineConfig, VllmConfig vllmConfig) {
-    super(engineConfig, new EngineAdapter(vllmConfig));
+    this(engineConfig, new EngineAdapter(vllmConfig));
+  }
+
+  private BatchEngine(BatchEngineConfig engineConfig, EngineAdapter adapter) {
+    super(engineConfig, adapter);
+    this.engineAdapter = adapter;
+  }
+
+  /** Returns the raw chat template string from the HuggingFace tokenizer. */
+  public String chatTemplateString() {
+    return engineAdapter.chatTemplateString();
+  }
+
+  public String bosToken() {
+    return engineAdapter.bosToken();
+  }
+
+  public String eosToken() {
+    return engineAdapter.eosToken();
   }
 
   /**
