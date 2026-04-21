@@ -1,3 +1,10 @@
+# [2.0.0-alpha.2](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0-alpha.1...2.0.0-alpha.2) (2026-04-21)
+
+
+### Features
+
+* wire bos eos tokens and chat template ([2ed6db4](https://github.com/gravitee-io/gravitee-inference/commit/2ed6db447d6ba8db8be1fa7d1ebac0c032b13e80))
+
 # [2.0.0-alpha.1](https://github.com/gravitee-io/gravitee-inference/compare/1.5.0...2.0.0-alpha.1) (2026-04-17)
 
 
