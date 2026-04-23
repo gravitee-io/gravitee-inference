@@ -90,9 +90,9 @@ public class OnnxBertEmbeddingInferenceTest extends OnnxBertBaseTest {
   public static final String THE_BROWN_FOX_JUMPED_OVER_THE_DOG = "The brown fox jumped over the dog";
 
   public static Stream<OnnxBertConfig> params_that_must_return_embedding() {
-    return Stream
-      .of(ONNX_BERT_CONFIG_STREAM_CLS.stream(), ONNX_BERT_CONFIG_STREAM_MEAN.stream())
-      .flatMap(Function.identity());
+    return Stream.of(ONNX_BERT_CONFIG_STREAM_CLS.stream(), ONNX_BERT_CONFIG_STREAM_MEAN.stream()).flatMap(
+      Function.identity()
+    );
   }
 
   public static Stream<OnnxBertConfig> params_that_must_return_embedding_with_mean() {

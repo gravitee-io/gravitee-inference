@@ -23,10 +23,10 @@ import io.gravitee.inference.rest.http.GraviteeInferenceHttpException;
 import io.gravitee.inference.rest.http.embedding.HttpEmbeddingConfig;
 import io.gravitee.inference.rest.http.embedding.HttpEmbeddingInference;
 import io.reactivex.rxjava3.core.Single;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.Json;
 import io.vertx.rxjava3.core.Vertx;
-import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
 import io.vertx.rxjava3.ext.web.client.HttpResponse;
 import io.vertx.rxjava3.ext.web.client.WebClient;
@@ -285,8 +285,9 @@ public class HttpEmbeddingInferenceTest {
     when(mockWebClient.requestAbs(any(), anyString())).thenReturn(mockHttpRequest);
     when(mockHttpRequest.followRedirects(true)).thenReturn(mockHttpRequest);
     when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(mockHttpRequest);
-    when(mockHttpRequest.rxSendBuffer(any(Buffer.class)))
-      .thenReturn(Single.error(new RuntimeException("Connection failed")));
+    when(mockHttpRequest.rxSendBuffer(any(Buffer.class))).thenReturn(
+      Single.error(new RuntimeException("Connection failed"))
+    );
 
     try {
       var webClientField = inference.getClass().getSuperclass().getSuperclass().getDeclaredField("webClient");

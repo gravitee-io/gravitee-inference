@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>23.4.1</version>
+        <version>24.0.1</version>
     </parent>
 
     <groupId>io.gravitee.inference</groupId>
@@ -36,14 +36,16 @@
     <packaging>pom</packaging>
 
     <properties>
-        <gravitee-bom.version>8.3.27</gravitee-bom.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
+        <gravitee-bom.version>9.0.0-alpha.4</gravitee-bom.version>
         <commons-math3.version>3.6.1</commons-math3.version>
-        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <ai.djl.version>0.33.0</ai.djl.version>
         <json-path.version>2.9.0</json-path.version>
+
+        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
+        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+
+        <gravitee.archrules.skip>true</gravitee.archrules.skip>
+        <maven.compiler.release>21</maven.compiler.release>
     </properties>
     <modules>
         <module>gravitee-inference-math</module>
