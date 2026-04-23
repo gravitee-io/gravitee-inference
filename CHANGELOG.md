@@ -1,3 +1,10 @@
+# [2.0.0-beta.2](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0-beta.1...2.0.0-beta.2) (2026-04-23)
+
+
+### Bug Fixes
+
+* use plain sentence for encoding embedding ([4e6d82e](https://github.com/gravitee-io/gravitee-inference/commit/4e6d82ea4719a46c08a7df4cc7a5ddd215fed4d3))
+
 # [2.0.0-beta.1](https://github.com/gravitee-io/gravitee-inference/compare/1.5.0...2.0.0-beta.1) (2026-04-23)
 
 
