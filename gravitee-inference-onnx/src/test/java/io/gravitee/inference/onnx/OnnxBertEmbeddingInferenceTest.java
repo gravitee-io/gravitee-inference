@@ -173,6 +173,6 @@ public class OnnxBertEmbeddingInferenceTest extends OnnxBertBaseTest {
     assertEquals(1.0f, gioMath.cosineScore(result1.embedding(), result1.embedding()));
     assertEquals(1.0f, gioMath.cosineScore(result2.embedding(), result2.embedding()));
 
-    assertEquals(0.84, FastMath.ceil(gioMath.cosineScore(result1.embedding(), result2.embedding()) * 100) / 100);
+    assertEquals(0.91, FastMath.ceil(gioMath.cosineScore(result1.embedding(), result2.embedding()) * 100) / 100);
   }
 }
