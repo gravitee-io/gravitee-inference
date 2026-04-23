@@ -22,10 +22,10 @@ import static org.mockito.Mockito.*;
 import io.gravitee.inference.rest.openai.embedding.OpenAIEmbeddingConfig;
 import io.gravitee.inference.rest.openai.embedding.OpenaiEmbeddingInference;
 import io.reactivex.rxjava3.core.Single;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava3.core.Vertx;
-import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
 import io.vertx.rxjava3.ext.web.client.HttpResponse;
 import io.vertx.rxjava3.ext.web.client.WebClient;
@@ -89,16 +89,15 @@ public class OpenaiEmbeddingInferenceTest {
       .put("object", "list")
       .put(
         "data",
-        new JsonArray()
-          .add(
-            new JsonObject()
-              .put("object", "embedding")
-              .put("index", 0)
-              .put(
-                "embedding",
-                new JsonArray().add(0.1f).add(0.2f).add(0.3f) // Sample embedding values
-              )
-          )
+        new JsonArray().add(
+          new JsonObject()
+            .put("object", "embedding")
+            .put("index", 0)
+            .put(
+              "embedding",
+              new JsonArray().add(0.1f).add(0.2f).add(0.3f) // Sample embedding values
+            )
+        )
       )
       .put("model", TEST_MODEL_NAME)
       .put("usage", new JsonObject().put("prompt_tokens", 10).put("total_tokens", 10));

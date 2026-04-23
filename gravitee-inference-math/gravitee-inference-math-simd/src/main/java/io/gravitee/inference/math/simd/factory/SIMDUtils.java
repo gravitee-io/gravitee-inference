@@ -67,6 +67,9 @@ public class SIMDUtils {
   }
 
   private static boolean checkCPUFeature(String feature) {
-    return PROCESSOR.getFeatureFlags().stream().map(String::toLowerCase).anyMatch(f -> f.contains(feature));
+    return PROCESSOR.getFeatureFlags()
+      .stream()
+      .map(String::toLowerCase)
+      .anyMatch(f -> f.contains(feature));
   }
 }
