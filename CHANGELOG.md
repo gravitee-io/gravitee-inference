@@ -1,3 +1,11 @@
+## [1.5.1](https://github.com/gravitee-io/gravitee-inference/compare/1.5.0...1.5.1) (2026-04-23)
+
+
+### Bug Fixes
+
+* partition size and autocloseable fix ([0388dd5](https://github.com/gravitee-io/gravitee-inference/commit/0388dd56cc283b04d3ad8770cec12d32b586935e))
+* use plain sentence for encoding embedding ([2a6cc30](https://github.com/gravitee-io/gravitee-inference/commit/2a6cc309d962b94ea81e2ccd8a9016aeb4bd45db))
+
 # [1.5.0](https://github.com/gravitee-io/gravitee-inference/compare/1.4.0...1.5.0) (2025-08-18)
 
 
