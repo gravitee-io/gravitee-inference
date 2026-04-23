@@ -22,9 +22,9 @@ import io.gravitee.inference.rest.openai.embedding.model.EmbeddingRequest;
 import io.gravitee.inference.rest.openai.embedding.model.EmbeddingResponse;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.Json;
 import io.vertx.rxjava3.core.Vertx;
-import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
 import io.vertx.rxjava3.ext.web.client.HttpResponse;
 import java.util.Objects;
@@ -47,8 +47,7 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
   @Override
   protected Maybe<EmbeddingTokenCount> parseResponse(Buffer responseJson) {
     LOGGER.debug("Parsing response from OpenAI embedding inference");
-    return Maybe
-      .just(responseJson)
+    return Maybe.just(responseJson)
       .flatMap(this::validateBuffer)
       .map(response -> Json.decodeValue(responseJson.toString(), EmbeddingResponse.class))
       .flatMap(this::validateResponse)
