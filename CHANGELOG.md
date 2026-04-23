@@ -1,3 +1,20 @@
+# [2.0.0-beta.1](https://github.com/gravitee-io/gravitee-inference/compare/1.5.0...2.0.0-beta.1) (2026-04-23)
+
+
+### Bug Fixes
+
+* partition size and autocloseable fix ([419c36f](https://github.com/gravitee-io/gravitee-inference/commit/419c36f6c70612b9bc4052457d96cfe3cf4b67da))
+
+
+### Features
+
+* migrate to Vert.x 5 ([f85b700](https://github.com/gravitee-io/gravitee-inference/commit/f85b700f972ae52a99386ea7557fedaa84d4660a))
+
+
+### BREAKING CHANGES
+
+* upgrade to Vert.x 5
+
 # [1.5.0](https://github.com/gravitee-io/gravitee-inference/compare/1.4.0...1.5.0) (2025-08-18)
 
 
