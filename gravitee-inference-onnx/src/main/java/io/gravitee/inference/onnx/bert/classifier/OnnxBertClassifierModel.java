@@ -22,6 +22,7 @@ import ai.djl.huggingface.tokenizers.Encoding;
 import ai.djl.huggingface.tokenizers.jni.CharSpan;
 import ai.onnxruntime.OnnxValue;
 import ai.onnxruntime.OrtException;
+import ai.onnxruntime.OrtSession;
 import io.gravitee.inference.api.classifier.ClassifierMode;
 import io.gravitee.inference.api.classifier.ClassifierResult;
 import io.gravitee.inference.api.classifier.ClassifierResults;
@@ -70,29 +71,31 @@ public class OnnxBertClassifierModel extends OnnxBertInference<ClassifierResults
   }
 
   private List<ClassifierResults> getTokenResults(EncodingResults encodingResult) {
-    var input = this.getTokenLogits(encodingResult.result().get(0));
-    var results = new ArrayList<ClassifierResults>(input.batchSize());
+    try (OrtSession.Result result1 = encodingResult.result()) {
+      TokenInput input = this.getTokenLogits(result1.get(0));
+      var results = new ArrayList<ClassifierResults>(input.batchSize());
 
-    for (int i = 0; i < input.batchSize(); i++) {
-      final Encoding encoding = encodingResult.encoding().get(i);
+      for (int i = 0; i < input.batchSize(); i++) {
+        final Encoding encoding = encodingResult.encoding().get(i);
 
-      final String[] tokens = encoding.getTokens();
-      final CharSpan[] spans = encoding.getCharTokenSpans();
+        final String[] tokens = encoding.getTokens();
+        final CharSpan[] spans = encoding.getCharTokenSpans();
 
-      float[][] tokenLogits = input.logits()[i];
-      var result = new ArrayList<ClassifierResult>();
-      for (int j = 1; j < tokens.length - 1; j++) {
-        final String sanitizedToken = tokens[j].trim();
-        var classifierResult = computeTokenProb(tokenLogits[j], sanitizedToken, spans[j]);
-        // we don't want all tokens to be present
-        if (!discarded.contains(classifierResult.label())) {
-          result.add(classifierResult);
+        float[][] tokenLogits = input.logits()[i];
+        var result = new ArrayList<ClassifierResult>();
+        for (int j = 1; j < tokens.length - 1; j++) {
+          final String sanitizedToken = tokens[j].trim();
+          var classifierResult = computeTokenProb(tokenLogits[j], sanitizedToken, spans[j]);
+          // we don't want all tokens to be present
+          if (!discarded.contains(classifierResult.label())) {
+            result.add(classifierResult);
+          }
         }
+        results.add(new ClassifierResults(result));
       }
-      results.add(new ClassifierResults(result));
-    }
 
-    return results;
+      return results;
+    }
   }
 
   private ClassifierResult computeTokenProb(float[] logit, String token, CharSpan span) {
@@ -112,13 +115,14 @@ public class OnnxBertClassifierModel extends OnnxBertInference<ClassifierResults
   }
 
   private List<ClassifierResults> getSequenceResults(EncodingResults encodingResult) {
-    var input = this.getSequenceInput(encodingResult.result().get(0));
-    var results = new ArrayList<ClassifierResults>(input.batchSize());
-    for (int i = 0; i < input.batchSize(); i++) {
-      results.add(new ClassifierResults(computeSequenceProb(input.logits()[i])));
+    try (OrtSession.Result result = encodingResult.result()) {
+      SequenceInput input = this.getSequenceInput(result.get(0));
+      var results = new ArrayList<ClassifierResults>(input.batchSize());
+      for (int i = 0; i < input.batchSize(); i++) {
+        results.add(new ClassifierResults(computeSequenceProb(input.logits()[i])));
+      }
+      return results;
     }
-
-    return results;
   }
 
   private List<ClassifierResult> computeSequenceProb(float[] logit) {
