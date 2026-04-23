@@ -41,16 +41,16 @@ public class OnnxBertEmbeddingModel extends OnnxBertInference<EmbeddingTokenCoun
   @Override
   public EmbeddingTokenCount infer(String input) {
     var tokens = tokenizer.tokenize(input);
-    var embeddings = getEmbeddings(tokens);
+    var embeddings = getEmbeddings(input, tokens.size());
 
     return new EmbeddingTokenCount(embeddings.toNormalizedWeighted(config.gioMath()), tokens.size());
   }
 
-  private EmbeddingsWithWeights getEmbeddings(List<String> tokens) {
+  private EmbeddingsWithWeights getEmbeddings(String input, int size) {
     final int partitionSize = config.get(MAX_SEQUENCE_LENGTH);
-    final int lastIndex = tokens.size() - 1;
+    final int lastIndex = size - 1;
 
-    final int nbPartitions = (tokens.size() / partitionSize) + 1;
+    final int nbPartitions = (size / partitionSize) + 1;
     var weights = new float[nbPartitions];
     var embeddings = new float[nbPartitions][];
 
@@ -58,7 +58,7 @@ public class OnnxBertEmbeddingModel extends OnnxBertInference<EmbeddingTokenCoun
     iterate(1, from -> from < lastIndex, from -> from + partitionSize).forEach(from -> {
       int to = min(lastIndex, from + partitionSize);
       int index = (from - 1) / partitionSize;
-      try (var partition = encode(String.join("", tokens.subList(from, to))).result()) {
+      try (var partition = encode(input).result()) {
         embeddings[index] = toEmbedding(partition);
         weights[index] = partition.size();
       }
