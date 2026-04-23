@@ -43,8 +43,7 @@ public abstract class OnnxInference<C extends OnnxConfig<?>, I, O> extends Infer
   private static final int MAX_INTRA_OPS_THREADS = getMaxIntraOpsThreads();
 
   private static int getMaxIntraOpsThreads() {
-    return POSSIBLE_KEYS
-      .stream()
+    return POSSIBLE_KEYS.stream()
       .map(System::getenv)
       .filter(Objects::nonNull)
       .filter(value -> NUMBER_PATTERN.matcher(value).matches())

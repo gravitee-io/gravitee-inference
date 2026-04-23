@@ -48,7 +48,9 @@ public class OnnxBertFillMaskInference extends OnnxBertInference<List<FillMaskRe
   public List<List<FillMaskResult<String>>> inferAll(List<String> input) {
     var encodingResults = encodeAll(input);
 
-    return range(0, input.size()).mapToObj(batchSize -> fillMask(input.get(batchSize), encodingResults, batchSize)).toList();
+    return range(0, input.size())
+      .mapToObj(batchSize -> fillMask(input.get(batchSize), encodingResults, batchSize))
+      .toList();
   }
 
   public List<FillMaskResult<String>> fillMask(String input, EncodingResults encodingResults, int batchInput) {

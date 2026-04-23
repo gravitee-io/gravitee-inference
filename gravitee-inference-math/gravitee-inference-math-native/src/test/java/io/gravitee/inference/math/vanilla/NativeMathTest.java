@@ -91,7 +91,9 @@ public class NativeMathTest {
 
   @Test
   void must_compute_max() {
-    var floatList = rangeClosed(0, 10000).mapToObj(i -> (float) i).collect(toList());
+    var floatList = rangeClosed(0, 10000)
+      .mapToObj(i -> (float) i)
+      .collect(toList());
     Collections.shuffle(floatList);
 
     final float[] array = floatList
