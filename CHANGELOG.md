@@ -1,3 +1,21 @@
+# [2.0.0-alpha.1](https://github.com/gravitee-io/gravitee-inference/compare/1.5.1...2.0.0-alpha.1) (2026-04-24)
+
+
+### Bug Fixes
+
+* format onnx embeddding code ([b375f21](https://github.com/gravitee-io/gravitee-inference/commit/b375f2175aec96ee5e72bcb08d0f51479b132806))
+
+
+### Features
+
+* llama.cpp and vLLM library handlers ([79b684a](https://github.com/gravitee-io/gravitee-inference/commit/79b684abedc6f22320b4c3e79a567321d188fc26))
+* wire bos eos tokens and chat template ([56c18ce](https://github.com/gravitee-io/gravitee-inference/commit/56c18ce07417bd581a6f2a0c1f555516aee1766e))
+
+
+### BREAKING CHANGES
+
+* java 25 required
+
 # [2.0.0-alpha.2](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0-alpha.1...2.0.0-alpha.2) (2026-04-21)
 
 
