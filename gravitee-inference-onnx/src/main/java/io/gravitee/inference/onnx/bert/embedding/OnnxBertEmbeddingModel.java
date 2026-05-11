@@ -32,7 +32,7 @@ import java.util.List;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class OnnxBertEmbeddingModel extends OnnxBertInference<EmbeddingTokenCount> {
+public class OnnxBertEmbeddingModel extends OnnxBertInference<String, EmbeddingTokenCount> {
 
   public OnnxBertEmbeddingModel(OnnxBertConfig onnxBertConfig) {
     super(onnxBertConfig);

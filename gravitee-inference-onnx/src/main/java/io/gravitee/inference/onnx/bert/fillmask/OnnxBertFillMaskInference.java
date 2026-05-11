@@ -31,7 +31,7 @@ import java.util.TreeSet;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class OnnxBertFillMaskInference extends OnnxBertInference<List<FillMaskResult<String>>> {
+public class OnnxBertFillMaskInference extends OnnxBertInference<String, List<FillMaskResult<String>>> {
 
   public static final String MASK_KEYWORD = "[MASK]";
 

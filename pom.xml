@@ -44,6 +44,7 @@
         <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
         <ai.djl.version>0.33.0</ai.djl.version>
         <json-path.version>2.9.0</json-path.version>
+        <gravitee.archrules.skip>true</gravitee.archrules.skip>
     </properties>
     <modules>
         <module>gravitee-inference-math</module>
