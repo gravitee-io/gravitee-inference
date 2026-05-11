@@ -41,7 +41,7 @@ import java.util.Set;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertConfig, String, OUTPUT> {
+public abstract class OnnxBertInference<INPUT, OUTPUT> extends OnnxInference<OnnxBertConfig, INPUT, OUTPUT> {
 
   protected static final ObjectMapper objectMapper = new ObjectMapper();
   protected final HuggingFaceTokenizer tokenizer;
@@ -101,6 +101,84 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
     }
   }
 
+  /** Encode a single (query, document) pair. Tokenizer auto-handles [CLS] q [SEP] d [SEP] + token type IDs. */
+  protected EncodingResults encodePair(String queryText, String docText) {
+    var encoding = tokenizer.encode(queryText, docText, true, false);
+
+    long[] inputIds = encoding.getIds();
+    long[] attentionMask = encoding.getAttentionMask();
+
+    long[] shape = { 1, inputIds.length };
+
+    try (
+      var inputIdsTensor = createTensor(environment, wrap(inputIds), shape);
+      var attentionMaskTensor = createTensor(environment, wrap(attentionMask), shape);
+    ) {
+      var inputs = new HashMap<String, OnnxTensor>();
+      inputs.put(INPUT_IDS, inputIdsTensor);
+      inputs.put(ATTENTION_MASK, attentionMaskTensor);
+
+      if (hasTokenTypeIds) {
+        var tokenTypeIdsTensor = createTensor(environment, wrap(encoding.getTypeIds()), shape);
+        inputs.put(TOKEN_TYPE_IDS, tokenTypeIdsTensor);
+      }
+      return new EncodingResults(List.of(encoding), session.run(inputs));
+    } catch (OrtException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  /** Encode a query against multiple documents as a batch of pairs. */
+  protected EncodingResults encodeAllPairs(String queryText, List<String> docTexts) {
+    List<Encoding> encodings = new ArrayList<>(docTexts.size());
+    int maxTokens = 0;
+
+    for (String docText : docTexts) {
+      var encoding = tokenizer.encode(queryText, docText, true, false);
+      maxTokens = Math.max(maxTokens, encoding.getIds().length);
+      encodings.add(encoding);
+    }
+
+    int batchSize = docTexts.size();
+    long[] inputIds = new long[batchSize * maxTokens];
+    long[] attentionMask = new long[batchSize * maxTokens];
+    long[] tokenTypeIds = hasTokenTypeIds ? new long[batchSize * maxTokens] : null;
+
+    for (int i = 0; i < batchSize; i++) {
+      Encoding encoding = encodings.get(i);
+
+      long[] sInputIds = encoding.getIds();
+      long[] sMask = encoding.getAttentionMask();
+
+      int start = i * maxTokens;
+      arraycopy(sInputIds, 0, inputIds, start, sInputIds.length);
+      arraycopy(sMask, 0, attentionMask, start, sMask.length);
+      if (hasTokenTypeIds) {
+        long[] sTypeIds = encoding.getTypeIds();
+        arraycopy(sTypeIds, 0, tokenTypeIds, start, sTypeIds.length);
+      }
+    }
+
+    long[] shape = { batchSize, maxTokens };
+
+    try (
+      var inputIdsTensor = createTensor(environment, wrap(inputIds), shape);
+      var attentionMaskTensor = createTensor(environment, wrap(attentionMask), shape);
+    ) {
+      var inputs = new HashMap<String, OnnxTensor>();
+      inputs.put(INPUT_IDS, inputIdsTensor);
+      inputs.put(ATTENTION_MASK, attentionMaskTensor);
+
+      if (hasTokenTypeIds) {
+        var tokenTypeIdsTensor = createTensor(environment, wrap(tokenTypeIds), shape);
+        inputs.put(TOKEN_TYPE_IDS, tokenTypeIdsTensor);
+      }
+      return new EncodingResults(encodings, session.run(inputs));
+    } catch (OrtException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
   protected EncodingResults encodeAll(List<String> sentences) {
     List<Encoding> encodings = new ArrayList<>(sentences.size());
     int maxTokens = 0;
@@ -113,7 +191,7 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
 
     long[] inputIds = new long[sentences.size() * maxTokens];
     long[] attentionMask = new long[sentences.size() * maxTokens];
-    long[] tokenTypeIds = new long[sentences.size() * maxTokens];
+    long[] tokenTypeIds = hasTokenTypeIds ? new long[sentences.size() * maxTokens] : null;
 
     for (int i = 0; i < sentences.size(); i++) {
       Encoding encoding = encodings.get(i);
@@ -121,12 +199,12 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
       // Retrieve the tokens for the current sentence
       long[] sentenceInputIds = encoding.getIds();
       long[] sentenceAttentionMask = encoding.getAttentionMask();
-      long[] sentenceTokenTypeIds = encoding.getTypeIds();
 
       int startIndex = i * maxTokens;
       arraycopy(sentenceInputIds, 0, inputIds, startIndex, sentenceInputIds.length);
       arraycopy(sentenceAttentionMask, 0, attentionMask, startIndex, sentenceAttentionMask.length);
       if (hasTokenTypeIds) {
+        long[] sentenceTokenTypeIds = encoding.getTypeIds();
         arraycopy(sentenceTokenTypeIds, 0, tokenTypeIds, startIndex, sentenceTokenTypeIds.length);
       }
     }

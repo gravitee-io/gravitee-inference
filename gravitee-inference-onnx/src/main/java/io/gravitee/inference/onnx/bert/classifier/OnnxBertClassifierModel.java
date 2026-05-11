@@ -34,7 +34,7 @@ import java.util.*;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class OnnxBertClassifierModel extends OnnxBertInference<ClassifierResults> {
+public class OnnxBertClassifierModel extends OnnxBertInference<String, ClassifierResults> {
 
   private static final String ID_2_LABEL = "id2label";
   private final List<String> labels;
