@@ -1,3 +1,15 @@
+# [2.0.0-alpha.3](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0-alpha.2...2.0.0-alpha.3) (2026-04-21)
+
+
+### Features
+
+* feat: rerank onnx ([b375f21](https://github.com/gravitee-io/gravitee-inference/commit/b375f2175aec96ee5e72bcb08d0f51479b132806))
+
+
+### Bug Fixes
+
+* fix: format onnx embeddding code ([b375f21](https://github.com/gravitee-io/gravitee-inference/commit/b375f2175aec96ee5e72bcb08d0f51479b132806))
+
 # [2.0.0-alpha.2](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0-alpha.1...2.0.0-alpha.2) (2026-04-21)
 
 
