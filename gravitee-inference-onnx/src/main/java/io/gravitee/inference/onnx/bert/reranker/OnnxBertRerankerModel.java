@@ -17,6 +17,9 @@ package io.gravitee.inference.onnx.bert.reranker;
 
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession.Result;
+import io.gravitee.inference.api.reranker.RerankPair;
+import io.gravitee.inference.api.reranker.RerankScoring;
+import io.gravitee.inference.api.reranker.RerankTokenCount;
 import io.gravitee.inference.onnx.bert.OnnxBertInference;
 import io.gravitee.inference.onnx.bert.config.OnnxBertConfig;
 import java.util.ArrayList;

@@ -63,6 +63,10 @@ public class EngineAdapter
       return;
     }
     String modelName = config.modelPath().getFileName().toString();
+    if (config.nCtx() == 0) {
+      LOGGER.info("Memory pre-flight: nCtx deferred to model — skipping estimate for {}", modelName);
+      return;
+    }
     LOGGER.info("Running memory pre-flight check for {} (policy={})", modelName, policy);
     MemoryEstimate estimate = LlamaMemoryEstimator.estimate(
       config.modelPath(),

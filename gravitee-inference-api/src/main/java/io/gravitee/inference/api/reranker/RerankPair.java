@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.inference.onnx.bert.reranker;
+package io.gravitee.inference.api.reranker;
 
 /**
  * Input for a cross-encoder reranker: a {@code (query, document)} pair

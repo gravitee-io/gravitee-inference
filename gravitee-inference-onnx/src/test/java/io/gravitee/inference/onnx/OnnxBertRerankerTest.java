@@ -18,12 +18,12 @@ package io.gravitee.inference.onnx;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.gravitee.inference.api.reranker.RerankPair;
+import io.gravitee.inference.api.reranker.RerankScoring;
+import io.gravitee.inference.api.reranker.RerankTokenCount;
 import io.gravitee.inference.math.vanilla.NativeMath;
 import io.gravitee.inference.onnx.bert.config.OnnxBertConfig;
 import io.gravitee.inference.onnx.bert.reranker.OnnxBertRerankerModel;
-import io.gravitee.inference.onnx.bert.reranker.RerankPair;
-import io.gravitee.inference.onnx.bert.reranker.RerankScoring;
-import io.gravitee.inference.onnx.bert.reranker.RerankTokenCount;
 import io.gravitee.inference.onnx.bert.resource.OnnxBertResource;
 import java.net.URI;
 import java.nio.file.Path;

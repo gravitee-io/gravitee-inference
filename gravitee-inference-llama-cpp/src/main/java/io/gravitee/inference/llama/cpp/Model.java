@@ -104,12 +104,13 @@ public final class Model implements AutoCloseable {
     }
 
     var contextParams = new LlamaContextParams(arena)
-      .nCtx(config.nCtx())
-      .nBatch(config.nBatch())
-      .nUBatch(config.nUBatch())
-      .nSeqMax(config.nSeqMax())
       .nThreads(config.nThreads())
-      .nThreadsBatch(config.nThreadsBatch());
+      .nThreadsBatch(config.nThreadsBatch())
+      .nCtx(config.nCtx());
+
+    if (config.nBatch() != 0) contextParams.nBatch(config.nBatch());
+    if (config.nUBatch() != 0) contextParams.nUBatch(config.nUBatch());
+    if (config.nSeqMax() != 0) contextParams.nSeqMax(config.nSeqMax());
 
     if (config.poolingType() != null) {
       contextParams.poolingType(config.poolingType());

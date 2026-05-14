@@ -34,13 +34,18 @@
     <description>llama.cpp implementation of the Inference API</description>
 
     <properties>
-        <llamaj.cpp.version>1.1.0</llamaj.cpp.version>
+        <llamaj.cpp.version>1.2.0</llamaj.cpp.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.gravitee.inference.api</groupId>
             <artifactId>gravitee-inference-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.gravitee.inference.math.api</groupId>
+            <artifactId>gravitee-inference-math-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

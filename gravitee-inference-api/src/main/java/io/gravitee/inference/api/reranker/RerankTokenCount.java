@@ -13,19 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.inference.onnx.bert.reranker;
+package io.gravitee.inference.api.reranker;
 
 /**
- * Scoring transformation for cross-encoder reranker output.
+ * Single (query, document) pair scoring result with token accounting.
  *
- * @author Rémi SULTAN (remi.sultan at graviteesource.com)
+ * @param score      cross-encoder score (post-transform: sigmoid/softmax/logit)
+ * @param tokenCount number of tokens consumed by the combined input sequence
+ *
+ * @author Remi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public enum RerankScoring {
-  /** Apply sigmoid to produce a 0..1 score. Default for [batch, 1] outputs. */
-  SIGMOID,
-  /** Apply softmax and take the positive class. Default for [batch, 2] outputs. */
-  SOFTMAX,
-  /** Return raw logit — monotonic ordering only, no normalization. */
-  LOGIT,
-}
+public record RerankTokenCount(float score, int tokenCount) {}
