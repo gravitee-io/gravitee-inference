@@ -1,3 +1,11 @@
+# [2.0.0-alpha.4](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0-alpha.3...2.0.0-alpha.4) (2026-04-21)
+
+
+### Features
+
+* embedding and rerank llama.cpp ([013ad95](https://github.com/gravitee-io/gravitee-inference/commit/013ad95f3dbdb737b5bbec771a853d63a103fc7d))
+
+
 # [2.0.0-alpha.3](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0-alpha.2...2.0.0-alpha.3) (2026-04-21)
 
 
