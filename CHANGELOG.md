@@ -1,4 +1,12 @@
-# [2.0.0-alpha.4](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0-alpha.3...2.0.0-alpha.4) (2026-04-21)
+# [2.0.0-alpha.5](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0-alpha.4...2.0.0-alpha.5) (2026-06-05)
+
+
+### Bug Fixes
+
+*  cancel properly the sequence ([d1ed7f4](https://github.com/gravitee-io/gravitee-inference/commit/d1ed7f495f3e855c7a4e048037b36c23a5551f0e))
+
+
+# [2.0.0-alpha.4](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0-alpha.3...2.0.0-alpha.4) (2026-05-29)
 
 
 ### Features
