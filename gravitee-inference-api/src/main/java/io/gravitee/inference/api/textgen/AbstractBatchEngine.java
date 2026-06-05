@@ -64,7 +64,18 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
   private final Map<Integer, Integer> externalToInternal = new ConcurrentHashMap<>();
   private final Deque<QueuedSequence<REQUEST>> pending = new ArrayDeque<>();
   private final Deque<Integer> availableSlots;
-  private final ReentrantLock lock = new ReentrantLock();
+  /**
+   * FAIR lock, deliberately. The worker loop re-acquires this lock
+   * nanoseconds after releasing it (the gap between two batch iterations),
+   * while doing all the expensive native decoding inside the critical
+   * section. With an unfair lock the loop barges back in before a parked
+   * waiter can wake, starving {@link #cancelSequence} and
+   * {@link #addSequence} until the loop parks on {@link #hasWork} — i.e.
+   * until every running generation has finished naturally. Fair FIFO
+   * handoff bounds their wait to a single batch step (~one token); the
+   * fairness overhead is negligible next to the per-iteration decode cost.
+   */
+  private final ReentrantLock lock = new ReentrantLock(true);
   private final Condition hasWork = lock.newCondition();
   private final AtomicBoolean running = new AtomicBoolean(false);
   private Consumer<InferenceToken<TOKEN>> tokenConsumer;
@@ -177,12 +188,65 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
       SequenceState<STATE> state = sequences.get(internalId);
       if (state != null && adapter.getFinishReason(state.engineState).isEmpty()) {
         adapter.removeSequence(internalId);
-        return finalizeSequence(state);
+        // finalizeSequence() would early-return here: a cancelled sequence
+        // has no engine finish reason, so it would never release the slot —
+        // each cancellation would permanently leak one slot out of
+        // maxConcurrentSequences until the engine stops accepting work.
+        // Finalize the cancellation explicitly instead.
+        return finalizeCancelled(state);
       }
       return null;
     } finally {
       lock.unlock();
     }
+  }
+
+  /**
+   * Finalizes a sequence cancelled before its natural end (client disconnect,
+   * context-window guard): cleans up engine state, releases the tracking maps
+   * and — critically — returns the slot to {@link #availableSlots} so new
+   * sequences can start. The native state was already removed by the caller
+   * via {@code adapter.removeSequence}.
+   *
+   * @return a final token with finish reason {@code "cancelled"}, or
+   *         {@code null} if the sequence already emitted its final token
+   */
+  private InferenceToken<TOKEN> finalizeCancelled(SequenceState<STATE> state) {
+    if (state == null || state.finalSent) {
+      return null;
+    }
+    state.finalSent = true;
+
+    updateTokenCounts(state);
+
+    InferenceToken<TOKEN> token = new InferenceToken<>(
+      state.externalId,
+      null,
+      state.index,
+      true,
+      "cancelled",
+      state.inputTokens,
+      state.outputTokens,
+      state.reasoningTokens,
+      state.toolTokens,
+      adapter.buildPerformance(state.engineState)
+    );
+
+    try {
+      adapter.cleanupSequenceState(state.engineState);
+    } catch (Exception e) {
+      LOGGER.error("Error cleaning up cancelled sequence state: {}", e.getMessage());
+    }
+
+    sequences.remove(state.conversationId);
+    externalToInternal.remove(state.externalId);
+    availableSlots.addLast(state.conversationId);
+
+    if (engineConfig.enableAutoStart()) {
+      startNextPending();
+    }
+
+    return token;
   }
 
   /**
