@@ -61,15 +61,18 @@ public final class Constants {
   public static final String POOLING_MODE = "poolingMode";
 
   public static final String PADDING = "padding";
-  public static final Map<String, String> DEFAULT_TOKENIZER_CONFIG = singletonMap(PADDING, "false");
+  public static final Map<String, String> DEFAULT_TOKENIZER_CONFIG =
+    singletonMap(PADDING, "false");
   public static final String MAX_SEQUENCE_LENGTH = "maxSequenceLength";
 
   /*
    Inference Service
   */
 
-  public static final String SERVICE_INFERENCE_MODELS_ADDRESS = "service:inference:models";
-  public static final String SERVICE_INFERENCE_MODELS_INFER_TEMPLATE = "service:inference:models:%s";
+  public static final String SERVICE_INFERENCE_MODELS_ADDRESS =
+    "service:inference:models";
+  public static final String SERVICE_INFERENCE_MODELS_INFER_TEMPLATE =
+    "service:inference:models:%s";
   public static final String INFERENCE_TYPE = "inferenceType";
   public static final String INFERENCE_FORMAT = "inferenceFormat";
   public static final String MODEL_ADDRESS_KEY = "modelAddress";

@@ -32,7 +32,8 @@ import java.util.List;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class OnnxBertEmbeddingModel extends OnnxBertInference<EmbeddingTokenCount> {
+public class OnnxBertEmbeddingModel
+  extends OnnxBertInference<EmbeddingTokenCount> {
 
   public OnnxBertEmbeddingModel(OnnxBertConfig onnxBertConfig) {
     super(onnxBertConfig);
@@ -43,7 +44,10 @@ public class OnnxBertEmbeddingModel extends OnnxBertInference<EmbeddingTokenCoun
     var tokens = tokenizer.tokenize(input);
     var embeddings = getEmbeddings(input, tokens.size());
 
-    return new EmbeddingTokenCount(embeddings.toNormalizedWeighted(config.gioMath()), tokens.size());
+    return new EmbeddingTokenCount(
+      embeddings.toNormalizedWeighted(config.gioMath()),
+      tokens.size()
+    );
   }
 
   private EmbeddingsWithWeights getEmbeddings(String input, int size) {
@@ -55,14 +59,16 @@ public class OnnxBertEmbeddingModel extends OnnxBertInference<EmbeddingTokenCoun
     var embeddings = new float[nbPartitions][];
 
     // we ignore first token (CLS) and last token (SEP)
-    iterate(1, from -> from < lastIndex, from -> from + partitionSize).forEach(from -> {
-      int to = min(lastIndex, from + partitionSize);
-      int index = (from - 1) / partitionSize;
-      try (var partition = encode(input).result()) {
-        embeddings[index] = toEmbedding(partition);
-        weights[index] = partition.size();
+    iterate(1, from -> from < lastIndex, from -> from + partitionSize).forEach(
+      from -> {
+        int to = min(lastIndex, from + partitionSize);
+        int index = (from - 1) / partitionSize;
+        try (var partition = encode(input).result()) {
+          embeddings[index] = toEmbedding(partition);
+          weights[index] = partition.size();
+        }
       }
-    });
+    );
 
     return new EmbeddingsWithWeights(embeddings, weights);
   }

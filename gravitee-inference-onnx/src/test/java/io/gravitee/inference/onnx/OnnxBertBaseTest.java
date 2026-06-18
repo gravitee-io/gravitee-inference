@@ -30,13 +30,18 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class OnnxBertBaseTest {
 
-  protected static final Logger LOGGER = LoggerFactory.getLogger(OnnxBertBaseTest.class);
+  protected static final Logger LOGGER = LoggerFactory.getLogger(
+    OnnxBertBaseTest.class
+  );
   protected static final String HF_URL = "https://huggingface.co/";
 
   // Download file
-  private static final String GRAVITEE_INFERENCE_SERVICE_DIRECTORY = "gravitee-inference-service";
+  private static final String GRAVITEE_INFERENCE_SERVICE_DIRECTORY =
+    "gravitee-inference-service";
   private static final String TMP_DIR_NAME =
-    System.getProperty("java.io.tmpdir") + "/" + GRAVITEE_INFERENCE_SERVICE_DIRECTORY;
+    System.getProperty("java.io.tmpdir") +
+    "/" +
+    GRAVITEE_INFERENCE_SERVICE_DIRECTORY;
   private static final Path TMP_DIR = Path.of(TMP_DIR_NAME);
 
   protected static URI getUriIfExist(String name, String download) {
@@ -44,14 +49,20 @@ public abstract class OnnxBertBaseTest {
       if (Files.notExists(TMP_DIR)) {
         Files.createDirectory(TMP_DIR);
       }
-      final Path fileDirectory = Path.of(TMP_DIR_NAME + "/" + name.split("/")[0]);
+      final Path fileDirectory = Path.of(
+        TMP_DIR_NAME + "/" + name.split("/")[0]
+      );
       if (Files.notExists(fileDirectory)) {
         Files.createDirectory(fileDirectory);
       }
       final Path file = Path.of(TMP_DIR_NAME + "/" + name);
       if (Files.notExists(file)) {
         LOGGER.info("Downloading [{}] model", name);
-        Files.copy(URI.create(download).toURL().openStream(), file, REPLACE_EXISTING);
+        Files.copy(
+          URI.create(download).toURL().openStream(),
+          file,
+          REPLACE_EXISTING
+        );
         LOGGER.info("[{}] model downloaded", name);
       }
       return file.toUri();

@@ -46,7 +46,11 @@ public final class OnnxBertConfig extends OnnxConfig<OnnxBertResource> {
     this.tokenizerConfig = tokenizerConfig;
   }
 
-  public OnnxBertConfig(OnnxBertResource resource, GioMaths gioMath, Map<String, Object> onnxConfig) {
+  public OnnxBertConfig(
+    OnnxBertResource resource,
+    GioMaths gioMath,
+    Map<String, Object> onnxConfig
+  ) {
     this(resource, gioMath, onnxConfig, DEFAULT_TOKENIZER_CONFIG);
   }
 

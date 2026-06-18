@@ -27,7 +27,13 @@ public class OpenaiConfig extends RestConfig {
 
   private final String model;
 
-  public OpenaiConfig(URI uri, String apiKey, String organizationId, String projectId, String model) {
+  public OpenaiConfig(
+    URI uri,
+    String apiKey,
+    String organizationId,
+    String projectId,
+    String model
+  ) {
     super(uri);
     this.apiKey = validateAndGetApiKey(apiKey);
     this.model = validateAndGetModel(model);
@@ -41,14 +47,18 @@ public class OpenaiConfig extends RestConfig {
 
   private String validateAndGetApiKey(String apiKey) {
     if (apiKey == null || apiKey.trim().isEmpty()) {
-      throw new GraviteeInferenceOpenaiException("API key cannot be null or blank");
+      throw new GraviteeInferenceOpenaiException(
+        "API key cannot be null or blank"
+      );
     }
     return apiKey.trim();
   }
 
   private String validateAndGetModel(String model) {
     if (model == null || model.trim().isEmpty()) {
-      throw new GraviteeInferenceOpenaiException("Model cannot be null or blank");
+      throw new GraviteeInferenceOpenaiException(
+        "Model cannot be null or blank"
+      );
     }
     return model.trim();
   }
@@ -84,7 +94,13 @@ public class OpenaiConfig extends RestConfig {
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), apiKey, organizationId, projectId, model);
+    return Objects.hash(
+      super.hashCode(),
+      apiKey,
+      organizationId,
+      projectId,
+      model
+    );
   }
 
   @Override
