@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>24.0.1</version>
+        <version>24.0.2</version>
     </parent>
 
     <groupId>io.gravitee.inference</groupId>
@@ -36,16 +36,17 @@
     <packaging>pom</packaging>
 
     <properties>
-        <gravitee-bom.version>9.0.0-alpha.4</gravitee-bom.version>
+        <gravitee-bom.version>9.0.0</gravitee-bom.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <ai.djl.version>0.33.0</ai.djl.version>
         <json-path.version>2.9.0</json-path.version>
 
-        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-        <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-
         <gravitee.archrules.skip>true</gravitee.archrules.skip>
         <maven.compiler.release>21</maven.compiler.release>
+
+        <!-- Default empty value so surefire's @{argLine} late replacement resolves
+             when JaCoCo's prepare-agent (which defines argLine) is not run, e.g. local builds. -->
+        <argLine/>
     </properties>
     <modules>
         <module>gravitee-inference-math</module>
@@ -104,101 +105,11 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.13</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>21</source>
-                        <target>21</target>
-                        <compilerArgs>
-                            <arg>--enable-preview</arg>
-                            <arg>--add-modules</arg>
-                            <arg>jdk.incubator.vector</arg>
-                        </compilerArgs>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven-jar-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>${maven-assembly-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.hubspot.maven.plugins</groupId>
-                    <artifactId>prettier-maven-plugin</artifactId>
-                    <version>${prettier-maven-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>${license-maven-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco-maven-plugin.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
-            <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
-                <configuration>
-                    <prettierJavaVersion>${prettier-maven-plugin.prettierJavaVersion}</prettierJavaVersion>
-                    <printWidth>125</printWidth>
-                    <skip>${skip.validation}</skip>
-                    <inputGlobs>
-                        <inputGlob>src/{main,test}/**/*.java</inputGlob>
-                        <inputGlob>.github/*.json</inputGlob>
-                    </inputGlobs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
-                <configuration>
-                    <prettierJavaVersion>${prettier-maven-plugin.prettierJavaVersion}</prettierJavaVersion>
-                    <printWidth>125</printWidth>
-                    <skip>${skip.validation}</skip>
-                    <inputGlobs>
-                        <inputGlob>src/{main,test}/**/*.java</inputGlob>
-                        <inputGlob>.github/*.json</inputGlob>
-                    </inputGlobs>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -214,38 +125,10 @@
                     <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report-aggregate</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report-aggregate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <source>21</source>
                     <additionalOptions>--add-modules jdk.incubator.vector</additionalOptions>
                 </configuration>
             </plugin>

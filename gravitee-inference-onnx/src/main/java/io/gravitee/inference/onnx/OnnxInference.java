@@ -33,12 +33,18 @@ import java.util.regex.Pattern;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public abstract class OnnxInference<C extends OnnxConfig<?>, I, O> extends InferenceModel<C, I, O> {
+public abstract class OnnxInference<C extends OnnxConfig<?>, I, O>
+  extends InferenceModel<C, I, O> {
 
-  private static final String INTRA_OPS_THREADS_KEY = "GRAVITEE_ONNX_INTRA_OPS_NUM_THREADS";
-  private static final List<String> POSSIBLE_KEYS = List.of(INTRA_OPS_THREADS_KEY, INTRA_OPS_THREADS_KEY.toLowerCase());
+  private static final String INTRA_OPS_THREADS_KEY =
+    "GRAVITEE_ONNX_INTRA_OPS_NUM_THREADS";
+  private static final List<String> POSSIBLE_KEYS = List.of(
+    INTRA_OPS_THREADS_KEY,
+    INTRA_OPS_THREADS_KEY.toLowerCase()
+  );
 
-  private static final int DEFAULT_MAX_INTRA_OPS_THREADS = Runtime.getRuntime().availableProcessors();
+  private static final int DEFAULT_MAX_INTRA_OPS_THREADS =
+    Runtime.getRuntime().availableProcessors();
   private static final Pattern NUMBER_PATTERN = Pattern.compile("^[0-9]+$");
   private static final int MAX_INTRA_OPS_THREADS = getMaxIntraOpsThreads();
 
@@ -69,7 +75,11 @@ public abstract class OnnxInference<C extends OnnxConfig<?>, I, O> extends Infer
       }
 
       options.setIntraOpNumThreads(MAX_INTRA_OPS_THREADS);
-      final String modelPath = config.getResource().getModel().toAbsolutePath().toString();
+      final String modelPath = config
+        .getResource()
+        .getModel()
+        .toAbsolutePath()
+        .toString();
       return environment.createSession(modelPath, options);
     } catch (OrtException e) {
       throw new IllegalArgumentException(e);
