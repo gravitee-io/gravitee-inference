@@ -50,7 +50,9 @@ public record InferencePerformance(
       throw new IllegalArgumentException("loadTimeMs must be non-negative");
     }
     if (promptEvalTimeMs < 0) {
-      throw new IllegalArgumentException("promptEvalTimeMs must be non-negative");
+      throw new IllegalArgumentException(
+        "promptEvalTimeMs must be non-negative"
+      );
     }
     if (evalTimeMs < 0) {
       throw new IllegalArgumentException("evalTimeMs must be non-negative");

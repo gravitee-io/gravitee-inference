@@ -89,7 +89,11 @@ public final class Model implements AutoCloseable {
 
     // Register RPC servers for distributed inference offloading
     if (config.hasRpcServers()) {
-      LOGGER.info("Registering {} RPC server(s): {}", config.rpcServers().size(), config.rpcServers());
+      LOGGER.info(
+        "Registering {} RPC server(s): {}",
+        config.rpcServers().size(),
+        config.rpcServers()
+      );
       modelParams.rpcServers(arena, config.rpcServers().toArray(String[]::new));
       var rpcDevices = BackendRegistry.getRpcDeviceHandles();
       LOGGER.info("RPC device handles obtained: {}", rpcDevices.size());
@@ -138,7 +142,12 @@ public final class Model implements AutoCloseable {
       if (config.flashAttnType() != null) {
         mtmdParams.flashAttnType(config.flashAttnType());
       }
-      this.mtmdContext = new MtmdContext(arena, this.model, config.mmprojPath(), mtmdParams);
+      this.mtmdContext = new MtmdContext(
+        arena,
+        this.model,
+        config.mmprojPath(),
+        mtmdParams
+      );
     } else {
       this.mtmdContext = null;
     }
@@ -171,7 +180,10 @@ public final class Model implements AutoCloseable {
           try {
             chatTemplateString = new LlamaTemplate(model).templateString();
           } catch (Exception e) {
-            LOGGER.debug("Could not read chat template from model: {}", e.getMessage());
+            LOGGER.debug(
+              "Could not read chat template from model: {}",
+              e.getMessage()
+            );
             chatTemplateString = null;
           }
           chatTemplateResolved = true;
@@ -197,26 +209,48 @@ public final class Model implements AutoCloseable {
     int promptTokens = stats.promptTokens();
     int contextTokens = stats.contextTokens();
     if (promptTokens >= contextTokens) {
-      throw new LlamaException("Prompt tokens (" + promptTokens + ") exceed or match context size (" + contextTokens + ").");
+      throw new LlamaException(
+        "Prompt tokens (" +
+          promptTokens +
+          ") exceed or match context size (" +
+          contextTokens +
+          ")."
+      );
     }
     int availableForCompletion = stats.availableForCompletion();
-    int maxTokens = request.maxTokens() != null ? request.maxTokens() : availableForCompletion;
+    int maxTokens = request.maxTokens() != null
+      ? request.maxTokens()
+      : availableForCompletion;
     if (maxTokens > availableForCompletion) {
       maxTokens = availableForCompletion;
     }
 
-    var state = ConversationState.create(arena, context, tokenizer, sampler, seqId);
+    var state = ConversationState.create(
+      arena,
+      context,
+      tokenizer,
+      sampler,
+      seqId
+    );
     state.setMaxTokens(maxTokens);
 
     if (request.stop() != null && !request.stop().isEmpty()) {
       state.setStopStrings(request.stop());
     }
 
-    if (request.reasoningTags() != null && request.reasoningTags().isConfigured()) {
-      state.setReasoning(request.reasoningTags().openToken(), request.reasoningTags().closeToken());
+    if (
+      request.reasoningTags() != null && request.reasoningTags().isConfigured()
+    ) {
+      state.setReasoning(
+        request.reasoningTags().openToken(),
+        request.reasoningTags().closeToken()
+      );
     }
     if (request.toolTags() != null && request.toolTags().isConfigured()) {
-      state.setToolCall(request.toolTags().openToken(), request.toolTags().closeToken());
+      state.setToolCall(
+        request.toolTags().openToken(),
+        request.toolTags().closeToken()
+      );
     }
 
     state.initialize(prompt);
@@ -233,10 +267,16 @@ public final class Model implements AutoCloseable {
   }
 
   public LlamaSampler samplerFor(Request request) {
-    float temperature = request.temperature() != null ? request.temperature() : 0.7f;
+    float temperature = request.temperature() != null
+      ? request.temperature()
+      : 0.7f;
     float topP = request.topP() != null ? request.topP() : 0.9f;
-    float presencePenalty = request.presencePenalty() != null ? request.presencePenalty() : 0.0f;
-    float frequencyPenalty = request.frequencyPenalty() != null ? request.frequencyPenalty() : 0.0f;
+    float presencePenalty = request.presencePenalty() != null
+      ? request.presencePenalty()
+      : 0.0f;
+    float frequencyPenalty = request.frequencyPenalty() != null
+      ? request.frequencyPenalty()
+      : 0.0f;
     int seed = request.seed() != null ? request.seed() : 42;
 
     var sampler = new LlamaSampler(arena);
@@ -273,7 +313,9 @@ public final class Model implements AutoCloseable {
     return new PromptStats(promptTokens, contextTokens);
   }
 
-  private String buildChatPrompt(List<io.gravitee.inference.api.textgen.ChatMessage> messages) {
+  private String buildChatPrompt(
+    List<io.gravitee.inference.api.textgen.ChatMessage> messages
+  ) {
     try (Arena promptArena = Arena.ofConfined()) {
       List<LlamaChatMessage> llamaMessages = messages
         .stream()
@@ -286,7 +328,11 @@ public final class Model implements AutoCloseable {
               content = mediaInfo.promptSuffix() + content;
             }
           }
-          return new LlamaChatMessage(promptArena, toRole(message.role()), content);
+          return new LlamaChatMessage(
+            promptArena,
+            toRole(message.role()),
+            content
+          );
         })
         .toList();
       return new LlamaTemplate(model).applyTemplate(
@@ -313,7 +359,9 @@ public final class Model implements AutoCloseable {
    *             with better performance and consistent error handling.
    */
   @Deprecated(since = "1.0", forRemoval = false)
-  private List<MtmdMedia> buildMedia(List<io.gravitee.inference.api.textgen.ChatMessage> messages) {
+  private List<MtmdMedia> buildMedia(
+    List<io.gravitee.inference.api.textgen.ChatMessage> messages
+  ) {
     return processMediaContent(messages).media();
   }
 
@@ -348,7 +396,9 @@ public final class Model implements AutoCloseable {
    * @param messages the chat messages containing media content
    * @return MediaInfo with prompt suffix and media list
    */
-  private MediaInfo processMediaContent(List<io.gravitee.inference.api.textgen.ChatMessage> messages) {
+  private MediaInfo processMediaContent(
+    List<io.gravitee.inference.api.textgen.ChatMessage> messages
+  ) {
     StringBuilder promptBuilder = new StringBuilder();
     List<MtmdMedia> mediaList = new ArrayList<>();
 
@@ -359,15 +409,29 @@ public final class Model implements AutoCloseable {
         // Single loop with unified type checking - eliminates redundant instanceof calls
         for (var content : message.media()) {
           try {
-            if (content instanceof io.gravitee.inference.api.textgen.ImageContent img) {
+            if (
+              content instanceof
+                io.gravitee.inference.api.textgen.ImageContent img
+            ) {
               promptBuilder.append("<__media__>\n");
               byte[] imageBytes = Base64.getMimeDecoder().decode(img.data());
-              mediaList.add(MtmdImage.fromBytesNative(arena, mtmdContext, imageBytes));
-            } else if (content instanceof io.gravitee.inference.api.textgen.AudioContent audio) {
+              mediaList.add(
+                MtmdImage.fromBytesNative(arena, mtmdContext, imageBytes)
+              );
+            } else if (
+              content instanceof
+                io.gravitee.inference.api.textgen.AudioContent audio
+            ) {
               promptBuilder.append("<__media__>\n");
               byte[] audioBytes = Base64.getMimeDecoder().decode(audio.data());
               int sampleRate = mtmdContext.getAudioSampleRate();
-              mediaList.add(MtmdAudio.fromBytes(arena, audioBytes, sampleRate > 0 ? sampleRate : 16000));
+              mediaList.add(
+                MtmdAudio.fromBytes(
+                  arena,
+                  audioBytes,
+                  sampleRate > 0 ? sampleRate : 16000
+                )
+              );
             }
           } catch (IOException | UnsupportedAudioFileException e) {
             throw new LlamaException("Failed to load media: " + e.getMessage());

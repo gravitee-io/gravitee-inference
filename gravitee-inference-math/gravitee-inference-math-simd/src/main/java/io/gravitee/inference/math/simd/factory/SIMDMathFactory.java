@@ -29,16 +29,22 @@ import org.slf4j.LoggerFactory;
  */
 public class SIMDMathFactory {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SIMDMathFactory.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    SIMDMathFactory.class
+  );
 
   public static GioMaths gioMaths() {
     if (SIMDUtils.isSIMDSupported()) {
       LOGGER.debug("SIMD supported");
       if (SIMDUtils.isSIMDMaskSupported()) {
-        LOGGER.debug("SIMD masking supported, using MaskAwareSIMDMath implementation");
+        LOGGER.debug(
+          "SIMD masking supported, using MaskAwareSIMDMath implementation"
+        );
         return MaskAwareSIMDMath.INSTANCE;
       }
-      LOGGER.debug("SIMD masking not supported, using LoopBoundSIMDMath implementation");
+      LOGGER.debug(
+        "SIMD masking not supported, using LoopBoundSIMDMath implementation"
+      );
       return LoopBoundSIMDMath.INSTANCE;
     }
     LOGGER.debug("SIMD not supported, using NativeMath implementation");

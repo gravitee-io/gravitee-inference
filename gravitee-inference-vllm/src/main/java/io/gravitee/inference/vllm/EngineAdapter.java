@@ -57,41 +57,63 @@ import org.slf4j.LoggerFactory;
  * @author GraviteeSource Team
  */
 public class EngineAdapter
-  implements io.gravitee.inference.api.EngineAdapter<VllmConfig, VllmRequest, String, EngineAdapter.VllmSequenceState> {
+  implements
+    io.gravitee.inference.api.EngineAdapter<
+      VllmConfig,
+      VllmRequest,
+      String,
+      EngineAdapter.VllmSequenceState
+    > {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(EngineAdapter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    EngineAdapter.class
+  );
 
   private final VllmEngine engine;
   private final VllmIterator iterator;
 
   /** Tracks per-sequence state keyed by internal ID. */
-  private final Map<Integer, VllmSequenceState> states = new ConcurrentHashMap<>();
+  private final Map<Integer, VllmSequenceState> states =
+    new ConcurrentHashMap<>();
 
   /** Buffer for the latest output from the iterator. */
-  private final AtomicReference<VllmOutput> currentOutput = new AtomicReference<>();
+  private final AtomicReference<VllmOutput> currentOutput =
+    new AtomicReference<>();
 
   public EngineAdapter(VllmConfig config) {
-    VllmEngineBuilder builder = VllmEngine.builder().model(config.model()).dtype(config.dtype());
+    VllmEngineBuilder builder = VllmEngine.builder()
+      .model(config.model())
+      .dtype(config.dtype());
 
     if (config.maxModelLen() > 0) builder.maxModelLen(config.maxModelLen());
     if (config.maxNumSeqs() > 0) builder.maxNumSeqs(config.maxNumSeqs());
-    if (config.gpuMemoryUtilization() > 0) builder.gpuMemoryUtilization(config.gpuMemoryUtilization());
-    if (config.maxNumBatchedTokens() > 0) builder.maxNumBatchedTokens(config.maxNumBatchedTokens());
+    if (config.gpuMemoryUtilization() > 0) builder.gpuMemoryUtilization(
+      config.gpuMemoryUtilization()
+    );
+    if (config.maxNumBatchedTokens() > 0) builder.maxNumBatchedTokens(
+      config.maxNumBatchedTokens()
+    );
     if (config.enforceEager()) builder.enforceEager(true);
     if (config.trustRemoteCode()) builder.trustRemoteCode(true);
-    if (config.quantization() != null) builder.quantization(config.quantization());
+    if (config.quantization() != null) builder.quantization(
+      config.quantization()
+    );
     if (config.swapSpace() > 0) builder.swapSpace(config.swapSpace());
     if (config.seed() != null) builder.seed(config.seed());
     if (config.enablePrefixCaching()) builder.enablePrefixCaching(true);
     builder.enableChunkedPrefill(config.enableChunkedPrefill());
-    if (config.kvCacheDtype() != null) builder.kvCacheDtype(config.kvCacheDtype());
+    if (config.kvCacheDtype() != null) builder.kvCacheDtype(
+      config.kvCacheDtype()
+    );
     if (config.enableLora()) {
       builder.enableLora(true);
       if (config.maxLoras() > 0) builder.maxLoras(config.maxLoras());
       if (config.maxLoraRank() > 0) builder.maxLoraRank(config.maxLoraRank());
     }
     if (config.venvPath() != null) builder.venvPath(config.venvPath());
-    if (config.enableSleepMode() != null) builder.enableSleepMode(config.enableSleepMode());
+    if (config.enableSleepMode() != null) builder.enableSleepMode(
+      config.enableSleepMode()
+    );
 
     // Distributed inference — read from system properties set by systemd
     String tp = System.getProperty("vllm.tensor_parallel_size");
@@ -133,7 +155,10 @@ public class EngineAdapter
   private static void runMemoryCheck(VllmConfig config) {
     MemoryCheckPolicy policy = config.memoryCheckPolicy();
     if (policy == null || policy == MemoryCheckPolicy.DISABLED) {
-      LOGGER.debug("Memory pre-flight check disabled for model {}", config.model());
+      LOGGER.debug(
+        "Memory pre-flight check disabled for model {}",
+        config.model()
+      );
       return;
     }
     MemoryEstimate estimate = VllmMemoryEstimator.estimate(
@@ -156,13 +181,21 @@ public class EngineAdapter
       return;
     }
     if (estimate.willFit()) {
-      LOGGER.info("Memory pre-flight for model {}: {}", config.model(), estimate.toHumanReadable());
+      LOGGER.info(
+        "Memory pre-flight for model {}: {}",
+        config.model(),
+        estimate.toHumanReadable()
+      );
       return;
     }
     if (policy == MemoryCheckPolicy.FAIL) {
       throw new InsufficientVramException(config.model(), estimate);
     }
-    LOGGER.warn("Memory pre-flight for model {}: {}", config.model(), estimate.toHumanReadable());
+    LOGGER.warn(
+      "Memory pre-flight for model {}: {}",
+      config.model(),
+      estimate.toHumanReadable()
+    );
   }
 
   /**
@@ -190,7 +223,10 @@ public class EngineAdapter
   }
 
   @Override
-  public VllmSequenceState createSequenceState(int internalId, VllmRequest request) throws Exception {
+  public VllmSequenceState createSequenceState(
+    int internalId,
+    VllmRequest request
+  ) throws Exception {
     // Prompt must be pre-rendered by the caller — this adapter does not template.
     String prompt = request.prompt();
     MultiModalData multiModalData = null;
@@ -212,19 +248,33 @@ public class EngineAdapter
     if (request.temperature() != null) sp.temperature(request.temperature());
     if (request.maxTokens() != null) sp.maxTokens(request.maxTokens());
     if (request.topP() != null) sp.topP(request.topP());
-    if (request.presencePenalty() != null) sp.presencePenalty(request.presencePenalty());
-    if (request.frequencyPenalty() != null) sp.frequencyPenalty(request.frequencyPenalty());
+    if (request.presencePenalty() != null) sp.presencePenalty(
+      request.presencePenalty()
+    );
+    if (request.frequencyPenalty() != null) sp.frequencyPenalty(
+      request.frequencyPenalty()
+    );
     if (request.seed() != null) sp.seed(request.seed().longValue());
-    if (request.stop() != null && !request.stop().isEmpty()) sp.stop(request.stop());
+    if (request.stop() != null && !request.stop().isEmpty()) sp.stop(
+      request.stop()
+    );
 
     // Always create a ConversationState so token counts (prompt, answer,
     // reasoning, tools) are tracked even without reasoning/tool tags.
     ConversationState conversationState = new ConversationState();
-    if (request.reasoningTags() != null && request.reasoningTags().isConfigured()) {
-      conversationState.reasoning(request.reasoningTags().openToken(), request.reasoningTags().closeToken());
+    if (
+      request.reasoningTags() != null && request.reasoningTags().isConfigured()
+    ) {
+      conversationState.reasoning(
+        request.reasoningTags().openToken(),
+        request.reasoningTags().closeToken()
+      );
     }
     if (request.toolTags() != null && request.toolTags().isConfigured()) {
-      conversationState.toolCall(request.toolTags().openToken(), request.toolTags().closeToken());
+      conversationState.toolCall(
+        request.toolTags().openToken(),
+        request.toolTags().closeToken()
+      );
     }
 
     String requestId = "seq-" + internalId;
@@ -240,12 +290,24 @@ public class EngineAdapter
     }
 
     // Build the vLLM4J request with full constructor (supports multimodal + LoRA)
-    var vllmRequest = new io.gravitee.vllm.engine.VllmRequest(requestId, prompt, sp, multiModalData, 0, loraReq);
+    var vllmRequest = new io.gravitee.vllm.engine.VllmRequest(
+      requestId,
+      prompt,
+      sp,
+      multiModalData,
+      0,
+      loraReq
+    );
 
     // Submit to iterator with conversation state for token tracking
     iterator.addRequest(vllmRequest, conversationState);
 
-    VllmSequenceState state = new VllmSequenceState(requestId, sp, conversationState, System.currentTimeMillis());
+    VllmSequenceState state = new VllmSequenceState(
+      requestId,
+      sp,
+      conversationState,
+      System.currentTimeMillis()
+    );
     states.put(internalId, state);
     return state;
   }
@@ -265,7 +327,8 @@ public class EngineAdapter
   }
 
   @Override
-  public Optional<EngineOutput<String, VllmSequenceState>> processNextBatch() throws Exception {
+  public Optional<EngineOutput<String, VllmSequenceState>> processNextBatch()
+    throws Exception {
     if (!iterator.hasNext()) {
       return Optional.empty();
     }
@@ -297,7 +360,11 @@ public class EngineAdapter
       try {
         iterator.abortRequest(state.requestId);
       } catch (Exception e) {
-        LOGGER.debug("Error aborting request {}: {}", state.requestId, e.getMessage());
+        LOGGER.debug(
+          "Error aborting request {}: {}",
+          state.requestId,
+          e.getMessage()
+        );
       }
     }
   }
@@ -310,7 +377,10 @@ public class EngineAdapter
     // Prefer the Java-side ConversationState finish reason when it detected
     // tool calls. Python vLLM has no concept of <tool_call> tags and reports
     // "stop", but the Java FSM correctly identified TOOL_CALL boundaries.
-    if (state.conversationState != null && state.conversationState.finishReason() != null) {
+    if (
+      state.conversationState != null &&
+      state.conversationState.finishReason() != null
+    ) {
       return Optional.of(state.conversationState.finishReason().label());
     }
     return Optional.of(state.finishReason);
@@ -338,7 +408,11 @@ public class EngineAdapter
       return null;
     }
     long startTime = state.startTimeMs;
-    long totalTime = (state.finishedTimeMs > 0 ? state.finishedTimeMs : System.currentTimeMillis()) - startTime;
+    long totalTime =
+      (state.finishedTimeMs > 0
+          ? state.finishedTimeMs
+          : System.currentTimeMillis()) -
+      startTime;
     return new InferencePerformance(
       startTime,
       0,
@@ -418,7 +492,9 @@ public class EngineAdapter
    * @param messages the parsed chat messages with optional media
    * @return a populated {@link MultiModalData}, or {@code null} if no media found
    */
-  private static MultiModalData extractMultiModalData(List<io.gravitee.inference.api.textgen.ChatMessage> messages) {
+  private static MultiModalData extractMultiModalData(
+    List<io.gravitee.inference.api.textgen.ChatMessage> messages
+  ) {
     MultiModalData mmData = null;
 
     for (var msg : messages) {
@@ -431,7 +507,10 @@ public class EngineAdapter
             if (mmData == null) mmData = new MultiModalData();
             mmData.addImage(imageBytes);
           } catch (IllegalArgumentException e) {
-            LOGGER.warn("Failed to decode base64 image data: {}", e.getMessage());
+            LOGGER.warn(
+              "Failed to decode base64 image data: {}",
+              e.getMessage()
+            );
           }
         } else if (content instanceof AudioContent audio) {
           try {
@@ -439,7 +518,10 @@ public class EngineAdapter
             if (mmData == null) mmData = new MultiModalData();
             mmData.addAudio(audioBytes);
           } catch (IllegalArgumentException e) {
-            LOGGER.warn("Failed to decode base64 audio data: {}", e.getMessage());
+            LOGGER.warn(
+              "Failed to decode base64 audio data: {}",
+              e.getMessage()
+            );
           }
         }
       }

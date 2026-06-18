@@ -48,30 +48,52 @@ import org.junit.jupiter.api.Test;
 class LlamaMemoryEstimatorTest {
 
   private static final Path NONEXISTENT = Path.of("/nonexistent/model.gguf");
-  private static final Path NONEXISTENT_MMPROJ = Path.of("/nonexistent/mmproj.gguf");
-  private static final Path NONEXISTENT_LORA = Path.of("/nonexistent/lora.gguf");
+  private static final Path NONEXISTENT_MMPROJ = Path.of(
+    "/nonexistent/mmproj.gguf"
+  );
+  private static final Path NONEXISTENT_LORA = Path.of(
+    "/nonexistent/lora.gguf"
+  );
   private static final int DEFAULT_N_SEQ_MAX = 1;
 
   @Nested
-  @DisplayName("Graceful failure — GPU mode (always passes, no native libs needed)")
+  @DisplayName(
+    "Graceful failure — GPU mode (always passes, no native libs needed)"
+  )
   class GracefulFailureGpu {
 
     @Test
     @DisplayName("nonexistent model path returns unknown() — never throws")
     void nonexistent_model_path_returns_unknown() {
-      MemoryEstimate result = LlamaMemoryEstimator.estimate(NONEXISTENT, null, null, 32, 4096, DEFAULT_N_SEQ_MAX);
+      MemoryEstimate result = LlamaMemoryEstimator.estimate(
+        NONEXISTENT,
+        null,
+        null,
+        32,
+        4096,
+        DEFAULT_N_SEQ_MAX
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
     @Test
     @DisplayName("null model path returns unknown() — never throws")
     void null_model_path_returns_unknown() {
-      MemoryEstimate result = LlamaMemoryEstimator.estimate(null, null, null, 32, 4096, DEFAULT_N_SEQ_MAX);
+      MemoryEstimate result = LlamaMemoryEstimator.estimate(
+        null,
+        null,
+        null,
+        32,
+        4096,
+        DEFAULT_N_SEQ_MAX
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
     @Test
-    @DisplayName("nonexistent mmproj path with nonexistent model returns unknown()")
+    @DisplayName(
+      "nonexistent mmproj path with nonexistent model returns unknown()"
+    )
     void nonexistent_mmproj_returns_unknown() {
       MemoryEstimate result = LlamaMemoryEstimator.estimate(
         NONEXISTENT,
@@ -85,7 +107,9 @@ class LlamaMemoryEstimatorTest {
     }
 
     @Test
-    @DisplayName("nonexistent lora path with nonexistent model returns unknown()")
+    @DisplayName(
+      "nonexistent lora path with nonexistent model returns unknown()"
+    )
     void nonexistent_lora_returns_unknown() {
       MemoryEstimate result = LlamaMemoryEstimator.estimate(
         NONEXISTENT,
@@ -118,16 +142,34 @@ class LlamaMemoryEstimatorTest {
   class GracefulFailureCpu {
 
     @Test
-    @DisplayName("nGpuLayers=0 with nonexistent model returns unknown() — never throws")
+    @DisplayName(
+      "nGpuLayers=0 with nonexistent model returns unknown() — never throws"
+    )
     void zero_gpu_layers_nonexistent_returns_unknown() {
-      MemoryEstimate result = LlamaMemoryEstimator.estimate(NONEXISTENT, null, null, 0, 4096, DEFAULT_N_SEQ_MAX);
+      MemoryEstimate result = LlamaMemoryEstimator.estimate(
+        NONEXISTENT,
+        null,
+        null,
+        0,
+        4096,
+        DEFAULT_N_SEQ_MAX
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
     @Test
-    @DisplayName("nGpuLayers=0 with null model returns unknown() — never throws")
+    @DisplayName(
+      "nGpuLayers=0 with null model returns unknown() — never throws"
+    )
     void zero_gpu_layers_null_returns_unknown() {
-      MemoryEstimate result = LlamaMemoryEstimator.estimate(null, null, null, 0, 4096, DEFAULT_N_SEQ_MAX);
+      MemoryEstimate result = LlamaMemoryEstimator.estimate(
+        null,
+        null,
+        null,
+        0,
+        4096,
+        DEFAULT_N_SEQ_MAX
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
@@ -148,14 +190,30 @@ class LlamaMemoryEstimatorTest {
     @Test
     @DisplayName("nGpuLayers=0 with nonexistent lora returns unknown()")
     void zero_gpu_layers_nonexistent_lora_returns_unknown() {
-      MemoryEstimate result = LlamaMemoryEstimator.estimate(NONEXISTENT, null, NONEXISTENT_LORA, 0, 4096, DEFAULT_N_SEQ_MAX);
+      MemoryEstimate result = LlamaMemoryEstimator.estimate(
+        NONEXISTENT,
+        null,
+        NONEXISTENT_LORA,
+        0,
+        4096,
+        DEFAULT_N_SEQ_MAX
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
     @Test
-    @DisplayName("negative nGpuLayers treated as CPU mode — returns unknown() for nonexistent model")
+    @DisplayName(
+      "negative nGpuLayers treated as CPU mode — returns unknown() for nonexistent model"
+    )
     void negative_gpu_layers_returns_unknown() {
-      MemoryEstimate result = LlamaMemoryEstimator.estimate(NONEXISTENT, null, null, -1, 4096, DEFAULT_N_SEQ_MAX);
+      MemoryEstimate result = LlamaMemoryEstimator.estimate(
+        NONEXISTENT,
+        null,
+        null,
+        -1,
+        4096,
+        DEFAULT_N_SEQ_MAX
+      );
       assertThat(result.isUnknown()).isTrue();
     }
   }
@@ -165,7 +223,9 @@ class LlamaMemoryEstimatorTest {
   class GracefulFailureRpc {
 
     @Test
-    @DisplayName("nonexistent model with RPC servers returns unknown() — never throws")
+    @DisplayName(
+      "nonexistent model with RPC servers returns unknown() — never throws"
+    )
     void rpc_nonexistent_model_returns_unknown() {
       MemoryEstimate result = LlamaMemoryEstimator.estimate(
         NONEXISTENT,
@@ -197,22 +257,55 @@ class LlamaMemoryEstimatorTest {
     @Test
     @DisplayName("null rpcServers falls through to GPU/CPU path")
     void null_rpc_servers_falls_through() {
-      MemoryEstimate result = LlamaMemoryEstimator.estimate(NONEXISTENT, null, null, 32, 4096, DEFAULT_N_SEQ_MAX, null);
+      MemoryEstimate result = LlamaMemoryEstimator.estimate(
+        NONEXISTENT,
+        null,
+        null,
+        32,
+        4096,
+        DEFAULT_N_SEQ_MAX,
+        null
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
     @Test
     @DisplayName("empty rpcServers falls through to GPU/CPU path")
     void empty_rpc_servers_falls_through() {
-      MemoryEstimate result = LlamaMemoryEstimator.estimate(NONEXISTENT, null, null, 32, 4096, DEFAULT_N_SEQ_MAX, List.of());
+      MemoryEstimate result = LlamaMemoryEstimator.estimate(
+        NONEXISTENT,
+        null,
+        null,
+        32,
+        4096,
+        DEFAULT_N_SEQ_MAX,
+        List.of()
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
     @Test
-    @DisplayName("convenience overload (no rpcServers param) behaves same as null rpcServers")
+    @DisplayName(
+      "convenience overload (no rpcServers param) behaves same as null rpcServers"
+    )
     void convenience_overload_same_as_null() {
-      MemoryEstimate withNull = LlamaMemoryEstimator.estimate(NONEXISTENT, null, null, 32, 4096, DEFAULT_N_SEQ_MAX, null);
-      MemoryEstimate withOverload = LlamaMemoryEstimator.estimate(NONEXISTENT, null, null, 32, 4096, DEFAULT_N_SEQ_MAX);
+      MemoryEstimate withNull = LlamaMemoryEstimator.estimate(
+        NONEXISTENT,
+        null,
+        null,
+        32,
+        4096,
+        DEFAULT_N_SEQ_MAX,
+        null
+      );
+      MemoryEstimate withOverload = LlamaMemoryEstimator.estimate(
+        NONEXISTENT,
+        null,
+        null,
+        32,
+        4096,
+        DEFAULT_N_SEQ_MAX
+      );
       assertThat(withNull.isUnknown()).isEqualTo(withOverload.isUnknown());
     }
   }
@@ -233,13 +326,22 @@ class LlamaMemoryEstimatorTest {
   }
 
   @Nested
-  @DisplayName("Contract properties (verified when native libs + device available)")
+  @DisplayName(
+    "Contract properties (verified when native libs + device available)"
+  )
   class ContractProperties {
 
     @Test
     @DisplayName("GPU estimate is exact (isApproximate=false) when successful")
     void gpu_exact_estimate_contract() {
-      MemoryEstimate result = LlamaMemoryEstimator.estimate(NONEXISTENT, null, null, 32, 4096, DEFAULT_N_SEQ_MAX);
+      MemoryEstimate result = LlamaMemoryEstimator.estimate(
+        NONEXISTENT,
+        null,
+        null,
+        32,
+        4096,
+        DEFAULT_N_SEQ_MAX
+      );
 
       if (!result.isUnknown()) {
         assertThat(result.isApproximate()).isFalse();
@@ -252,7 +354,14 @@ class LlamaMemoryEstimatorTest {
     @Test
     @DisplayName("CPU estimate is exact (isApproximate=false) when successful")
     void cpu_exact_estimate_contract() {
-      MemoryEstimate result = LlamaMemoryEstimator.estimate(NONEXISTENT, null, null, 0, 4096, DEFAULT_N_SEQ_MAX);
+      MemoryEstimate result = LlamaMemoryEstimator.estimate(
+        NONEXISTENT,
+        null,
+        null,
+        0,
+        4096,
+        DEFAULT_N_SEQ_MAX
+      );
 
       if (!result.isUnknown()) {
         assertThat(result.isApproximate()).isFalse();

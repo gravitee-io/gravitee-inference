@@ -148,10 +148,26 @@ public final class LlamaMemoryEstimator {
           } else {
             llamaLogger.setLogging(logLevel);
           }
-          return doEstimate(modelPath, mmprojPath, loraPath, nGpuLayers, nCtx, nSeqMax, rpcServers);
+          return doEstimate(
+            modelPath,
+            mmprojPath,
+            loraPath,
+            nGpuLayers,
+            nCtx,
+            nSeqMax,
+            rpcServers
+          );
         }
       }
-      return doEstimate(modelPath, mmprojPath, loraPath, nGpuLayers, nCtx, nSeqMax, rpcServers);
+      return doEstimate(
+        modelPath,
+        mmprojPath,
+        loraPath,
+        nGpuLayers,
+        nCtx,
+        nSeqMax,
+        rpcServers
+      );
     } catch (Exception e) {
       return MemoryEstimate.unknown();
     }
@@ -171,7 +187,16 @@ public final class LlamaMemoryEstimator {
     int nSeqMax,
     List<String> rpcServers
   ) {
-    return estimate(modelPath, mmprojPath, loraPath, nGpuLayers, nCtx, nSeqMax, rpcServers, null);
+    return estimate(
+      modelPath,
+      mmprojPath,
+      loraPath,
+      nGpuLayers,
+      nCtx,
+      nSeqMax,
+      rpcServers,
+      null
+    );
   }
 
   /**
@@ -187,7 +212,16 @@ public final class LlamaMemoryEstimator {
     int nCtx,
     int nSeqMax
   ) {
-    return estimate(modelPath, mmprojPath, loraPath, nGpuLayers, nCtx, nSeqMax, null, null);
+    return estimate(
+      modelPath,
+      mmprojPath,
+      loraPath,
+      nGpuLayers,
+      nCtx,
+      nSeqMax,
+      null,
+      null
+    );
   }
 
   // --- private implementation ---
@@ -206,7 +240,14 @@ public final class LlamaMemoryEstimator {
 
     // RPC mode: query remote GPU VRAM (takes priority over local GPU)
     if (rpcServers != null && !rpcServers.isEmpty()) {
-      return estimateRpc(dims, mmprojPath, loraPath, nGpuLayers, totalCtx, rpcServers);
+      return estimateRpc(
+        dims,
+        mmprojPath,
+        loraPath,
+        nGpuLayers,
+        totalCtx,
+        rpcServers
+      );
     }
 
     // CPU-only mode: skip GPU entirely, check system RAM
@@ -217,7 +258,14 @@ public final class LlamaMemoryEstimator {
     // GPU mode: try GPU first, fall back to CPU if no GPU found
     GpuMemoryInfo gpuMemory = GpuMemoryQuery.queryBest();
     if (gpuMemory != null) {
-      return estimateGpu(dims, mmprojPath, loraPath, nGpuLayers, totalCtx, gpuMemory);
+      return estimateGpu(
+        dims,
+        mmprojPath,
+        loraPath,
+        nGpuLayers,
+        totalCtx,
+        gpuMemory
+      );
     }
 
     // No GPU found — fall back to CPU memory check
@@ -235,16 +283,35 @@ public final class LlamaMemoryEstimator {
     GpuMemoryInfo gpuMemory
   ) {
     int effectiveGpuLayers = Math.min(nGpuLayers, dims.nLayers());
-    long gpuWeightBytes = computeGpuWeightBytes(dims.totalWeightBytes(), effectiveGpuLayers, dims.nLayers());
+    long gpuWeightBytes = computeGpuWeightBytes(
+      dims.totalWeightBytes(),
+      effectiveGpuLayers,
+      dims.nLayers()
+    );
 
     long mmprojBytes = loadAuxiliaryWeightBytes(mmprojPath);
     long loraBytes = loadAuxiliaryWeightBytes(loraPath);
-    long kvBytes = computeKvBytes(nCtx, effectiveGpuLayers, dims.nHeadKv(), dims.headDim());
+    long kvBytes = computeKvBytes(
+      nCtx,
+      effectiveGpuLayers,
+      dims.nHeadKv(),
+      dims.headDim()
+    );
     long totalRequired = gpuWeightBytes + mmprojBytes + loraBytes + kvBytes;
 
     long fixedOverhead = mmprojBytes + loraBytes;
-    int suggestedLayers = computeSuggestedLayers(dims, fixedOverhead, nCtx, gpuMemory.freeBytes());
-    String breakdown = buildBreakdown(gpuWeightBytes, kvBytes, mmprojBytes, loraBytes);
+    int suggestedLayers = computeSuggestedLayers(
+      dims,
+      fixedOverhead,
+      nCtx,
+      gpuMemory.freeBytes()
+    );
+    String breakdown = buildBreakdown(
+      gpuWeightBytes,
+      kvBytes,
+      mmprojBytes,
+      loraBytes
+    );
     String suggestion = buildGpuSuggestion(
       breakdown,
       totalRequired,
@@ -280,11 +347,20 @@ public final class LlamaMemoryEstimator {
 
     // RPC distributes layers across servers proportionally to free VRAM
     int effectiveGpuLayers = Math.min(nGpuLayers, dims.nLayers());
-    long gpuWeightBytes = computeGpuWeightBytes(dims.totalWeightBytes(), effectiveGpuLayers, dims.nLayers());
+    long gpuWeightBytes = computeGpuWeightBytes(
+      dims.totalWeightBytes(),
+      effectiveGpuLayers,
+      dims.nLayers()
+    );
 
     long mmprojBytes = loadAuxiliaryWeightBytes(mmprojPath);
     long loraBytes = loadAuxiliaryWeightBytes(loraPath);
-    long kvBytes = computeKvBytes(nCtx, effectiveGpuLayers, dims.nHeadKv(), dims.headDim());
+    long kvBytes = computeKvBytes(
+      nCtx,
+      effectiveGpuLayers,
+      dims.nHeadKv(),
+      dims.headDim()
+    );
     long totalRequired = gpuWeightBytes + mmprojBytes + loraBytes + kvBytes;
 
     String suggestion = buildRpcSuggestion(
@@ -309,7 +385,12 @@ public final class LlamaMemoryEstimator {
 
   // --- CPU estimation ---
 
-  private static MemoryEstimate estimateCpu(LlamaModelDims dims, Path mmprojPath, Path loraPath, int nCtx) {
+  private static MemoryEstimate estimateCpu(
+    LlamaModelDims dims,
+    Path mmprojPath,
+    Path loraPath,
+    int nCtx
+  ) {
     CpuMemoryInfo cpuMemory = CpuMemoryQuery.query();
     if (cpuMemory == null) {
       return MemoryEstimate.unknown();
@@ -319,11 +400,25 @@ public final class LlamaMemoryEstimator {
     long modelBytes = dims.totalWeightBytes();
     long mmprojBytes = loadAuxiliaryWeightBytes(mmprojPath);
     long loraBytes = loadAuxiliaryWeightBytes(loraPath);
-    long kvBytes = computeKvBytes(nCtx, dims.nLayers(), dims.nHeadKv(), dims.headDim());
+    long kvBytes = computeKvBytes(
+      nCtx,
+      dims.nLayers(),
+      dims.nHeadKv(),
+      dims.headDim()
+    );
     long totalRequired = modelBytes + mmprojBytes + loraBytes + kvBytes;
 
-    String breakdown = buildBreakdown(modelBytes, kvBytes, mmprojBytes, loraBytes);
-    String suggestion = buildCpuSuggestion(breakdown, totalRequired, cpuMemory.freeBytes());
+    String breakdown = buildBreakdown(
+      modelBytes,
+      kvBytes,
+      mmprojBytes,
+      loraBytes
+    );
+    String suggestion = buildCpuSuggestion(
+      breakdown,
+      totalRequired,
+      cpuMemory.freeBytes()
+    );
 
     return MemoryEstimate.of(
       totalRequired,
@@ -335,7 +430,11 @@ public final class LlamaMemoryEstimator {
     );
   }
 
-  private static long computeGpuWeightBytes(long totalWeightBytes, int gpuLayers, int totalLayers) {
+  private static long computeGpuWeightBytes(
+    long totalWeightBytes,
+    int gpuLayers,
+    int totalLayers
+  ) {
     if (totalLayers == 0) return totalWeightBytes;
     return (totalWeightBytes * gpuLayers) / totalLayers;
   }
@@ -354,12 +453,28 @@ public final class LlamaMemoryEstimator {
     }
   }
 
-  private static long computeKvBytes(int nCtx, int gpuLayers, int nHeadKv, int headDim) {
-    return ((long) nCtx * gpuLayers * nHeadKv * headDim * KV_BYTES_PER_TOKEN_PER_LAYER_PER_HEAD);
+  private static long computeKvBytes(
+    int nCtx,
+    int gpuLayers,
+    int nHeadKv,
+    int headDim
+  ) {
+    return (
+      (long) nCtx *
+      gpuLayers *
+      nHeadKv *
+      headDim *
+      KV_BYTES_PER_TOKEN_PER_LAYER_PER_HEAD
+    );
   }
 
   /** Binary-searches for the max number of layers that fit within available VRAM. */
-  private static int computeSuggestedLayers(LlamaModelDims dims, long mmprojBytes, int nCtx, long freeBytes) {
+  private static int computeSuggestedLayers(
+    LlamaModelDims dims,
+    long mmprojBytes,
+    int nCtx,
+    long freeBytes
+  ) {
     long usable = (long) (freeBytes * (1.0 - GPU_SAFETY_MARGIN)) - mmprojBytes;
     if (usable <= 0) return 0;
     int lo = 0,
@@ -367,7 +482,11 @@ public final class LlamaMemoryEstimator {
       best = 0;
     while (lo <= hi) {
       int mid = (lo + hi) / 2;
-      long w = computeGpuWeightBytes(dims.totalWeightBytes(), mid, dims.nLayers());
+      long w = computeGpuWeightBytes(
+        dims.totalWeightBytes(),
+        mid,
+        dims.nLayers()
+      );
       long kv = computeKvBytes(nCtx, mid, dims.nHeadKv(), dims.headDim());
       if (w + kv <= usable) {
         best = mid;
@@ -387,7 +506,10 @@ public final class LlamaMemoryEstimator {
     int suggestedLayers
   ) {
     if (required <= available * (1.0 - GPU_SAFETY_MARGIN)) {
-      return "%s Model fits with %.0f%% headroom.".formatted(breakdown, (100.0 * (available - required)) / available);
+      return "%s Model fits with %.0f%% headroom.".formatted(
+        breakdown,
+        (100.0 * (available - required)) / available
+      );
     }
     if (suggestedLayers > 0) {
       return "%s Try nGpuLayers=%d (requested %d) to fit within available VRAM.".formatted(
@@ -396,10 +518,16 @@ public final class LlamaMemoryEstimator {
         requestedLayers
       );
     }
-    return "%s Model is too large for GPU. Consider CPU-only inference (nGpuLayers=0).".formatted(breakdown);
+    return "%s Model is too large for GPU. Consider CPU-only inference (nGpuLayers=0).".formatted(
+      breakdown
+    );
   }
 
-  private static String buildCpuSuggestion(String breakdown, long required, long available) {
+  private static String buildCpuSuggestion(
+    String breakdown,
+    long required,
+    long available
+  ) {
     if (required <= available) {
       return "%s Model fits in system RAM with %.0f%% headroom.".formatted(
         breakdown,
@@ -420,8 +548,15 @@ public final class LlamaMemoryEstimator {
     long totalFreeBytes,
     int serverCount
   ) {
-    String breakdown = buildBreakdown(gpuWeightBytes, kvBytes, mmprojBytes, loraBytes);
-    String servers = serverCount == 1 ? "1 RPC server" : serverCount + " RPC servers";
+    String breakdown = buildBreakdown(
+      gpuWeightBytes,
+      kvBytes,
+      mmprojBytes,
+      loraBytes
+    );
+    String servers = serverCount == 1
+      ? "1 RPC server"
+      : serverCount + " RPC servers";
     if (totalRequired <= totalFreeBytes * (1.0 - GPU_SAFETY_MARGIN)) {
       return "%s Model fits across %s (combined free=%.2f GiB) with %.0f%% headroom.".formatted(
         breakdown,
@@ -438,9 +573,19 @@ public final class LlamaMemoryEstimator {
   }
 
   /** Builds a human-readable breakdown of estimated memory components. */
-  private static String buildBreakdown(long weightBytes, long kvBytes, long mmprojBytes, long loraBytes) {
+  private static String buildBreakdown(
+    long weightBytes,
+    long kvBytes,
+    long mmprojBytes,
+    long loraBytes
+  ) {
     StringBuilder sb = new StringBuilder();
-    sb.append("Breakdown: weights=%.2f GiB, KV-cache=%.2f GiB".formatted(weightBytes / GB, kvBytes / GB));
+    sb.append(
+      "Breakdown: weights=%.2f GiB, KV-cache=%.2f GiB".formatted(
+        weightBytes / GB,
+        kvBytes / GB
+      )
+    );
     if (mmprojBytes > 0) {
       sb.append(", mmproj=%.2f GiB".formatted(mmprojBytes / GB));
     }

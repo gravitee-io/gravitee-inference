@@ -24,4 +24,7 @@ package io.gravitee.inference.api.textgen;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public record QueuedSequence<REQUEST extends GenerationRequest>(int seqId, REQUEST request) {}
+public record QueuedSequence<REQUEST extends GenerationRequest>(
+  int seqId,
+  REQUEST request
+) {}

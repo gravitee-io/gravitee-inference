@@ -15,7 +15,11 @@
  */
 package io.gravitee.inference.api.textgen;
 
-public record ChatMessage(Role role, String content, java.util.List<Content> media) {
+public record ChatMessage(
+  Role role,
+  String content,
+  java.util.List<Content> media
+) {
   public ChatMessage {
     if (content == null) {
       content = "";
@@ -27,7 +31,9 @@ public record ChatMessage(Role role, String content, java.util.List<Content> med
     // Validate that media contains only ImageContent or AudioContent
     for (Content c : media) {
       if (!(c instanceof ImageContent || c instanceof AudioContent)) {
-        throw new IllegalArgumentException("Media must be either ImageContent or AudioContent");
+        throw new IllegalArgumentException(
+          "Media must be either ImageContent or AudioContent"
+        );
       }
     }
   }

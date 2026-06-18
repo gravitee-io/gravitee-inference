@@ -31,7 +31,13 @@ import java.util.function.Consumer;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class BatchEngine extends AbstractBatchEngine<VllmConfig, VllmRequest, String, EngineAdapter.VllmSequenceState> {
+public class BatchEngine
+  extends AbstractBatchEngine<
+    VllmConfig,
+    VllmRequest,
+    String,
+    EngineAdapter.VllmSequenceState
+  > {
 
   private final EngineAdapter engineAdapter;
 
@@ -41,7 +47,10 @@ public class BatchEngine extends AbstractBatchEngine<VllmConfig, VllmRequest, St
    * @param config The vLLM configuration
    */
   public BatchEngine(VllmConfig config) {
-    this(BatchEngineConfig.of(config.maxNumSeqs() > 0 ? config.maxNumSeqs() : 8), config);
+    this(
+      BatchEngineConfig.of(config.maxNumSeqs() > 0 ? config.maxNumSeqs() : 8),
+      config
+    );
   }
 
   /**

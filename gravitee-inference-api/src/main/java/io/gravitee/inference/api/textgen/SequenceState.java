@@ -41,12 +41,20 @@ public class SequenceState<STATE> {
   int toolTokens = 0;
   boolean finalSent = false;
 
-  SequenceState(int conversationId, int externalId, STATE engineState, List<String> stopStrings) {
+  SequenceState(
+    int conversationId,
+    int externalId,
+    STATE engineState,
+    List<String> stopStrings
+  ) {
     this.conversationId = conversationId;
     this.externalId = externalId;
     this.engineState = engineState;
     this.stopStrings = stopStrings == null ? List.of() : stopStrings;
-    this.maxStopLength = this.stopStrings.stream().mapToInt(String::length).max().orElse(0);
+    this.maxStopLength = this.stopStrings.stream()
+      .mapToInt(String::length)
+      .max()
+      .orElse(0);
 
     // Detect token type from first token if possible
     this.tokenType = String.class; // Default to String, could be overridden

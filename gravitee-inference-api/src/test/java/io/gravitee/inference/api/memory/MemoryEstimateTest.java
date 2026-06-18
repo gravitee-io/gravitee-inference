@@ -31,7 +31,9 @@ class MemoryEstimateTest {
   class UnknownSentinel {
 
     @Test
-    @DisplayName("unknown() returns a sentinel with zero values and willFit=true")
+    @DisplayName(
+      "unknown() returns a sentinel with zero values and willFit=true"
+    )
     void unknown_returns_zero_sentinel() {
       MemoryEstimate unknown = MemoryEstimate.unknown();
       assertThat(unknown.totalGb()).isEqualTo(0.0);
@@ -51,21 +53,42 @@ class MemoryEstimateTest {
     @Test
     @DisplayName("isUnknown() returns true for any estimate with all zeros")
     void isUnknown_returns_true_when_all_zero() {
-      MemoryEstimate estimate = new MemoryEstimate(0, 0, 0, false, "anything", false);
+      MemoryEstimate estimate = new MemoryEstimate(
+        0,
+        0,
+        0,
+        false,
+        "anything",
+        false
+      );
       assertThat(estimate.isUnknown()).isTrue();
     }
 
     @Test
     @DisplayName("isUnknown() returns false when requiredGb is non-zero")
     void isUnknown_returns_false_when_required_is_nonzero() {
-      MemoryEstimate estimate = new MemoryEstimate(24.0, 20.0, 1.0, true, "", false);
+      MemoryEstimate estimate = new MemoryEstimate(
+        24.0,
+        20.0,
+        1.0,
+        true,
+        "",
+        false
+      );
       assertThat(estimate.isUnknown()).isFalse();
     }
 
     @Test
     @DisplayName("isUnknown() returns false when usableGb is non-zero")
     void isUnknown_returns_false_when_usable_is_nonzero() {
-      MemoryEstimate estimate = new MemoryEstimate(24.0, 2.0, 0, true, "", false);
+      MemoryEstimate estimate = new MemoryEstimate(
+        24.0,
+        2.0,
+        0,
+        true,
+        "",
+        false
+      );
       assertThat(estimate.isUnknown()).isFalse();
     }
 
@@ -89,7 +112,14 @@ class MemoryEstimateTest {
       long available = (long) (24 * GB);
       long total = (long) (24 * GB);
 
-      MemoryEstimate estimate = MemoryEstimate.of(required, available, total, 0.10, "It fits!", false);
+      MemoryEstimate estimate = MemoryEstimate.of(
+        required,
+        available,
+        total,
+        0.10,
+        "It fits!",
+        false
+      );
 
       assertThat(estimate.requiredGb()).isCloseTo(8.0, within(0.01));
       assertThat(estimate.usableGb()).isCloseTo(21.6, within(0.01));
@@ -100,14 +130,23 @@ class MemoryEstimateTest {
     }
 
     @Test
-    @DisplayName("model that does NOT fit: willFit=false with 10% safety margin")
+    @DisplayName(
+      "model that does NOT fit: willFit=false with 10% safety margin"
+    )
     void model_does_not_fit_with_safety_margin() {
       // 22 GiB required, 24 GiB free, 24 GiB total, 10% margin -> usable = 21.6 GiB -> does NOT fit
       long required = (long) (22 * GB);
       long available = (long) (24 * GB);
       long total = (long) (24 * GB);
 
-      MemoryEstimate estimate = MemoryEstimate.of(required, available, total, 0.10, "Too big", true);
+      MemoryEstimate estimate = MemoryEstimate.of(
+        required,
+        available,
+        total,
+        0.10,
+        "Too big",
+        true
+      );
 
       assertThat(estimate.willFit()).isFalse();
       assertThat(estimate.isApproximate()).isTrue();
@@ -121,7 +160,14 @@ class MemoryEstimateTest {
       long total = (long) (24 * GB);
       long required = (long) (available * 0.90); // exactly usable
 
-      MemoryEstimate estimate = MemoryEstimate.of(required, available, total, 0.10, "boundary", false);
+      MemoryEstimate estimate = MemoryEstimate.of(
+        required,
+        available,
+        total,
+        0.10,
+        "boundary",
+        false
+      );
 
       assertThat(estimate.willFit()).isTrue();
     }
@@ -133,7 +179,14 @@ class MemoryEstimateTest {
       long available = (long) (24 * GB);
       long total = (long) (24 * GB);
 
-      MemoryEstimate estimate = MemoryEstimate.of(required, available, total, 0.0, "no margin", false);
+      MemoryEstimate estimate = MemoryEstimate.of(
+        required,
+        available,
+        total,
+        0.0,
+        "no margin",
+        false
+      );
 
       assertThat(estimate.willFit()).isTrue();
     }
@@ -146,13 +199,27 @@ class MemoryEstimateTest {
       long available = (long) (24 * GB);
       long total = (long) (24 * GB);
 
-      MemoryEstimate estimate = MemoryEstimate.of(required, available, total, 0.25, "multimodal", true);
+      MemoryEstimate estimate = MemoryEstimate.of(
+        required,
+        available,
+        total,
+        0.25,
+        "multimodal",
+        true
+      );
 
       assertThat(estimate.willFit()).isTrue();
 
       // 19 GiB required -> does NOT fit (19 > 18)
       long required2 = (long) (19 * GB);
-      MemoryEstimate estimate2 = MemoryEstimate.of(required2, available, total, 0.25, "multimodal", true);
+      MemoryEstimate estimate2 = MemoryEstimate.of(
+        required2,
+        available,
+        total,
+        0.25,
+        "multimodal",
+        true
+      );
       assertThat(estimate2.willFit()).isFalse();
     }
 
@@ -160,7 +227,14 @@ class MemoryEstimateTest {
     @DisplayName("zero required bytes produces requiredGb=0 and willFit=true")
     void zero_required_bytes() {
       long total = (long) (24 * GB);
-      MemoryEstimate estimate = MemoryEstimate.of(0, total, total, 0.10, "empty", false);
+      MemoryEstimate estimate = MemoryEstimate.of(
+        0,
+        total,
+        total,
+        0.10,
+        "empty",
+        false
+      );
       assertThat(estimate.requiredGb()).isEqualTo(0.0);
       assertThat(estimate.willFit()).isTrue();
     }
@@ -168,7 +242,14 @@ class MemoryEstimateTest {
     @Test
     @DisplayName("zero available bytes: nothing fits (unless zero required)")
     void zero_available_bytes() {
-      MemoryEstimate estimate = MemoryEstimate.of((long) (8 * GB), 0, 0, 0.10, "no gpu", false);
+      MemoryEstimate estimate = MemoryEstimate.of(
+        (long) (8 * GB),
+        0,
+        0,
+        0.10,
+        "no gpu",
+        false
+      );
       assertThat(estimate.usableGb()).isEqualTo(0.0);
       assertThat(estimate.willFit()).isFalse();
     }
@@ -177,7 +258,14 @@ class MemoryEstimateTest {
     @DisplayName("isUnknown() returns false for a real estimate")
     void real_estimate_is_not_unknown() {
       long total = (long) (24 * GB);
-      MemoryEstimate estimate = MemoryEstimate.of((long) (8 * GB), total, total, 0.10, "ok", false);
+      MemoryEstimate estimate = MemoryEstimate.of(
+        (long) (8 * GB),
+        total,
+        total,
+        0.10,
+        "ok",
+        false
+      );
       assertThat(estimate.isUnknown()).isFalse();
     }
   }
@@ -194,7 +282,13 @@ class MemoryEstimateTest {
       long usable = (long) (20 * GB);
       long total = (long) (24 * GB);
 
-      MemoryEstimate estimate = MemoryEstimate.of(required, usable, total, "It fits!", true);
+      MemoryEstimate estimate = MemoryEstimate.of(
+        required,
+        usable,
+        total,
+        "It fits!",
+        true
+      );
 
       assertThat(estimate.requiredGb()).isCloseTo(8.0, within(0.01));
       assertThat(estimate.usableGb()).isCloseTo(20.0, within(0.01));
@@ -211,7 +305,13 @@ class MemoryEstimateTest {
       long usable = (long) (20 * GB);
       long total = (long) (24 * GB);
 
-      MemoryEstimate estimate = MemoryEstimate.of(required, usable, total, "Too big", true);
+      MemoryEstimate estimate = MemoryEstimate.of(
+        required,
+        usable,
+        total,
+        "Too big",
+        true
+      );
 
       assertThat(estimate.willFit()).isFalse();
     }
@@ -224,7 +324,14 @@ class MemoryEstimateTest {
     @Test
     @DisplayName("fits + exact: includes 'fits' and '(exact)'")
     void fits_exact() {
-      MemoryEstimate estimate = new MemoryEstimate(24.0, 21.6, 8.0, true, "All good.", false);
+      MemoryEstimate estimate = new MemoryEstimate(
+        24.0,
+        21.6,
+        8.0,
+        true,
+        "All good.",
+        false
+      );
       String readable = estimate.toHumanReadable();
 
       assertThat(readable).contains("(exact)");
@@ -236,9 +343,18 @@ class MemoryEstimateTest {
     }
 
     @Test
-    @DisplayName("does NOT fit + approximate: includes 'does NOT fit' and '(approximate)'")
+    @DisplayName(
+      "does NOT fit + approximate: includes 'does NOT fit' and '(approximate)'"
+    )
     void does_not_fit_approximate() {
-      MemoryEstimate estimate = new MemoryEstimate(8.0, 6.0, 22.0, false, "Too big.", true);
+      MemoryEstimate estimate = new MemoryEstimate(
+        8.0,
+        6.0,
+        22.0,
+        false,
+        "Too big.",
+        true
+      );
       String readable = estimate.toHumanReadable();
 
       assertThat(readable).contains("(approximate)");
@@ -251,7 +367,14 @@ class MemoryEstimateTest {
     @Test
     @DisplayName("null suggestion is handled gracefully")
     void null_suggestion() {
-      MemoryEstimate estimate = new MemoryEstimate(24.0, 21.6, 8.0, true, null, false);
+      MemoryEstimate estimate = new MemoryEstimate(
+        24.0,
+        21.6,
+        8.0,
+        true,
+        null,
+        false
+      );
       String readable = estimate.toHumanReadable();
 
       assertThat(readable).doesNotContain("null");
@@ -272,7 +395,14 @@ class MemoryEstimateTest {
     @Test
     @DisplayName("record accessors return correct values")
     void accessors() {
-      MemoryEstimate estimate = new MemoryEstimate(24.0, 20.0, 16.5, true, "ok", false);
+      MemoryEstimate estimate = new MemoryEstimate(
+        24.0,
+        20.0,
+        16.5,
+        true,
+        "ok",
+        false
+      );
       assertThat(estimate.totalGb()).isEqualTo(24.0);
       assertThat(estimate.usableGb()).isEqualTo(20.0);
       assertThat(estimate.requiredGb()).isEqualTo(16.5);

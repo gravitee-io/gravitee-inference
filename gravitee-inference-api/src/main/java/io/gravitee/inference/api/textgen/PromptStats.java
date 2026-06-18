@@ -25,7 +25,11 @@ package io.gravitee.inference.api.textgen;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public record PromptStats(int promptTokens, int contextTokens, int estimatedGenerationTokens) {
+public record PromptStats(
+  int promptTokens,
+  int contextTokens,
+  int estimatedGenerationTokens
+) {
   public PromptStats {
     if (promptTokens < 0) {
       throw new IllegalArgumentException("promptTokens must be non-negative");

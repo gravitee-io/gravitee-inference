@@ -144,7 +144,9 @@ public record ModelConfig(
     private MemoryCheckPolicy memoryCheckPolicy = MemoryCheckPolicy.WARN;
 
     private Builder(Path modelPath) {
-      if (modelPath == null) throw new IllegalArgumentException("modelPath must not be null");
+      if (modelPath == null) throw new IllegalArgumentException(
+        "modelPath must not be null"
+      );
       this.modelPath = modelPath;
     }
 

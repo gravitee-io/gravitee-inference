@@ -15,7 +15,8 @@
  */
 package io.gravitee.inference.api.textgen;
 
-public record AudioContent(MediaType mediaType, String data) implements Content {
+public record AudioContent(MediaType mediaType, String data) implements
+  Content {
   public AudioContent {
     if (data == null || data.trim().isEmpty()) {
       throw new IllegalArgumentException("Audio data cannot be null or empty");

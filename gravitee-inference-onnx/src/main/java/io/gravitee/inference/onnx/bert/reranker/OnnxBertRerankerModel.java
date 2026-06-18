@@ -44,7 +44,8 @@ import java.util.List;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class OnnxBertRerankerModel extends OnnxBertInference<RerankPair, RerankTokenCount> {
+public class OnnxBertRerankerModel
+  extends OnnxBertInference<RerankPair, RerankTokenCount> {
 
   private final RerankScoring scoring;
 
@@ -112,16 +113,21 @@ public class OnnxBertRerankerModel extends OnnxBertInference<RerankPair, RerankT
     Object raw = result.get(0).getValue();
     if (!(raw instanceof float[][] logits)) {
       throw new IllegalArgumentException(
-        "Reranker output must be [batch, N] float32 — got: " + raw.getClass().getSimpleName()
+        "Reranker output must be [batch, N] float32 — got: " +
+          raw.getClass().getSimpleName()
       );
     }
     if (logits.length == 0) return new float[0];
     int numClasses = logits[0].length;
     if (numClasses != 1 && numClasses != 2) {
-      throw new IllegalArgumentException("Reranker output must have 1 or 2 classes per row, got: " + numClasses);
+      throw new IllegalArgumentException(
+        "Reranker output must have 1 or 2 classes per row, got: " + numClasses
+      );
     }
 
-    RerankScoring mode = scoring != null ? scoring : (numClasses == 1 ? RerankScoring.SIGMOID : RerankScoring.SOFTMAX);
+    RerankScoring mode = scoring != null
+      ? scoring
+      : (numClasses == 1 ? RerankScoring.SIGMOID : RerankScoring.SOFTMAX);
 
     return switch (mode) {
       case SIGMOID -> handleSigmoid(logits, numClasses);
@@ -142,7 +148,9 @@ public class OnnxBertRerankerModel extends OnnxBertInference<RerankPair, RerankT
   private float[] handleSoftmax(float[][] logits, int numClasses) {
     float[] out = new float[logits.length];
     if (numClasses != 2) {
-      throw new IllegalArgumentException("SOFTMAX scoring requires [batch, 2] output, got " + numClasses);
+      throw new IllegalArgumentException(
+        "SOFTMAX scoring requires [batch, 2] output, got " + numClasses
+      );
     }
     for (int i = 0; i < logits.length; i++) {
       out[i] = config.gioMath().softmax(logits[i])[1];

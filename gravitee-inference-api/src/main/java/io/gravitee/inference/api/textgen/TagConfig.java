@@ -17,6 +17,11 @@ package io.gravitee.inference.api.textgen;
 
 public record TagConfig(String openToken, String closeToken) {
   public boolean isConfigured() {
-    return openToken != null && !openToken.isBlank() && closeToken != null && !closeToken.isBlank();
+    return (
+      openToken != null &&
+      !openToken.isBlank() &&
+      closeToken != null &&
+      !closeToken.isBlank()
+    );
   }
 }

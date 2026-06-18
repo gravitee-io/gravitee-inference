@@ -38,7 +38,8 @@ import java.util.List;
  * @author Remi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public abstract class LlamaCppInference<INPUT, OUTPUT> extends InferenceModel<ModelConfig, INPUT, OUTPUT> {
+public abstract class LlamaCppInference<INPUT, OUTPUT>
+  extends InferenceModel<ModelConfig, INPUT, OUTPUT> {
 
   static {
     LlamaBackend.init();

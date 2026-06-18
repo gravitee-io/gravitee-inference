@@ -42,25 +42,38 @@ import org.junit.jupiter.api.Test;
  */
 public class OnnxBertRerankerTest extends OnnxBertBaseTest {
 
-  private static final String HF_RERANKER_BASE = "Xenova/ms-marco-MiniLM-L-6-v2/resolve/main/";
-  private static final String HF_RERANKER_ONNX_DOWNLOAD = HF_URL + HF_RERANKER_BASE + "onnx/model_quantized.onnx";
-  private static final String HF_RERANKER_TOKENIZER = HF_URL + HF_RERANKER_BASE + "tokenizer.json";
+  private static final String HF_RERANKER_BASE =
+    "Xenova/ms-marco-MiniLM-L-6-v2/resolve/main/";
+  private static final String HF_RERANKER_ONNX_DOWNLOAD =
+    HF_URL + HF_RERANKER_BASE + "onnx/model_quantized.onnx";
+  private static final String HF_RERANKER_TOKENIZER =
+    HF_URL + HF_RERANKER_BASE + "tokenizer.json";
 
-  private static final String RERANKER_MODEL_ONNX = "ms-marco-minilm-l-6-v2/model_quantized.onnx";
-  private static final String RERANKER_TOKENIZER_JSON = "ms-marco-minilm-l-6-v2/tokenizer.json";
+  private static final String RERANKER_MODEL_ONNX =
+    "ms-marco-minilm-l-6-v2/model_quantized.onnx";
+  private static final String RERANKER_TOKENIZER_JSON =
+    "ms-marco-minilm-l-6-v2/tokenizer.json";
 
-  private static final URI RERANKER_MODEL_URI = getUriIfExist(RERANKER_MODEL_ONNX, HF_RERANKER_ONNX_DOWNLOAD);
-  private static final URI RERANKER_TOKENIZER_URI = getUriIfExist(RERANKER_TOKENIZER_JSON, HF_RERANKER_TOKENIZER);
-
-  private static final OnnxBertResource RERANKER_RESOURCE = new OnnxBertResource(
-    Path.of(RERANKER_MODEL_URI),
-    Path.of(RERANKER_TOKENIZER_URI)
+  private static final URI RERANKER_MODEL_URI = getUriIfExist(
+    RERANKER_MODEL_ONNX,
+    HF_RERANKER_ONNX_DOWNLOAD
   );
+  private static final URI RERANKER_TOKENIZER_URI = getUriIfExist(
+    RERANKER_TOKENIZER_JSON,
+    HF_RERANKER_TOKENIZER
+  );
+
+  private static final OnnxBertResource RERANKER_RESOURCE =
+    new OnnxBertResource(
+      Path.of(RERANKER_MODEL_URI),
+      Path.of(RERANKER_TOKENIZER_URI)
+    );
 
   // Shared model instance — cross-encoder, [batch,1] output → SIGMOID default
-  private static final OnnxBertRerankerModel rerankerModel = new OnnxBertRerankerModel(
-    new OnnxBertConfig(RERANKER_RESOURCE, NativeMath.INSTANCE, Map.of())
-  );
+  private static final OnnxBertRerankerModel rerankerModel =
+    new OnnxBertRerankerModel(
+      new OnnxBertConfig(RERANKER_RESOURCE, NativeMath.INSTANCE, Map.of())
+    );
 
   // A highly relevant (query, document) pair
   private static final RerankPair RELEVANT_PAIR = new RerankPair(
@@ -79,9 +92,18 @@ public class OnnxBertRerankerTest extends OnnxBertBaseTest {
     var relevant = rerankerModel.infer(RELEVANT_PAIR);
     var irrelevant = rerankerModel.infer(IRRELEVANT_PAIR);
 
-    assertTrue(relevant.score() > irrelevant.score(), "relevant score must exceed irrelevant score");
-    assertTrue(relevant.score() > 0.5f, "relevant pair should score above 0.5 with sigmoid");
-    assertTrue(irrelevant.score() < 0.5f, "irrelevant pair should score below 0.5 with sigmoid");
+    assertTrue(
+      relevant.score() > irrelevant.score(),
+      "relevant score must exceed irrelevant score"
+    );
+    assertTrue(
+      relevant.score() > 0.5f,
+      "relevant pair should score above 0.5 with sigmoid"
+    );
+    assertTrue(
+      irrelevant.score() < 0.5f,
+      "irrelevant pair should score below 0.5 with sigmoid"
+    );
   }
 
   @Test
@@ -93,16 +115,27 @@ public class OnnxBertRerankerTest extends OnnxBertBaseTest {
 
   @Test
   public void must_infer_all_same_query_in_batch() {
-    var results = rerankerModel.inferAll(List.of(RELEVANT_PAIR, IRRELEVANT_PAIR));
+    var results = rerankerModel.inferAll(
+      List.of(RELEVANT_PAIR, IRRELEVANT_PAIR)
+    );
 
     assertEquals(2, results.size());
 
     var relevant = results.getFirst();
     var irrelevant = results.getLast();
 
-    assertTrue(relevant.score() > irrelevant.score(), "batched: relevant score must exceed irrelevant score");
-    assertTrue(relevant.score() > 0.5f, "batched: relevant pair should score above 0.5 with sigmoid");
-    assertTrue(irrelevant.score() < 0.5f, "batched: irrelevant pair should score below 0.5 with sigmoid");
+    assertTrue(
+      relevant.score() > irrelevant.score(),
+      "batched: relevant score must exceed irrelevant score"
+    );
+    assertTrue(
+      relevant.score() > 0.5f,
+      "batched: relevant pair should score above 0.5 with sigmoid"
+    );
+    assertTrue(
+      irrelevant.score() < 0.5f,
+      "batched: irrelevant pair should score below 0.5 with sigmoid"
+    );
   }
 
   @Test
@@ -114,20 +147,35 @@ public class OnnxBertRerankerTest extends OnnxBertBaseTest {
 
     // Padding in batch mode may produce slightly different float values due to attention mask
     // differences. Verify ranking agreement instead of exact equality.
-    assertTrue(singleRelevant.score() > singleIrrelevant.score(), "single: relevant must rank higher than irrelevant");
-    assertTrue(batch.getFirst().score() > batch.getLast().score(), "batch: relevant must rank higher than irrelevant");
+    assertTrue(
+      singleRelevant.score() > singleIrrelevant.score(),
+      "single: relevant must rank higher than irrelevant"
+    );
+    assertTrue(
+      batch.getFirst().score() > batch.getLast().score(),
+      "batch: relevant must rank higher than irrelevant"
+    );
   }
 
   @Test
   public void must_fall_back_to_sequential_for_mixed_queries() {
-    var pair1 = new RerankPair("What is the capital of France?", "Paris is the capital of France.");
-    var pair2 = new RerankPair("Who wrote Hamlet?", "Hamlet was written by William Shakespeare.");
+    var pair1 = new RerankPair(
+      "What is the capital of France?",
+      "Paris is the capital of France."
+    );
+    var pair2 = new RerankPair(
+      "Who wrote Hamlet?",
+      "Hamlet was written by William Shakespeare."
+    );
 
     var results = rerankerModel.inferAll(List.of(pair1, pair2));
 
     assertEquals(2, results.size());
     for (RerankTokenCount r : results) {
-      assertTrue(r.score() >= 0f && r.score() <= 1f, "sigmoid output must be in [0, 1]");
+      assertTrue(
+        r.score() >= 0f && r.score() <= 1f,
+        "sigmoid output must be in [0, 1]"
+      );
       assertTrue(r.tokenCount() > 0, "token count must be positive");
     }
   }
@@ -149,7 +197,10 @@ public class OnnxBertRerankerTest extends OnnxBertBaseTest {
     var irrelevant = logitModel.infer(IRRELEVANT_PAIR);
 
     // Raw logit: relevant should still rank higher
-    assertTrue(relevant.score() > irrelevant.score(), "logit: relevant score must exceed irrelevant score");
+    assertTrue(
+      relevant.score() > irrelevant.score(),
+      "logit: relevant score must exceed irrelevant score"
+    );
 
     logitModel.close();
   }

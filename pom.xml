@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>24.0.2</version>
+        <version>25.0.0</version>
     </parent>
 
     <groupId>io.gravitee.inference</groupId>
@@ -36,15 +36,14 @@
     <packaging>pom</packaging>
 
     <properties>
-        <gravitee-bom.version>8.3.49</gravitee-bom.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- we need it explicitly to allow us to enable preview -->
         <maven.compiler.release>25</maven.compiler.release>
+        <gravitee-bom.version>9.0.0</gravitee-bom.version>
         <commons-math3.version>3.6.1</commons-math3.version>
-        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-        <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
         <ai.djl.version>0.33.0</ai.djl.version>
         <json-path.version>2.9.0</json-path.version>
         <gravitee.archrules.skip>true</gravitee.archrules.skip>
+        <byte-buddy.version>1.18.7</byte-buddy.version>
     </properties>
     <modules>
         <module>gravitee-inference-math</module>
@@ -101,7 +100,7 @@
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.18.7</version>
+            <version>${byte-buddy.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -123,106 +122,27 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.5.13</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>25</source>
-                        <target>25</target>
-                        <compilerArgs>
-                            <arg>--enable-preview</arg>
-                            <arg>--add-modules</arg>
-                            <arg>jdk.incubator.vector</arg>
-                        </compilerArgs>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven-jar-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>${maven-assembly-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.hubspot.maven.plugins</groupId>
-                    <artifactId>prettier-maven-plugin</artifactId>
-                    <version>${prettier-maven-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>${license-maven-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco-maven-plugin.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
             <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <prettierJavaVersion>${prettier-maven-plugin.prettierJavaVersion}</prettierJavaVersion>
-                    <printWidth>125</printWidth>
-                    <skip>${skip.validation}</skip>
-                    <inputGlobs>
-                        <inputGlob>src/{main,test}/**/*.java</inputGlob>
-                        <inputGlob>.github/*.json</inputGlob>
-                    </inputGlobs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
-                <configuration>
-                    <prettierJavaVersion>${prettier-maven-plugin.prettierJavaVersion}</prettierJavaVersion>
-                    <printWidth>125</printWidth>
-                    <skip>${skip.validation}</skip>
-                    <inputGlobs>
-                        <inputGlob>src/{main,test}/**/*.java</inputGlob>
-                        <inputGlob>.github/*.json</inputGlob>
-                    </inputGlobs>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                        <arg>--add-modules</arg>
+                        <arg>jdk.incubator.vector</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>@{argLine} -Xmx2048m --enable-preview --add-opens java.base/java.lang=ALL-UNNAMED
+                    <argLine>-Xmx2048m --enable-preview --add-opens java.base/java.lang=ALL-UNNAMED
                         --add-opens
                         java.base/java.util=ALL-UNNAMED
                         --add-opens java.base/java.util.regex=ALL-UNNAMED --add-opens
@@ -233,38 +153,10 @@
                     <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>report-aggregate</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report-aggregate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
-                    <source>25</source>
                     <additionalOptions>--enable-preview --add-modules jdk.incubator.vector</additionalOptions>
                 </configuration>
             </plugin>

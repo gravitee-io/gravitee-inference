@@ -55,13 +55,23 @@ import org.slf4j.LoggerFactory;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequest, TOKEN, STATE> implements AutoCloseable {
+public abstract class AbstractBatchEngine<
+  CONFIG,
+  REQUEST extends GenerationRequest,
+  TOKEN,
+  STATE
+>
+  implements AutoCloseable {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBatchEngine.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    AbstractBatchEngine.class
+  );
   private final BatchEngineConfig engineConfig;
   private final EngineAdapter<CONFIG, REQUEST, TOKEN, STATE> adapter;
-  private final Map<Integer, SequenceState<STATE>> sequences = new ConcurrentHashMap<>();
-  private final Map<Integer, Integer> externalToInternal = new ConcurrentHashMap<>();
+  private final Map<Integer, SequenceState<STATE>> sequences =
+    new ConcurrentHashMap<>();
+  private final Map<Integer, Integer> externalToInternal =
+    new ConcurrentHashMap<>();
   private final Deque<QueuedSequence<REQUEST>> pending = new ArrayDeque<>();
   private final Deque<Integer> availableSlots;
   /**
@@ -88,10 +98,18 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
    * @param engineConfig The engine configuration
    * @param adapter The engine adapter
    */
-  protected AbstractBatchEngine(BatchEngineConfig engineConfig, EngineAdapter<CONFIG, REQUEST, TOKEN, STATE> adapter) {
-    this.engineConfig = Objects.requireNonNull(engineConfig, "engineConfig is required");
+  protected AbstractBatchEngine(
+    BatchEngineConfig engineConfig,
+    EngineAdapter<CONFIG, REQUEST, TOKEN, STATE> adapter
+  ) {
+    this.engineConfig = Objects.requireNonNull(
+      engineConfig,
+      "engineConfig is required"
+    );
     this.adapter = Objects.requireNonNull(adapter, "adapter is required");
-    this.availableSlots = new ArrayDeque<>(engineConfig.maxConcurrentSequences());
+    this.availableSlots = new ArrayDeque<>(
+      engineConfig.maxConcurrentSequences()
+    );
     for (int i = 0; i < engineConfig.maxConcurrentSequences(); i++) {
       availableSlots.addLast(i);
     }
@@ -115,7 +133,10 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
       Thread thread = new Thread(runnable, "batch-engine-iterator");
       thread.setUncaughtExceptionHandler((t, e) -> {
         running.set(false);
-        LOGGER.error("Uncaught exception in batch engine worker thread: {}", e.getMessage());
+        LOGGER.error(
+          "Uncaught exception in batch engine worker thread: {}",
+          e.getMessage()
+        );
       });
       return thread;
     });
@@ -151,7 +172,11 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
 
       // Check if queue is full
       if (pending.size() >= engineConfig.queueCapacity()) {
-        throw new IllegalStateException("Pending queue is full (capacity: " + engineConfig.queueCapacity() + ")");
+        throw new IllegalStateException(
+          "Pending queue is full (capacity: " +
+            engineConfig.queueCapacity() +
+            ")"
+        );
       }
 
       // Queue or start immediately
@@ -186,7 +211,9 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
       }
 
       SequenceState<STATE> state = sequences.get(internalId);
-      if (state != null && adapter.getFinishReason(state.engineState).isEmpty()) {
+      if (
+        state != null && adapter.getFinishReason(state.engineState).isEmpty()
+      ) {
         adapter.removeSequence(internalId);
         // finalizeSequence() would early-return here: a cancelled sequence
         // has no engine finish reason, so it would never release the slot —
@@ -235,7 +262,10 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
     try {
       adapter.cleanupSequenceState(state.engineState);
     } catch (Exception e) {
-      LOGGER.error("Error cleaning up cancelled sequence state: {}", e.getMessage());
+      LOGGER.error(
+        "Error cleaning up cancelled sequence state: {}",
+        e.getMessage()
+      );
     }
 
     sequences.remove(state.conversationId);
@@ -301,7 +331,9 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
    */
   private void processOutput(SequenceState<STATE> state, TOKEN token) {
     // Handle null or empty tokens
-    if (token == null || (token instanceof String && ((String) token).isEmpty())) {
+    if (
+      token == null || (token instanceof String && ((String) token).isEmpty())
+    ) {
       return;
     }
 
@@ -314,7 +346,12 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
 
     // Emit token if there's text to emit
     if (!emission.text().isEmpty()) {
-      InferenceToken<TOKEN> inferenceToken = buildToken(state, emission.text(), state.index++, false);
+      InferenceToken<TOKEN> inferenceToken = buildToken(
+        state,
+        emission.text(),
+        state.index++,
+        false
+      );
       emitToken(inferenceToken);
     }
 
@@ -351,7 +388,12 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
     // Flush pending tokens
     String pending = state.flushPending();
     if (!pending.isEmpty()) {
-      InferenceToken<TOKEN> chunk = buildToken(state, pending, state.index++, false);
+      InferenceToken<TOKEN> chunk = buildToken(
+        state,
+        pending,
+        state.index++,
+        false
+      );
       emitToken(chunk);
     }
 
@@ -434,7 +476,10 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
         return;
       }
 
-      sequences.put(internalId, new SequenceState<>(internalId, seqId, engineState, request.stop()));
+      sequences.put(
+        internalId,
+        new SequenceState<>(internalId, seqId, engineState, request.stop())
+      );
       externalToInternal.put(seqId, internalId);
       hasWork.signalAll();
     } catch (Exception e) {
@@ -481,7 +526,18 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
    * Emits a length-failed token.
    */
   private void emitLength(int seqId, int promptTokens) {
-    InferenceToken<TOKEN> token = new InferenceToken<>(seqId, null, 0, true, "length", promptTokens, 0, 0, 0, null);
+    InferenceToken<TOKEN> token = new InferenceToken<>(
+      seqId,
+      null,
+      0,
+      true,
+      "length",
+      promptTokens,
+      0,
+      0,
+      0,
+      null
+    );
     emitToken(token);
   }
 
@@ -489,7 +545,12 @@ public abstract class AbstractBatchEngine<CONFIG, REQUEST extends GenerationRequ
    * Builds an inference token.
    */
   @SuppressWarnings("unchecked")
-  private InferenceToken<TOKEN> buildToken(SequenceState<STATE> state, String text, int index, boolean isFinal) {
+  private InferenceToken<TOKEN> buildToken(
+    SequenceState<STATE> state,
+    String text,
+    int index,
+    boolean isFinal
+  ) {
     TOKEN token;
     if (state.tokenType == String.class) {
       token = (TOKEN) text;

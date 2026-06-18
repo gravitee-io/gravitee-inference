@@ -24,10 +24,22 @@ import org.junit.jupiter.api.Test;
 class InsufficientVramExceptionTest {
 
   @Test
-  @DisplayName("exception message contains model ID and human-readable estimate")
+  @DisplayName(
+    "exception message contains model ID and human-readable estimate"
+  )
   void message_contains_model_id_and_estimate() {
-    MemoryEstimate estimate = new MemoryEstimate(8.0, 6.0, 22.0, false, "Too big.", true);
-    InsufficientVramException exception = new InsufficientVramException("Qwen/Qwen3-32B", estimate);
+    MemoryEstimate estimate = new MemoryEstimate(
+      8.0,
+      6.0,
+      22.0,
+      false,
+      "Too big.",
+      true
+    );
+    InsufficientVramException exception = new InsufficientVramException(
+      "Qwen/Qwen3-32B",
+      estimate
+    );
 
     assertThat(exception.getMessage()).contains("Qwen/Qwen3-32B");
     assertThat(exception.getMessage()).contains("Insufficient VRAM");
@@ -39,8 +51,18 @@ class InsufficientVramExceptionTest {
   @Test
   @DisplayName("estimate() accessor returns the original estimate")
   void estimate_accessor() {
-    MemoryEstimate estimate = new MemoryEstimate(24.0, 20.0, 16.5, false, "Tight fit", false);
-    InsufficientVramException exception = new InsufficientVramException("meta-llama/Llama-3.1-70B", estimate);
+    MemoryEstimate estimate = new MemoryEstimate(
+      24.0,
+      20.0,
+      16.5,
+      false,
+      "Tight fit",
+      false
+    );
+    InsufficientVramException exception = new InsufficientVramException(
+      "meta-llama/Llama-3.1-70B",
+      estimate
+    );
 
     assertThat(exception.estimate()).isSameAs(estimate);
     assertThat(exception.estimate().requiredGb()).isEqualTo(16.5);
@@ -52,7 +74,10 @@ class InsufficientVramExceptionTest {
   @DisplayName("exception is a RuntimeException")
   void is_runtime_exception() {
     MemoryEstimate estimate = MemoryEstimate.unknown();
-    InsufficientVramException exception = new InsufficientVramException("test-model", estimate);
+    InsufficientVramException exception = new InsufficientVramException(
+      "test-model",
+      estimate
+    );
 
     assertThat(exception).isInstanceOf(RuntimeException.class);
   }
@@ -60,7 +85,14 @@ class InsufficientVramExceptionTest {
   @Test
   @DisplayName("can be thrown and caught with standard try/catch")
   void throwable_behavior() {
-    MemoryEstimate estimate = new MemoryEstimate(8.0, 6.0, 32.0, false, "Way too big.", true);
+    MemoryEstimate estimate = new MemoryEstimate(
+      8.0,
+      6.0,
+      32.0,
+      false,
+      "Way too big.",
+      true
+    );
 
     assertThatThrownBy(() -> {
       throw new InsufficientVramException("huge-model", estimate);

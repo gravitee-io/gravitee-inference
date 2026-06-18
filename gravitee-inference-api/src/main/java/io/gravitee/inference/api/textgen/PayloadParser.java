@@ -27,7 +27,9 @@ import org.slf4j.LoggerFactory;
  */
 public final class PayloadParser {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PayloadParser.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    PayloadParser.class
+  );
 
   private PayloadParser() {}
 
@@ -114,7 +116,9 @@ public final class PayloadParser {
               if ("text".equals(contentType)) {
                 String text = stringValue(contentMap.get("text"));
                 if (text != null) {
-                  textContent = (textContent == null) ? text : textContent + "\n" + text;
+                  textContent = (textContent == null)
+                    ? text
+                    : textContent + "\n" + text;
                 }
               } else if ("image_url".equals(contentType)) {
                 Object imageUrlObj = contentMap.get("image_url");
@@ -123,7 +127,12 @@ public final class PayloadParser {
                   if (imageUrl != null) {
                     String base64Data = extractBase64Data(imageUrl, "image");
                     if (base64Data != null) {
-                      mediaContent.add(new ImageContent(MediaType.APPLICATION_OCTET_STREAM, base64Data));
+                      mediaContent.add(
+                        new ImageContent(
+                          MediaType.APPLICATION_OCTET_STREAM,
+                          base64Data
+                        )
+                      );
                     }
                   }
                 }
@@ -132,7 +141,12 @@ public final class PayloadParser {
                 if (audioObj instanceof Map<?, ?> audioMap) {
                   String base64Data = stringValue(audioMap.get("data"));
                   if (base64Data != null && !base64Data.trim().isEmpty()) {
-                    mediaContent.add(new AudioContent(MediaType.APPLICATION_OCTET_STREAM, base64Data));
+                    mediaContent.add(
+                      new AudioContent(
+                        MediaType.APPLICATION_OCTET_STREAM,
+                        base64Data
+                      )
+                    );
                   }
                 }
               }
@@ -141,7 +155,13 @@ public final class PayloadParser {
         }
 
         if (textContent != null || !mediaContent.isEmpty()) {
-          result.add(new ChatMessage(toRole(role), textContent != null ? textContent : "", mediaContent));
+          result.add(
+            new ChatMessage(
+              toRole(role),
+              textContent != null ? textContent : "",
+              mediaContent
+            )
+          );
         }
       }
     }
@@ -169,7 +189,10 @@ public final class PayloadParser {
     if (mediaUrl.startsWith("data:")) {
       int commaIndex = mediaUrl.indexOf(",");
       if (commaIndex <= 0) {
-        LOGGER.warn("Invalid data URL for {}: missing base64 data after comma", mediaType);
+        LOGGER.warn(
+          "Invalid data URL for {}: missing base64 data after comma",
+          mediaType
+        );
         return null;
       }
       String base64Data = mediaUrl.substring(commaIndex + 1).trim();
@@ -182,7 +205,8 @@ public final class PayloadParser {
 
     if (mediaUrl.startsWith("http://") || mediaUrl.startsWith("https://")) {
       LOGGER.warn(
-        "HTTP/HTTPS URLs for {} are not supported. " + "Please use base64-encoded data or data URLs. Received URL: {}",
+        "HTTP/HTTPS URLs for {} are not supported. " +
+          "Please use base64-encoded data or data URLs. Received URL: {}",
         mediaType,
         mediaUrl
       );

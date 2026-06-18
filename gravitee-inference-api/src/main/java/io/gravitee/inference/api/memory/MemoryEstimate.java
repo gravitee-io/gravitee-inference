@@ -49,7 +49,14 @@ public record MemoryEstimate(
    * config.json missing). Callers should treat this as "skip the check".
    */
   public static MemoryEstimate unknown() {
-    return new MemoryEstimate(0, 0, 0, true, "Memory estimate unavailable — skipping check.", true);
+    return new MemoryEstimate(
+      0,
+      0,
+      0,
+      true,
+      "Memory estimate unavailable — skipping check.",
+      true
+    );
   }
 
   /** Returns {@code true} if this is the sentinel {@link #unknown()} value. */
@@ -83,7 +90,14 @@ public record MemoryEstimate(
     double usable = (availableBytes * (1.0 - safetyMargin)) / GB;
     double required = requiredBytes / GB;
     boolean fits = required <= usable;
-    return new MemoryEstimate(total, usable, required, fits, suggestion, isApproximate);
+    return new MemoryEstimate(
+      total,
+      usable,
+      required,
+      fits,
+      suggestion,
+      isApproximate
+    );
   }
 
   /**
@@ -108,7 +122,14 @@ public record MemoryEstimate(
     double usable = usableBytes / GB;
     double required = requiredBytes / GB;
     boolean fits = required <= usable;
-    return new MemoryEstimate(total, usable, required, fits, suggestion, isApproximate);
+    return new MemoryEstimate(
+      total,
+      usable,
+      required,
+      fits,
+      suggestion,
+      isApproximate
+    );
   }
 
   /** Returns a formatted, human-readable summary line. */

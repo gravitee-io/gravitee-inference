@@ -25,10 +25,16 @@ package io.gravitee.inference.api.textgen;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public record BatchEngineConfig(int maxConcurrentSequences, int queueCapacity, boolean enableAutoStart) {
+public record BatchEngineConfig(
+  int maxConcurrentSequences,
+  int queueCapacity,
+  boolean enableAutoStart
+) {
   public BatchEngineConfig {
     if (maxConcurrentSequences <= 0) {
-      throw new IllegalArgumentException("maxConcurrentSequences must be positive");
+      throw new IllegalArgumentException(
+        "maxConcurrentSequences must be positive"
+      );
     }
     if (queueCapacity <= 0) {
       throw new IllegalArgumentException("queueCapacity must be positive");
@@ -43,7 +49,10 @@ public record BatchEngineConfig(int maxConcurrentSequences, int queueCapacity, b
     return new BatchEngineConfig(maxConcurrentSequences, 100, true);
   }
 
-  public static BatchEngineConfig of(int maxConcurrentSequences, int queueCapacity) {
+  public static BatchEngineConfig of(
+    int maxConcurrentSequences,
+    int queueCapacity
+  ) {
     return new BatchEngineConfig(maxConcurrentSequences, queueCapacity, true);
   }
 }

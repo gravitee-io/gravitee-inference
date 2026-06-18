@@ -18,10 +18,9 @@ package io.gravitee.inference.rest.openai;
 import io.gravitee.inference.rest.RestConfig;
 import io.gravitee.inference.rest.RestInference;
 import io.vertx.rxjava3.core.Vertx;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public abstract class OpenaiRestInference<C extends RestConfig, O> extends RestInference<C, String, O> {
+public abstract class OpenaiRestInference<C extends RestConfig, O>
+  extends RestInference<C, String, O> {
 
   public OpenaiRestInference(C config, Vertx vertx) {
     super(config, vertx);

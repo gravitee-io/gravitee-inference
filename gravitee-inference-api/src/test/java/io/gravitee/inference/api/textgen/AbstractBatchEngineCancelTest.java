@@ -75,7 +75,8 @@ class AbstractBatchEngineCancelTest {
   }
 
   /** Minimal in-memory adapter: sequences never finish on their own. */
-  private static class FakeAdapter implements EngineAdapter<Void, FakeRequest, String, Object> {
+  private static class FakeAdapter
+    implements EngineAdapter<Void, FakeRequest, String, Object> {
 
     final List<Integer> removedInternalIds = new ArrayList<>();
     final List<Object> cleanedStates = new ArrayList<>();
@@ -124,7 +125,8 @@ class AbstractBatchEngineCancelTest {
     public void shutdown() {}
   }
 
-  private static final class TestEngine extends AbstractBatchEngine<Void, FakeRequest, String, Object> {
+  private static final class TestEngine
+    extends AbstractBatchEngine<Void, FakeRequest, String, Object> {
 
     TestEngine(BatchEngineConfig config, FakeAdapter adapter) {
       super(config, adapter);
@@ -162,7 +164,11 @@ class AbstractBatchEngineCancelTest {
     engine.addSequence(2, new FakeRequest("deuxième"));
     var token = engine.cancelSequence(2);
 
-    assertThat(token).as("sequence 2 should have taken the slot released by the cancelled sequence 1").isNotNull();
+    assertThat(token)
+      .as(
+        "sequence 2 should have taken the slot released by the cancelled sequence 1"
+      )
+      .isNotNull();
     assertThat(token.finishReason()).isEqualTo("cancelled");
   }
 
@@ -176,7 +182,9 @@ class AbstractBatchEngineCancelTest {
 
     for (int i = 1; i <= 25; i++) {
       engine.addSequence(i, new FakeRequest("req-" + i));
-      assertThat(engine.cancelSequence(i)).as("cancellation #%d", i).isNotNull();
+      assertThat(engine.cancelSequence(i))
+        .as("cancellation #%d", i)
+        .isNotNull();
     }
   }
 
@@ -228,10 +236,9 @@ class AbstractBatchEngineCancelTest {
     Thread.sleep(100); // let the worker loop spin on the generation
 
     try {
-      var token = java.util.concurrent.CompletableFuture.supplyAsync(() -> engine.cancelSequence(1)).get(
-        5,
-        java.util.concurrent.TimeUnit.SECONDS
-      );
+      var token = java.util.concurrent.CompletableFuture.supplyAsync(() ->
+        engine.cancelSequence(1)
+      ).get(5, java.util.concurrent.TimeUnit.SECONDS);
 
       assertThat(token).isNotNull();
       assertThat(token.finishReason()).isEqualTo("cancelled");

@@ -34,7 +34,8 @@ import java.util.*;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class OnnxBertClassifierModel extends OnnxBertInference<String, ClassifierResults> {
+public class OnnxBertClassifierModel
+  extends OnnxBertInference<String, ClassifierResults> {
 
   private static final String ID_2_LABEL = "id2label";
   private final List<String> labels;
@@ -48,7 +49,10 @@ public class OnnxBertClassifierModel extends OnnxBertInference<String, Classifie
 
   private List<String> getLabels(OnnxBertConfig config) {
     if (configJson != null) {
-      Map<?, ?> id2label = objectMapper.convertValue(configJson.get(ID_2_LABEL), LinkedHashMap.class);
+      Map<?, ?> id2label = objectMapper.convertValue(
+        configJson.get(ID_2_LABEL),
+        LinkedHashMap.class
+      );
       return id2label.values().stream().map(Object::toString).toList();
     }
     return config.get(CLASSIFIER_LABELS, List.of());
@@ -70,7 +74,9 @@ public class OnnxBertClassifierModel extends OnnxBertInference<String, Classifie
     };
   }
 
-  private List<ClassifierResults> getTokenResults(EncodingResults encodingResult) {
+  private List<ClassifierResults> getTokenResults(
+    EncodingResults encodingResult
+  ) {
     try (OrtSession.Result result1 = encodingResult.result()) {
       TokenInput input = this.getTokenLogits(result1.get(0));
       var results = new ArrayList<ClassifierResults>(input.batchSize());
@@ -85,7 +91,11 @@ public class OnnxBertClassifierModel extends OnnxBertInference<String, Classifie
         var result = new ArrayList<ClassifierResult>();
         for (int j = 1; j < tokens.length - 1; j++) {
           final String sanitizedToken = tokens[j].trim();
-          var classifierResult = computeTokenProb(tokenLogits[j], sanitizedToken, spans[j]);
+          var classifierResult = computeTokenProb(
+            tokenLogits[j],
+            sanitizedToken,
+            spans[j]
+          );
           // we don't want all tokens to be present
           if (!discarded.contains(classifierResult.label())) {
             result.add(classifierResult);
@@ -98,7 +108,11 @@ public class OnnxBertClassifierModel extends OnnxBertInference<String, Classifie
     }
   }
 
-  private ClassifierResult computeTokenProb(float[] logit, String token, CharSpan span) {
+  private ClassifierResult computeTokenProb(
+    float[] logit,
+    String token,
+    CharSpan span
+  ) {
     float[] probabilities = config.gioMath().softmax(logit);
 
     int argMax = 0;
@@ -111,15 +125,25 @@ public class OnnxBertClassifierModel extends OnnxBertInference<String, Classifie
       }
     }
 
-    return new ClassifierResult(computeLabel(probabilities, argMax), maxProb, token, span.getStart(), span.getEnd());
+    return new ClassifierResult(
+      computeLabel(probabilities, argMax),
+      maxProb,
+      token,
+      span.getStart(),
+      span.getEnd()
+    );
   }
 
-  private List<ClassifierResults> getSequenceResults(EncodingResults encodingResult) {
+  private List<ClassifierResults> getSequenceResults(
+    EncodingResults encodingResult
+  ) {
     try (OrtSession.Result result = encodingResult.result()) {
       SequenceInput input = this.getSequenceInput(result.get(0));
       var results = new ArrayList<ClassifierResults>(input.batchSize());
       for (int i = 0; i < input.batchSize(); i++) {
-        results.add(new ClassifierResults(computeSequenceProb(input.logits()[i])));
+        results.add(
+          new ClassifierResults(computeSequenceProb(input.logits()[i]))
+        );
       }
       return results;
     }
@@ -130,7 +154,9 @@ public class OnnxBertClassifierModel extends OnnxBertInference<String, Classifie
     List<ClassifierResult> results = new ArrayList<>(probabilities.length);
 
     for (int j = 0; j < probabilities.length; j++) {
-      results.add(new ClassifierResult(computeLabel(probabilities, j), probabilities[j]));
+      results.add(
+        new ClassifierResult(computeLabel(probabilities, j), probabilities[j])
+      );
     }
 
     if (results.size() == 2) {
@@ -148,7 +174,9 @@ public class OnnxBertClassifierModel extends OnnxBertInference<String, Classifie
   }
 
   private String computeLabel(float[] probabilities, int j) {
-    return !labels.isEmpty() && labels.size() == probabilities.length ? labels.get(j) : valueOf(j);
+    return !labels.isEmpty() && labels.size() == probabilities.length
+      ? labels.get(j)
+      : valueOf(j);
   }
 
   private SequenceInput getSequenceInput(OnnxValue value) {

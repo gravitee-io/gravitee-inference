@@ -15,7 +15,8 @@
  */
 package io.gravitee.inference.api.textgen;
 
-public record ImageContent(MediaType mediaType, String data) implements Content {
+public record ImageContent(MediaType mediaType, String data) implements
+  Content {
   public ImageContent {
     if (data == null || data.trim().isEmpty()) {
       throw new IllegalArgumentException("Image data cannot be null or empty");

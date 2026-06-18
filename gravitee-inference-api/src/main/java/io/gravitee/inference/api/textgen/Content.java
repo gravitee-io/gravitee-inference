@@ -15,6 +15,7 @@
  */
 package io.gravitee.inference.api.textgen;
 
-public sealed interface Content permits TextContent, ImageContent, AudioContent {
+public sealed interface Content
+  permits TextContent, ImageContent, AudioContent {
   String type();
 }

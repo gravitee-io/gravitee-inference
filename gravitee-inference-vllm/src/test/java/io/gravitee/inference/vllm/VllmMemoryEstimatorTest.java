@@ -48,35 +48,85 @@ class VllmMemoryEstimatorTest {
     @Test
     @DisplayName("totalParams <= 0 returns unknown()")
     void zero_total_params_returns_unknown() {
-      MemoryEstimate result = VllmMemoryEstimator.estimate(0, 2, 32, 8, 128, 4096, 8, 0.9, false);
+      MemoryEstimate result = VllmMemoryEstimator.estimate(
+        0,
+        2,
+        32,
+        8,
+        128,
+        4096,
+        8,
+        0.9,
+        false
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
     @Test
     @DisplayName("negative totalParams returns unknown()")
     void negative_total_params_returns_unknown() {
-      MemoryEstimate result = VllmMemoryEstimator.estimate(-1, 2, 32, 8, 128, 4096, 8, 0.9, false);
+      MemoryEstimate result = VllmMemoryEstimator.estimate(
+        -1,
+        2,
+        32,
+        8,
+        128,
+        4096,
+        8,
+        0.9,
+        false
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
     @Test
     @DisplayName("bytesPerParam <= 0 returns unknown()")
     void zero_bytes_per_param_returns_unknown() {
-      MemoryEstimate result = VllmMemoryEstimator.estimate(TOTAL_PARAMS_8B, 0, 32, 8, 128, 4096, 8, 0.9, false);
+      MemoryEstimate result = VllmMemoryEstimator.estimate(
+        TOTAL_PARAMS_8B,
+        0,
+        32,
+        8,
+        128,
+        4096,
+        8,
+        0.9,
+        false
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
     @Test
     @DisplayName("negative bytesPerParam returns unknown()")
     void negative_bytes_per_param_returns_unknown() {
-      MemoryEstimate result = VllmMemoryEstimator.estimate(TOTAL_PARAMS_8B, -1, 32, 8, 128, 4096, 8, 0.9, false);
+      MemoryEstimate result = VllmMemoryEstimator.estimate(
+        TOTAL_PARAMS_8B,
+        -1,
+        32,
+        8,
+        128,
+        4096,
+        8,
+        0.9,
+        false
+      );
       assertThat(result.isUnknown()).isTrue();
     }
 
     @Test
     @DisplayName("both invalid returns unknown()")
     void both_invalid_returns_unknown() {
-      MemoryEstimate result = VllmMemoryEstimator.estimate(0, 0, 0, 0, 0, 0, 8, 0.9, false);
+      MemoryEstimate result = VllmMemoryEstimator.estimate(
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        8,
+        0.9,
+        false
+      );
       assertThat(result.isUnknown()).isTrue();
     }
   }

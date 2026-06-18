@@ -22,23 +22,26 @@ import io.gravitee.inference.rest.openai.embedding.model.EmbeddingRequest;
 import io.gravitee.inference.rest.openai.embedding.model.EmbeddingResponse;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Single;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.Json;
 import io.vertx.rxjava3.core.Vertx;
-import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
 import io.vertx.rxjava3.ext.web.client.HttpResponse;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddingConfig, EmbeddingTokenCount> {
+public class OpenaiEmbeddingInference
+  extends OpenaiRestInference<OpenAIEmbeddingConfig, EmbeddingTokenCount> {
 
   static final String EMBEDDINGS_ENDPOINT = "/embeddings";
   static final String MEDIA_TYPE = "application/json";
   static final String CONTENT_TYPE = "Content-Type";
   static final String OPEN_AI_ORGANIZATION = "OpenAI-Organization";
   static final String OPEN_AI_PROJECT = "OpenAI-Project";
-  private static final Logger LOGGER = LoggerFactory.getLogger(OpenaiEmbeddingInference.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    OpenaiEmbeddingInference.class
+  );
 
   public OpenaiEmbeddingInference(OpenAIEmbeddingConfig config, Vertx vertx) {
     super(config, vertx);
@@ -49,7 +52,9 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
     LOGGER.debug("Parsing response from OpenAI embedding inference");
     return Maybe.just(responseJson)
       .flatMap(this::validateBuffer)
-      .map(response -> Json.decodeValue(responseJson.toString(), EmbeddingResponse.class))
+      .map(response ->
+        Json.decodeValue(responseJson.toString(), EmbeddingResponse.class)
+      )
       .flatMap(this::validateResponse)
       .flatMap(this::extractEmbeddingTokenCount)
       .doOnSuccess(embeddingTokenCount -> {
@@ -63,26 +68,38 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
 
   private Maybe<Buffer> validateBuffer(Buffer buffer) {
     if (buffer == null || buffer.length() == 0) {
-      return Maybe.error(new GraviteeInferenceOpenaiException("Response buffer is null or empty"));
+      return Maybe.error(
+        new GraviteeInferenceOpenaiException("Response buffer is null or empty")
+      );
     }
     return Maybe.just(buffer);
   }
 
-  private Maybe<EmbeddingResponse> validateResponse(EmbeddingResponse response) {
+  private Maybe<EmbeddingResponse> validateResponse(
+    EmbeddingResponse response
+  ) {
     if (response == null || response.data() == null) {
-      return Maybe.error(new GraviteeInferenceOpenaiException("Invalid embedding response structure"));
+      return Maybe.error(
+        new GraviteeInferenceOpenaiException(
+          "Invalid embedding response structure"
+        )
+      );
     }
     return Maybe.just(response);
   }
 
-  private Maybe<EmbeddingTokenCount> extractEmbeddingTokenCount(EmbeddingResponse response) {
+  private Maybe<EmbeddingTokenCount> extractEmbeddingTokenCount(
+    EmbeddingResponse response
+  ) {
     var embedding = response.data().getFirst().embedding();
     int totalTokens = response.usage().total_tokens();
     return Maybe.just(new EmbeddingTokenCount(embedding, totalTokens));
   }
 
   @Override
-  protected Single<HttpResponse<Buffer>> executeHttpRequest(Buffer requestJson) {
+  protected Single<HttpResponse<Buffer>> executeHttpRequest(
+    Buffer requestJson
+  ) {
     LOGGER.debug("Executing OpenAI embedding inference");
 
     HttpRequest<Buffer> request = webClient
@@ -115,12 +132,21 @@ public class OpenaiEmbeddingInference extends OpenaiRestInference<OpenAIEmbeddin
       return Single.just(
         Buffer.buffer(
           Json.encode(
-            new EmbeddingRequest(config.getModel(), input, config.getDimensions(), config.getEncodingFormat().getFormat())
+            new EmbeddingRequest(
+              config.getModel(),
+              input,
+              config.getDimensions(),
+              config.getEncodingFormat().getFormat()
+            )
           )
         )
       );
     } catch (Exception e) {
-      return Single.error(new GraviteeInferenceOpenaiException("Failed to prepare OpenAI request" + e));
+      return Single.error(
+        new GraviteeInferenceOpenaiException(
+          "Failed to prepare OpenAI request" + e
+        )
+      );
     }
   }
 }

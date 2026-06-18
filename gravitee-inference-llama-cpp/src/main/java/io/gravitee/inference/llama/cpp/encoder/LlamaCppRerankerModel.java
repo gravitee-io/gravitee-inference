@@ -36,7 +36,8 @@ import java.util.List;
  * @author Remi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class LlamaCppRerankerModel extends LlamaCppInference<RerankPair, RerankTokenCount> {
+public class LlamaCppRerankerModel
+  extends LlamaCppInference<RerankPair, RerankTokenCount> {
 
   private final GioMaths gioMaths;
   private final RerankTemplate template;
@@ -47,12 +48,19 @@ public class LlamaCppRerankerModel extends LlamaCppInference<RerankPair, RerankT
     this(config, gioMaths, RerankTemplate.PLAIN, null);
   }
 
-  public LlamaCppRerankerModel(ModelConfig config, GioMaths gioMaths, RerankTemplate template, RerankScoring scoring) {
+  public LlamaCppRerankerModel(
+    ModelConfig config,
+    GioMaths gioMaths,
+    RerankTemplate template,
+    RerankScoring scoring
+  ) {
     super(config);
     this.gioMaths = gioMaths;
     this.template = template != null ? template : RerankTemplate.PLAIN;
     this.nClsOut = model.nClsOut();
-    this.scoring = scoring != null ? scoring : (nClsOut == 1 ? RerankScoring.SIGMOID : RerankScoring.SOFTMAX);
+    this.scoring = scoring != null
+      ? scoring
+      : (nClsOut == 1 ? RerankScoring.SIGMOID : RerankScoring.SOFTMAX);
   }
 
   @Override
@@ -83,7 +91,9 @@ public class LlamaCppRerankerModel extends LlamaCppInference<RerankPair, RerankT
       }
       case SOFTMAX -> {
         if (nClsOut < 2) {
-          throw new IllegalStateException("SOFTMAX scoring requires nClsOut >= 2, got " + nClsOut);
+          throw new IllegalStateException(
+            "SOFTMAX scoring requires nClsOut >= 2, got " + nClsOut
+          );
         }
         yield gioMaths.softmax(raw)[0];
       }

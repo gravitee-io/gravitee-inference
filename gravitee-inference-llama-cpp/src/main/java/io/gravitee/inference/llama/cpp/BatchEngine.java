@@ -28,7 +28,13 @@ import java.util.function.Consumer;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class BatchEngine extends AbstractBatchEngine<ModelConfig, Request, String, io.gravitee.llama.cpp.ConversationState> {
+public class BatchEngine
+  extends AbstractBatchEngine<
+    ModelConfig,
+    Request,
+    String,
+    io.gravitee.llama.cpp.ConversationState
+  > {
 
   private final EngineAdapter engineAdapter;
 

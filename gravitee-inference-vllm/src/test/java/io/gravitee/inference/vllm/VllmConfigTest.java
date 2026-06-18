@@ -33,7 +33,9 @@ class VllmConfigTest {
     @Test
     @DisplayName("null model throws IllegalArgumentException")
     void null_model_throws() {
-      assertThatThrownBy(() -> buildConfig(null, "auto", MemoryCheckPolicy.WARN))
+      assertThatThrownBy(() ->
+        buildConfig(null, "auto", MemoryCheckPolicy.WARN)
+      )
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("model must not be null or blank");
     }
@@ -41,7 +43,9 @@ class VllmConfigTest {
     @Test
     @DisplayName("blank model throws IllegalArgumentException")
     void blank_model_throws() {
-      assertThatThrownBy(() -> buildConfig("   ", "auto", MemoryCheckPolicy.WARN))
+      assertThatThrownBy(() ->
+        buildConfig("   ", "auto", MemoryCheckPolicy.WARN)
+      )
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("model must not be null or blank");
     }
@@ -62,14 +66,22 @@ class VllmConfigTest {
     @Test
     @DisplayName("null dtype defaults to 'auto'")
     void null_dtype_defaults_to_auto() {
-      VllmConfig config = buildConfig("Qwen/Qwen3-0.6B", null, MemoryCheckPolicy.FAIL);
+      VllmConfig config = buildConfig(
+        "Qwen/Qwen3-0.6B",
+        null,
+        MemoryCheckPolicy.FAIL
+      );
       assertThat(config.dtype()).isEqualTo("auto");
     }
 
     @Test
     @DisplayName("blank dtype defaults to 'auto'")
     void blank_dtype_defaults_to_auto() {
-      VllmConfig config = buildConfig("Qwen/Qwen3-0.6B", "  ", MemoryCheckPolicy.FAIL);
+      VllmConfig config = buildConfig(
+        "Qwen/Qwen3-0.6B",
+        "  ",
+        MemoryCheckPolicy.FAIL
+      );
       assertThat(config.dtype()).isEqualTo("auto");
     }
 
@@ -151,16 +163,26 @@ class VllmConfigTest {
     @Test
     @DisplayName("minimal config with required fields only")
     void minimal_config() {
-      VllmConfig config = buildConfig("Qwen/Qwen3-0.6B", "auto", MemoryCheckPolicy.DISABLED);
+      VllmConfig config = buildConfig(
+        "Qwen/Qwen3-0.6B",
+        "auto",
+        MemoryCheckPolicy.DISABLED
+      );
       assertThat(config.model()).isEqualTo("Qwen/Qwen3-0.6B");
       assertThat(config.dtype()).isEqualTo("auto");
-      assertThat(config.memoryCheckPolicy()).isEqualTo(MemoryCheckPolicy.DISABLED);
+      assertThat(config.memoryCheckPolicy()).isEqualTo(
+        MemoryCheckPolicy.DISABLED
+      );
     }
   }
 
   // --- helper ---
 
-  private static VllmConfig buildConfig(String model, String dtype, MemoryCheckPolicy policy) {
+  private static VllmConfig buildConfig(
+    String model,
+    String dtype,
+    MemoryCheckPolicy policy
+  ) {
     return new VllmConfig(
       model,
       dtype,

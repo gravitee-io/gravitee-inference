@@ -19,14 +19,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import io.gravitee.inference.rest.http.GraviteeInferenceHttpException;
 import io.gravitee.inference.rest.http.embedding.HttpEmbeddingConfig;
 import io.gravitee.inference.rest.http.embedding.HttpEmbeddingInference;
 import io.reactivex.rxjava3.core.Single;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.Json;
 import io.vertx.rxjava3.core.Vertx;
-import io.vertx.rxjava3.core.buffer.Buffer;
 import io.vertx.rxjava3.ext.web.client.HttpRequest;
 import io.vertx.rxjava3.ext.web.client.HttpResponse;
 import io.vertx.rxjava3.ext.web.client.WebClient;
@@ -79,19 +78,34 @@ public class HttpEmbeddingInferenceTest {
       outputJsonPath
     );
 
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
-    ArgumentCaptor<Buffer> requestBodyCaptor = ArgumentCaptor.forClass(Buffer.class);
+    ArgumentCaptor<Buffer> requestBodyCaptor = ArgumentCaptor.forClass(
+      Buffer.class
+    );
 
-    when(mockWebClient.requestAbs(config.getMethod(), config.getUri().toString())).thenReturn(mockHttpRequest);
+    when(
+      mockWebClient.requestAbs(config.getMethod(), config.getUri().toString())
+    ).thenReturn(mockHttpRequest);
     when(mockHttpRequest.followRedirects(true)).thenReturn(mockHttpRequest);
-    when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(mockHttpRequest);
-    when(mockHttpRequest.rxSendBuffer(requestBodyCaptor.capture())).thenReturn(Single.just(mockHttpResponse));
+    when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(
+      mockHttpRequest
+    );
+    when(mockHttpRequest.rxSendBuffer(requestBodyCaptor.capture())).thenReturn(
+      Single.just(mockHttpResponse)
+    );
     when(mockHttpResponse.statusCode()).thenReturn(200);
     when(mockHttpResponse.body()).thenReturn(Buffer.buffer(jsonResponse));
 
     try {
-      var webClientField = inference.getClass().getSuperclass().getSuperclass().getDeclaredField("webClient");
+      var webClientField = inference
+        .getClass()
+        .getSuperclass()
+        .getSuperclass()
+        .getDeclaredField("webClient");
       webClientField.setAccessible(true);
       webClientField.set(inference, mockWebClient);
     } catch (Exception e) {
@@ -105,7 +119,10 @@ public class HttpEmbeddingInferenceTest {
     testObserver
       .assertComplete()
       .assertNoErrors()
-      .assertValue(embeddingTokenCount -> expectedEmbeddingLength == embeddingTokenCount.embedding().length);
+      .assertValue(
+        embeddingTokenCount ->
+          expectedEmbeddingLength == embeddingTokenCount.embedding().length
+      );
 
     Buffer capturedRequestBody = requestBodyCaptor.getValue();
     String actualRequestBody = capturedRequestBody.toString();
@@ -113,7 +130,8 @@ public class HttpEmbeddingInferenceTest {
     assertEquals(
       Json.decodeValue(expectedRequestBody),
       Json.decodeValue(actualRequestBody),
-      "Request body should match the expected fulfilled template for: " + description
+      "Request body should match the expected fulfilled template for: " +
+        description
     );
 
     verify(mockHttpRequest).rxSendBuffer(any(Buffer.class));
@@ -122,31 +140,46 @@ public class HttpEmbeddingInferenceTest {
   @Test
   void testInferWithNullInput() {
     HttpEmbeddingConfig config = createValidConfig();
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
     var testObserver = inference.infer(null).test();
 
-    testObserver.assertNotComplete().assertError(IllegalArgumentException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(IllegalArgumentException.class);
   }
 
   @Test
   void testInferWithEmptyInput() {
     HttpEmbeddingConfig config = createValidConfig();
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
     var testObserver = inference.infer("").test();
 
-    testObserver.assertNotComplete().assertError(IllegalArgumentException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(IllegalArgumentException.class);
   }
 
   @Test
   void testInferWithWhitespaceOnlyInput() {
     HttpEmbeddingConfig config = createValidConfig();
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
     var testObserver = inference.infer("   \t\n   ").test();
 
-    testObserver.assertNotComplete().assertError(IllegalArgumentException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(IllegalArgumentException.class);
   }
 
   @Test
@@ -159,7 +192,10 @@ public class HttpEmbeddingInferenceTest {
       "$.text",
       "$.embedding"
     );
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
     var testObserver = inference.infer("test input").test();
 
@@ -192,9 +228,15 @@ public class HttpEmbeddingInferenceTest {
       "$.text",
       ""
     );
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
-    setupMockWebClientForSuccessfulRequest(inference, "{\"embedding\": [0.1, 0.2, 0.3]}");
+    setupMockWebClientForSuccessfulRequest(
+      inference,
+      "{\"embedding\": [0.1, 0.2, 0.3]}"
+    );
 
     var testObserver = inference.infer("test input").test();
 
@@ -211,11 +253,16 @@ public class HttpEmbeddingInferenceTest {
       "$.text",
       "$.embedding"
     );
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
     var testObserver = inference.infer("test input").test();
 
-    testObserver.assertNotComplete().assertError(GraviteeInferenceHttpException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(GraviteeInferenceHttpException.class);
   }
 
   @Test
@@ -228,11 +275,16 @@ public class HttpEmbeddingInferenceTest {
       "$.invalid[path",
       "$.embedding"
     );
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
     var testObserver = inference.infer("test input").test();
 
-    testObserver.assertNotComplete().assertError(GraviteeInferenceHttpException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(GraviteeInferenceHttpException.class);
   }
 
   @Test
@@ -245,27 +297,45 @@ public class HttpEmbeddingInferenceTest {
       "$.nonexistent.field",
       "$.embedding"
     );
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
     var testObserver = inference.infer("test input").test();
 
-    testObserver.assertNotComplete().assertError(GraviteeInferenceHttpException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(GraviteeInferenceHttpException.class);
   }
 
   @Test
   void testInferWithHttpErrorStatusCode() {
     HttpEmbeddingConfig config = createValidConfig();
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
-    when(mockWebClient.requestAbs(any(), anyString())).thenReturn(mockHttpRequest);
+    when(mockWebClient.requestAbs(any(), anyString())).thenReturn(
+      mockHttpRequest
+    );
     when(mockHttpRequest.followRedirects(true)).thenReturn(mockHttpRequest);
-    when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(mockHttpRequest);
-    when(mockHttpRequest.rxSendBuffer(any(Buffer.class))).thenReturn(Single.just(mockHttpResponse));
+    when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(
+      mockHttpRequest
+    );
+    when(mockHttpRequest.rxSendBuffer(any(Buffer.class))).thenReturn(
+      Single.just(mockHttpResponse)
+    );
     when(mockHttpResponse.statusCode()).thenReturn(500);
     when(mockHttpResponse.bodyAsString()).thenReturn("Internal Server Error");
 
     try {
-      var webClientField = inference.getClass().getSuperclass().getSuperclass().getDeclaredField("webClient");
+      var webClientField = inference
+        .getClass()
+        .getSuperclass()
+        .getSuperclass()
+        .getDeclaredField("webClient");
       webClientField.setAccessible(true);
       webClientField.set(inference, mockWebClient);
     } catch (Exception e) {
@@ -280,17 +350,28 @@ public class HttpEmbeddingInferenceTest {
   @Test
   void testInferWithHttpConnectionFailure() {
     HttpEmbeddingConfig config = createValidConfig();
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
-    when(mockWebClient.requestAbs(any(), anyString())).thenReturn(mockHttpRequest);
+    when(mockWebClient.requestAbs(any(), anyString())).thenReturn(
+      mockHttpRequest
+    );
     when(mockHttpRequest.followRedirects(true)).thenReturn(mockHttpRequest);
-    when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(mockHttpRequest);
+    when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(
+      mockHttpRequest
+    );
     when(mockHttpRequest.rxSendBuffer(any(Buffer.class))).thenReturn(
       Single.error(new RuntimeException("Connection failed"))
     );
 
     try {
-      var webClientField = inference.getClass().getSuperclass().getSuperclass().getDeclaredField("webClient");
+      var webClientField = inference
+        .getClass()
+        .getSuperclass()
+        .getSuperclass()
+        .getDeclaredField("webClient");
       webClientField.setAccessible(true);
       webClientField.set(inference, mockWebClient);
     } catch (Exception e) {
@@ -305,61 +386,95 @@ public class HttpEmbeddingInferenceTest {
   @Test
   void testInferWithInvalidJsonResponse() {
     HttpEmbeddingConfig config = createValidConfig();
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
-    setupMockWebClientForSuccessfulRequest(inference, "{invalid json response}");
+    setupMockWebClientForSuccessfulRequest(
+      inference,
+      "{invalid json response}"
+    );
 
     var testObserver = inference.infer("test input").test();
 
-    testObserver.assertNotComplete().assertError(GraviteeInferenceHttpException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(GraviteeInferenceHttpException.class);
   }
 
   @Test
   void testInferWithMissingEmbeddingInResponse() {
     HttpEmbeddingConfig config = createValidConfig();
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
-    setupMockWebClientForSuccessfulRequest(inference, "{\"result\": \"success\"}");
+    setupMockWebClientForSuccessfulRequest(
+      inference,
+      "{\"result\": \"success\"}"
+    );
 
     var testObserver = inference.infer("test input").test();
 
-    testObserver.assertNotComplete().assertError(GraviteeInferenceHttpException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(GraviteeInferenceHttpException.class);
   }
 
   @Test
   void testInferWithEmptyEmbeddingArray() {
     HttpEmbeddingConfig config = createValidConfig();
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
     setupMockWebClientForSuccessfulRequest(inference, "{\"embedding\": []}");
 
     var testObserver = inference.infer("test input").test();
 
-    testObserver.assertNotComplete().assertError(GraviteeInferenceHttpException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(GraviteeInferenceHttpException.class);
   }
 
   @Test
   void testInferWithNullEmbeddingInResponse() {
     HttpEmbeddingConfig config = createValidConfig();
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
     setupMockWebClientForSuccessfulRequest(inference, "{\"embedding\": null}");
 
     var testObserver = inference.infer("test input").test();
 
-    testObserver.assertNotComplete().assertError(GraviteeInferenceHttpException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(GraviteeInferenceHttpException.class);
   }
 
   @Test
   void testInferWithInvalidEmbeddingFormat() {
     HttpEmbeddingConfig config = createValidConfig();
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
-    setupMockWebClientForSuccessfulRequest(inference, "{\"embedding\": \"not an array\"}");
+    setupMockWebClientForSuccessfulRequest(
+      inference,
+      "{\"embedding\": \"not an array\"}"
+    );
 
     var testObserver = inference.infer("test input").test();
 
-    testObserver.assertNotComplete().assertError(GraviteeInferenceHttpException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(GraviteeInferenceHttpException.class);
   }
 
   @Test
@@ -372,13 +487,21 @@ public class HttpEmbeddingInferenceTest {
       "$.text",
       "$.invalid[path"
     );
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
-    setupMockWebClientForSuccessfulRequest(inference, "{\"embedding\": [0.1, 0.2, 0.3]}");
+    setupMockWebClientForSuccessfulRequest(
+      inference,
+      "{\"embedding\": [0.1, 0.2, 0.3]}"
+    );
 
     var testObserver = inference.infer("test input").test();
 
-    testObserver.assertNotComplete().assertError(GraviteeInferenceHttpException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(GraviteeInferenceHttpException.class);
   }
 
   @Test
@@ -391,13 +514,21 @@ public class HttpEmbeddingInferenceTest {
       "$.text",
       "$.nonexistent.embedding"
     );
-    HttpEmbeddingInference inference = new HttpEmbeddingInference(config, vertx);
+    HttpEmbeddingInference inference = new HttpEmbeddingInference(
+      config,
+      vertx
+    );
 
-    setupMockWebClientForSuccessfulRequest(inference, "{\"embedding\": [0.1, 0.2, 0.3]}");
+    setupMockWebClientForSuccessfulRequest(
+      inference,
+      "{\"embedding\": [0.1, 0.2, 0.3]}"
+    );
 
     var testObserver = inference.infer("test input").test();
 
-    testObserver.assertNotComplete().assertError(GraviteeInferenceHttpException.class);
+    testObserver
+      .assertNotComplete()
+      .assertError(GraviteeInferenceHttpException.class);
   }
 
   private HttpEmbeddingConfig createValidConfig() {
@@ -411,16 +542,29 @@ public class HttpEmbeddingInferenceTest {
     );
   }
 
-  private void setupMockWebClientForSuccessfulRequest(HttpEmbeddingInference inference, String jsonResponse) {
-    when(mockWebClient.requestAbs(any(), anyString())).thenReturn(mockHttpRequest);
+  private void setupMockWebClientForSuccessfulRequest(
+    HttpEmbeddingInference inference,
+    String jsonResponse
+  ) {
+    when(mockWebClient.requestAbs(any(), anyString())).thenReturn(
+      mockHttpRequest
+    );
     when(mockHttpRequest.followRedirects(true)).thenReturn(mockHttpRequest);
-    when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(mockHttpRequest);
-    when(mockHttpRequest.rxSendBuffer(any(Buffer.class))).thenReturn(Single.just(mockHttpResponse));
+    when(mockHttpRequest.putHeader(anyString(), anyString())).thenReturn(
+      mockHttpRequest
+    );
+    when(mockHttpRequest.rxSendBuffer(any(Buffer.class))).thenReturn(
+      Single.just(mockHttpResponse)
+    );
     when(mockHttpResponse.statusCode()).thenReturn(200);
     when(mockHttpResponse.body()).thenReturn(Buffer.buffer(jsonResponse));
 
     try {
-      var webClientField = inference.getClass().getSuperclass().getSuperclass().getDeclaredField("webClient");
+      var webClientField = inference
+        .getClass()
+        .getSuperclass()
+        .getSuperclass()
+        .getDeclaredField("webClient");
       webClientField.setAccessible(true);
       webClientField.set(inference, mockWebClient);
     } catch (Exception e) {

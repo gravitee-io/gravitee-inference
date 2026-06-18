@@ -34,7 +34,8 @@ import java.util.List;
  * @author Remi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class LlamaCppEmbeddingModel extends LlamaCppInference<String, EmbeddingTokenCount> {
+public class LlamaCppEmbeddingModel
+  extends LlamaCppInference<String, EmbeddingTokenCount> {
 
   private final GioMaths gioMaths;
   private final EmbeddingTemplate template;
@@ -43,7 +44,11 @@ public class LlamaCppEmbeddingModel extends LlamaCppInference<String, EmbeddingT
     this(config, gioMaths, EmbeddingTemplate.IDENTITY);
   }
 
-  public LlamaCppEmbeddingModel(ModelConfig config, GioMaths gioMaths, EmbeddingTemplate template) {
+  public LlamaCppEmbeddingModel(
+    ModelConfig config,
+    GioMaths gioMaths,
+    EmbeddingTemplate template
+  ) {
     super(config);
     this.gioMaths = gioMaths;
     this.template = template;

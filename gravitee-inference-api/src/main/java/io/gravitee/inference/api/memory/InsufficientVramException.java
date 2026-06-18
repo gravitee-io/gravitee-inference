@@ -39,6 +39,10 @@ public class InsufficientVramException extends RuntimeException {
   }
 
   private static String buildMessage(String modelId, MemoryEstimate estimate) {
-    return String.format("Insufficient VRAM to load model [%s]: %s", modelId, estimate.toHumanReadable());
+    return String.format(
+      "Insufficient VRAM to load model [%s]: %s",
+      modelId,
+      estimate.toHumanReadable()
+    );
   }
 }

@@ -53,7 +53,9 @@ public record InferenceToken<T>(
       throw new IllegalArgumentException("index must be non-negative");
     }
     if (isFinal && finishReason == null) {
-      throw new IllegalArgumentException("finishReason is required when isFinal is true");
+      throw new IllegalArgumentException(
+        "finishReason is required when isFinal is true"
+      );
     }
   }
 }

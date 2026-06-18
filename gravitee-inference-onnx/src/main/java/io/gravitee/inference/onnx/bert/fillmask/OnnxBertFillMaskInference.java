@@ -31,7 +31,8 @@ import java.util.TreeSet;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class OnnxBertFillMaskInference extends OnnxBertInference<String, List<FillMaskResult<String>>> {
+public class OnnxBertFillMaskInference
+  extends OnnxBertInference<String, List<FillMaskResult<String>>> {
 
   public static final String MASK_KEYWORD = "[MASK]";
 
@@ -49,21 +50,35 @@ public class OnnxBertFillMaskInference extends OnnxBertInference<String, List<Fi
     var encodingResults = encodeAll(input);
 
     return range(0, input.size())
-      .mapToObj(batchSize -> fillMask(input.get(batchSize), encodingResults, batchSize))
+      .mapToObj(batchSize ->
+        fillMask(input.get(batchSize), encodingResults, batchSize)
+      )
       .toList();
   }
 
-  public List<FillMaskResult<String>> fillMask(String input, EncodingResults encodingResults, int batchInput) {
+  public List<FillMaskResult<String>> fillMask(
+    String input,
+    EncodingResults encodingResults,
+    int batchInput
+  ) {
     try {
       var tokens = tokenizer.tokenize(input);
       int maskedIndex = tokens.indexOf(MASK_KEYWORD);
-      return getPredictedWords(getLogits(encodingResults), batchInput, maskedIndex);
+      return getPredictedWords(
+        getLogits(encodingResults),
+        batchInput,
+        maskedIndex
+      );
     } catch (OrtException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private List<FillMaskResult<String>> getPredictedWords(float[][][] logits, int batchNumber, int maskedIndex) {
+  private List<FillMaskResult<String>> getPredictedWords(
+    float[][][] logits,
+    int batchNumber,
+    int maskedIndex
+  ) {
     return getTokenIdWithHighestLogits(logits[batchNumber][maskedIndex])
       .stream()
       .map(fm -> new FillMaskResult<>(decodeTokenIds(fm.label()), fm.score()))
@@ -71,18 +86,27 @@ public class OnnxBertFillMaskInference extends OnnxBertInference<String, List<Fi
       .subList(0, 5);
   }
 
-  private Set<FillMaskResult<Integer>> getTokenIdWithHighestLogits(float[] logits) {
+  private Set<FillMaskResult<Integer>> getTokenIdWithHighestLogits(
+    float[] logits
+  ) {
     float[] probabilities = config.gioMath().softmax(logits);
     return range(0, probabilities.length)
       .mapToObj(index -> new FillMaskResult<>(index, probabilities[index]))
-      .collect(toCollection(() -> new TreeSet<FillMaskResult<Integer>>(comparing(FillMaskResult::score, reverseOrder()))));
+      .collect(
+        toCollection(() ->
+          new TreeSet<FillMaskResult<Integer>>(
+            comparing(FillMaskResult::score, reverseOrder())
+          )
+        )
+      );
   }
 
   private String decodeTokenIds(long tokenId) {
     return tokenizer.decode(new long[] { tokenId });
   }
 
-  private static float[][][] getLogits(EncodingResults encode) throws OrtException {
+  private static float[][][] getLogits(EncodingResults encode)
+    throws OrtException {
     return (float[][][]) encode.result().get(0).getValue();
   }
 }

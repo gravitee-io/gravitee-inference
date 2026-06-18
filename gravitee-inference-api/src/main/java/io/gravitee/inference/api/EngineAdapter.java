@@ -125,5 +125,10 @@ public interface EngineAdapter<CONFIG, REQUEST, TOKEN, STATE> {
    * @param reasoningTokens Number of reasoning tokens (0 if not supported)
    * @param toolTokens Number of tool call tokens (0 if not supported)
    */
-  record TokenCountInfo(int inputTokens, int outputTokens, int reasoningTokens, int toolTokens) {}
+  record TokenCountInfo(
+    int inputTokens,
+    int outputTokens,
+    int reasoningTokens,
+    int toolTokens
+  ) {}
 }

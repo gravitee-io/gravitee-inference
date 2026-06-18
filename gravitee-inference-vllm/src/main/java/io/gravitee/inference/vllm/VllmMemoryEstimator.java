@@ -144,9 +144,13 @@ public final class VllmMemoryEstimator {
       return MemoryEstimate.unknown();
     }
     try {
-      double utilization = gpuMemoryUtilization > 0 ? gpuMemoryUtilization : DEFAULT_GPU_MEMORY_UTILIZATION;
+      double utilization = gpuMemoryUtilization > 0
+        ? gpuMemoryUtilization
+        : DEFAULT_GPU_MEMORY_UTILIZATION;
       int seqs = maxNumSeqs > 0 ? maxNumSeqs : 1;
-      double margin = multimodal ? SAFETY_MARGIN_MULTIMODAL : SAFETY_MARGIN_TEXT;
+      double margin = multimodal
+        ? SAFETY_MARGIN_MULTIMODAL
+        : SAFETY_MARGIN_TEXT;
       return doEstimate(
         totalParams,
         bytesPerParam,
@@ -184,15 +188,27 @@ public final class VllmMemoryEstimator {
     }
 
     long weightBytes = totalParams * bytesPerParam;
-    long kvBytes = computeKvBytes(maxModelLen, maxNumSeqs, numHiddenLayers, numKvHeads, headDim);
+    long kvBytes = computeKvBytes(
+      maxModelLen,
+      maxNumSeqs,
+      numHiddenLayers,
+      numKvHeads,
+      headDim
+    );
     long totalRequired = weightBytes + kvBytes;
 
     // vLLM's usable budget: totalGpuMemory × gpuMemoryUtilization.
     // Within that budget we also reserve a safety margin for CUDA context,
     // NCCL buffers, FlashInfer workspace, and CUDA graph captures.
-    long usableBudget = (long) (cuda.totalBytes() * gpuMemoryUtilization * (1.0 - safetyMargin));
+    long usableBudget = (long) (cuda.totalBytes() *
+      gpuMemoryUtilization *
+      (1.0 - safetyMargin));
 
-    double suggestedUtilization = computeSuggestedUtilization(totalRequired, cuda.totalBytes(), safetyMargin);
+    double suggestedUtilization = computeSuggestedUtilization(
+      totalRequired,
+      cuda.totalBytes(),
+      safetyMargin
+    );
     String suggestion = buildSuggestion(
       totalRequired,
       usableBudget,
@@ -203,16 +219,37 @@ public final class VllmMemoryEstimator {
       multimodal
     );
 
-    return MemoryEstimate.of(totalRequired, usableBudget, cuda.totalBytes(), suggestion, true);
-  }
-
-  private static long computeKvBytes(int maxModelLen, int maxNumSeqs, int numHiddenLayers, int numKvHeads, int headDim) {
-    return (
-      (long) maxModelLen * maxNumSeqs * numHiddenLayers * numKvHeads * headDim * KV_BYTES_PER_TOKEN_PER_LAYER_PER_HEAD
+    return MemoryEstimate.of(
+      totalRequired,
+      usableBudget,
+      cuda.totalBytes(),
+      suggestion,
+      true
     );
   }
 
-  private static double computeSuggestedUtilization(long totalRequired, long totalBytes, double safetyMargin) {
+  private static long computeKvBytes(
+    int maxModelLen,
+    int maxNumSeqs,
+    int numHiddenLayers,
+    int numKvHeads,
+    int headDim
+  ) {
+    return (
+      (long) maxModelLen *
+      maxNumSeqs *
+      numHiddenLayers *
+      numKvHeads *
+      headDim *
+      KV_BYTES_PER_TOKEN_PER_LAYER_PER_HEAD
+    );
+  }
+
+  private static double computeSuggestedUtilization(
+    long totalRequired,
+    long totalBytes,
+    double safetyMargin
+  ) {
     if (totalBytes <= 0) return 0.9;
     double needed = totalRequired / (double) totalBytes;
     double suggested = needed / (1.0 - safetyMargin);
@@ -228,7 +265,9 @@ public final class VllmMemoryEstimator {
     double safetyMargin,
     boolean multimodal
   ) {
-    String mmNote = multimodal ? " Multimodal model detected — using 25%% safety margin for encoder activations." : "";
+    String mmNote = multimodal
+      ? " Multimodal model detected — using 25%% safety margin for encoder activations."
+      : "";
     if (required <= usableBudget) {
       double headroom = (100.0 * (usableBudget - required)) / usableBudget;
       return (

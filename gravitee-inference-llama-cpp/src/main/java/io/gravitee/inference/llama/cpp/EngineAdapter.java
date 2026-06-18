@@ -38,9 +38,17 @@ import org.slf4j.LoggerFactory;
  * @author GraviteeSource Team
  */
 public class EngineAdapter
-  implements io.gravitee.inference.api.EngineAdapter<ModelConfig, Request, String, ConversationState> {
+  implements
+    io.gravitee.inference.api.EngineAdapter<
+      ModelConfig,
+      Request,
+      String,
+      ConversationState
+    > {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(EngineAdapter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    EngineAdapter.class
+  );
 
   private final Model model;
   private final BatchIterator iterator;
@@ -64,10 +72,17 @@ public class EngineAdapter
     }
     String modelName = config.modelPath().getFileName().toString();
     if (config.nCtx() == 0) {
-      LOGGER.info("Memory pre-flight: nCtx deferred to model — skipping estimate for {}", modelName);
+      LOGGER.info(
+        "Memory pre-flight: nCtx deferred to model — skipping estimate for {}",
+        modelName
+      );
       return;
     }
-    LOGGER.info("Running memory pre-flight check for {} (policy={})", modelName, policy);
+    LOGGER.info(
+      "Running memory pre-flight check for {} (policy={})",
+      modelName,
+      policy
+    );
     MemoryEstimate estimate = LlamaMemoryEstimator.estimate(
       config.modelPath(),
       config.mmprojPath(),
@@ -89,11 +104,17 @@ public class EngineAdapter
     if (policy == MemoryCheckPolicy.FAIL) {
       throw new InsufficientVramException(modelName, estimate);
     }
-    LOGGER.warn("Memory pre-flight: model may not fit — {}", estimate.suggestion());
+    LOGGER.warn(
+      "Memory pre-flight: model may not fit — {}",
+      estimate.suggestion()
+    );
   }
 
   @Override
-  public ConversationState createSequenceState(int internalId, Request request) {
+  public ConversationState createSequenceState(
+    int internalId,
+    Request request
+  ) {
     ConversationState state = model.newConversation(internalId, request);
     // Add the state to the iterator so it can be processed
     iterator.addState(state);
@@ -137,7 +158,9 @@ public class EngineAdapter
     if (!state.isFinished()) return Optional.empty();
 
     FinishReason finishReason = state.getFinishReason();
-    return finishReason == null ? Optional.empty() : Optional.of(mapFinishReason(finishReason));
+    return finishReason == null
+      ? Optional.empty()
+      : Optional.of(mapFinishReason(finishReason));
   }
 
   @Override
