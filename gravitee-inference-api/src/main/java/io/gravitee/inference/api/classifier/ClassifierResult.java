@@ -19,7 +19,13 @@ package io.gravitee.inference.api.classifier;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public record ClassifierResult(String label, float score, String token, Integer start, Integer end) {
+public record ClassifierResult(
+  String label,
+  float score,
+  String token,
+  Integer start,
+  Integer end
+) {
   public ClassifierResult(String label, float score) {
     this(label, score, null, null, null);
   }

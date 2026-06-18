@@ -48,13 +48,16 @@ public class NativeMath implements GioMaths {
       return 0.0f;
     }
 
-    return (float) (dotProduct / (FastMath.sqrt(magnitudeA) * FastMath.sqrt(magnitudeB)));
+    return (float) (dotProduct /
+      (FastMath.sqrt(magnitudeA) * FastMath.sqrt(magnitudeB)));
   }
 
   @Override
   public float euclideanDistance(float[] v1, float[] v2) {
     if (v1.length != v2.length) {
-      throw new IllegalArgumentException("Both points must have the same dimension.");
+      throw new IllegalArgumentException(
+        "Both points must have the same dimension."
+      );
     }
 
     float sum = 0.0f;

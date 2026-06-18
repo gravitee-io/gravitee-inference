@@ -24,7 +24,9 @@ import oshi.hardware.CentralProcessor;
  */
 public class SIMDUtils {
 
-  private static final CentralProcessor PROCESSOR = new SystemInfo().getHardware().getProcessor();
+  private static final CentralProcessor PROCESSOR = new SystemInfo()
+    .getHardware()
+    .getProcessor();
   private static final String X_86 = "x86";
   private static final String ARM = "arm";
   private static final String AVX_512 = "avx512";
@@ -63,7 +65,10 @@ public class SIMDUtils {
   }
 
   private static boolean isX86(String architecture) {
-    return architecture.toLowerCase().contains("intel") || architecture.toLowerCase().contains("amd");
+    return (
+      architecture.toLowerCase().contains("intel") ||
+      architecture.toLowerCase().contains("amd")
+    );
   }
 
   private static boolean checkCPUFeature(String feature) {

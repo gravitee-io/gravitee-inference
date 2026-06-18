@@ -30,7 +30,8 @@ import org.apache.commons.math3.util.FastMath;
  */
 public class LoopBoundSIMDMath implements GioMaths {
 
-  private static final VectorSpecies<Float> SPECIES = FloatVector.SPECIES_PREFERRED;
+  private static final VectorSpecies<Float> SPECIES =
+    FloatVector.SPECIES_PREFERRED;
 
   private LoopBoundSIMDMath() {}
 
@@ -39,7 +40,9 @@ public class LoopBoundSIMDMath implements GioMaths {
   @Override
   public float euclideanDistance(float[] v1, float[] v2) {
     if (v1.length != v2.length) {
-      throw new IllegalArgumentException("Both vectors must have the same dimension.");
+      throw new IllegalArgumentException(
+        "Both vectors must have the same dimension."
+      );
     }
 
     int length = v1.length;
@@ -93,7 +96,8 @@ public class LoopBoundSIMDMath implements GioMaths {
       return 0.0f;
     }
 
-    return (float) (dotProduct / (FastMath.sqrt(magnitudeA) * FastMath.sqrt(magnitudeB)));
+    return (float) (dotProduct /
+      (FastMath.sqrt(magnitudeA) * FastMath.sqrt(magnitudeB)));
   }
 
   @Override
@@ -203,7 +207,11 @@ public class LoopBoundSIMDMath implements GioMaths {
     return computeMean(sum, vector, vector);
   }
 
-  private static float[] computeMean(float sum, float[] vector, float[] accumulator) {
+  private static float[] computeMean(
+    float sum,
+    float[] vector,
+    float[] accumulator
+  ) {
     int i = 0;
     for (; i < SPECIES.loopBound(accumulator.length); i += SPECIES.length()) {
       var v1 = FloatVector.fromArray(SPECIES, vector, i);

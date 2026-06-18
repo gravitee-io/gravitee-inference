@@ -38,39 +38,66 @@ import org.junit.jupiter.api.Test;
  */
 public class OnnxBertTokenClassificationTest extends OnnxBertBaseTest {
 
-  protected static final String TOKEN_TOKENIZER_JSON = "tarekziade-distilbert-NER/tokenizer.json";
-  protected static final String TOKEN_MODEL_ONNX = "tarekziade-distilbert-NER/model.onnx";
-  protected static final String TOKEN_CONFIG_JSON = "tarekziade-distilbert-NER/config.json";
+  protected static final String TOKEN_TOKENIZER_JSON =
+    "tarekziade-distilbert-NER/tokenizer.json";
+  protected static final String TOKEN_MODEL_ONNX =
+    "tarekziade-distilbert-NER/model.onnx";
+  protected static final String TOKEN_CONFIG_JSON =
+    "tarekziade-distilbert-NER/config.json";
 
-  private static final String DSLIM_BERT_BASE_NER_RESOLVE_MAIN = "tarekziade/distilbert-NER/resolve/main/";
-  private static final String HF_DISTILBERT_NER_TOKEN_PATH = DSLIM_BERT_BASE_NER_RESOLVE_MAIN + "onnx/";
+  private static final String DSLIM_BERT_BASE_NER_RESOLVE_MAIN =
+    "tarekziade/distilbert-NER/resolve/main/";
+  private static final String HF_DISTILBERT_NER_TOKEN_PATH =
+    DSLIM_BERT_BASE_NER_RESOLVE_MAIN + "onnx/";
 
   protected static final String HF_DISTILBERT_NER_ONNX_DOWNLOAD =
     HF_URL + HF_DISTILBERT_NER_TOKEN_PATH + "model_quantized.onnx";
-  protected static final String HF_DISTILBERT_NER_TOKENIZER = HF_URL + DSLIM_BERT_BASE_NER_RESOLVE_MAIN + "tokenizer.json";
-  protected static final String HF_DISTILBERT_NER_CONFIG_JSON = HF_URL + DSLIM_BERT_BASE_NER_RESOLVE_MAIN + "config.json";
+  protected static final String HF_DISTILBERT_NER_TOKENIZER =
+    HF_URL + DSLIM_BERT_BASE_NER_RESOLVE_MAIN + "tokenizer.json";
+  protected static final String HF_DISTILBERT_NER_CONFIG_JSON =
+    HF_URL + DSLIM_BERT_BASE_NER_RESOLVE_MAIN + "config.json";
 
-  private static final URI TKN_MODEL_ONNX = getUriIfExist(TOKEN_MODEL_ONNX, HF_DISTILBERT_NER_ONNX_DOWNLOAD);
-  private static final URI TKN_HF_TOKENIZER = getUriIfExist(TOKEN_TOKENIZER_JSON, HF_DISTILBERT_NER_TOKENIZER);
-  private static final URI TKN_MODEL_CONFIG_JSON = getUriIfExist(TOKEN_CONFIG_JSON, HF_DISTILBERT_NER_CONFIG_JSON);
-
-  private static final OnnxBertResource TOKEN_ONNX_BERT_RESOURCE = new OnnxBertResource(
-    Path.of(TKN_MODEL_ONNX),
-    Path.of(TKN_HF_TOKENIZER),
-    Path.of(TKN_MODEL_CONFIG_JSON)
+  private static final URI TKN_MODEL_ONNX = getUriIfExist(
+    TOKEN_MODEL_ONNX,
+    HF_DISTILBERT_NER_ONNX_DOWNLOAD
+  );
+  private static final URI TKN_HF_TOKENIZER = getUriIfExist(
+    TOKEN_TOKENIZER_JSON,
+    HF_DISTILBERT_NER_TOKENIZER
+  );
+  private static final URI TKN_MODEL_CONFIG_JSON = getUriIfExist(
+    TOKEN_CONFIG_JSON,
+    HF_DISTILBERT_NER_CONFIG_JSON
   );
 
-  private static final OnnxBertClassifierModel tokenModel = new OnnxBertClassifierModel(
-    new OnnxBertConfig(
-      TOKEN_ONNX_BERT_RESOURCE,
-      NativeMath.INSTANCE,
-      Map.of(CLASSIFIER_MODE, TOKEN, DISCARDED_LABELS, List.of("O", "B-MISC", "I-MISC"))
-    )
-  );
+  private static final OnnxBertResource TOKEN_ONNX_BERT_RESOURCE =
+    new OnnxBertResource(
+      Path.of(TKN_MODEL_ONNX),
+      Path.of(TKN_HF_TOKENIZER),
+      Path.of(TKN_MODEL_CONFIG_JSON)
+    );
+
+  private static final OnnxBertClassifierModel tokenModel =
+    new OnnxBertClassifierModel(
+      new OnnxBertConfig(
+        TOKEN_ONNX_BERT_RESOURCE,
+        NativeMath.INSTANCE,
+        Map.of(
+          CLASSIFIER_MODE,
+          TOKEN,
+          DISCARDED_LABELS,
+          List.of("O", "B-MISC", "I-MISC")
+        )
+      )
+    );
 
   @Test
   public void must_classify_tokens_in_sentence() {
-    var results = tokenModel.infer("My name is Laura and I live in Houston, Texas").results().stream().toList();
+    var results = tokenModel
+      .infer("My name is Laura and I live in Houston, Texas")
+      .results()
+      .stream()
+      .toList();
 
     assertEquals(3, results.size());
 
@@ -100,7 +127,10 @@ public class OnnxBertTokenClassificationTest extends OnnxBertBaseTest {
   public void must_classify_tokens_in_sentences() {
     var tokensList = tokenModel
       .inferAll(
-        List.of("My name is Laura and I live in Houston, Texas", "My name is Clara and I live in Berkley, California")
+        List.of(
+          "My name is Laura and I live in Houston, Texas",
+          "My name is Clara and I live in Berkley, California"
+        )
       )
       .stream()
       .map(ClassifierResults::results)
