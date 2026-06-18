@@ -35,7 +35,9 @@ public class OpenAIEmbeddingConfig extends OpenaiConfig {
   ) {
     super(uri, apiKey, organizationId, projectId, model);
     this.dimensions = validateDimensions(dimensions);
-    this.encodingFormat = encodingFormat != null ? encodingFormat : EncodingFormat.FLOAT;
+    this.encodingFormat = encodingFormat != null
+      ? encodingFormat
+      : EncodingFormat.FLOAT;
   }
 
   public OpenAIEmbeddingConfig(
@@ -46,14 +48,41 @@ public class OpenAIEmbeddingConfig extends OpenaiConfig {
     String model,
     Integer dimensions
   ) {
-    this(uri, apiKey, organizationId, projectId, model, dimensions, EncodingFormat.FLOAT);
+    this(
+      uri,
+      apiKey,
+      organizationId,
+      projectId,
+      model,
+      dimensions,
+      EncodingFormat.FLOAT
+    );
   }
 
-  public OpenAIEmbeddingConfig(URI uri, String apiKey, String organizationId, String projectId, String model) {
-    this(uri, apiKey, organizationId, projectId, model, null, EncodingFormat.FLOAT);
+  public OpenAIEmbeddingConfig(
+    URI uri,
+    String apiKey,
+    String organizationId,
+    String projectId,
+    String model
+  ) {
+    this(
+      uri,
+      apiKey,
+      organizationId,
+      projectId,
+      model,
+      null,
+      EncodingFormat.FLOAT
+    );
   }
 
-  public OpenAIEmbeddingConfig(URI uri, String apiKey, String organizationId, String model) {
+  public OpenAIEmbeddingConfig(
+    URI uri,
+    String apiKey,
+    String organizationId,
+    String model
+  ) {
     this(uri, apiKey, organizationId, null, model, null, EncodingFormat.FLOAT);
   }
 
@@ -63,7 +92,9 @@ public class OpenAIEmbeddingConfig extends OpenaiConfig {
 
   private Integer validateDimensions(Integer dimensions) {
     if (dimensions != null && dimensions <= 0) {
-      throw new IllegalArgumentException("Dimensions must be positive when specified");
+      throw new IllegalArgumentException(
+        "Dimensions must be positive when specified"
+      );
     }
     return dimensions;
   }
@@ -81,7 +112,10 @@ public class OpenAIEmbeddingConfig extends OpenaiConfig {
     if (this == o) return true;
     if (!(o instanceof OpenAIEmbeddingConfig that)) return false;
     if (!super.equals(o)) return false;
-    return Objects.equals(dimensions, that.dimensions) && encodingFormat == that.encodingFormat;
+    return (
+      Objects.equals(dimensions, that.dimensions) &&
+      encodingFormat == that.encodingFormat
+    );
   }
 
   @Override

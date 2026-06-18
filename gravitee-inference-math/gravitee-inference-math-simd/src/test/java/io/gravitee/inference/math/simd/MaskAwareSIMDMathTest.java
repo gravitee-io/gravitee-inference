@@ -41,8 +41,30 @@ public class MaskAwareSIMDMathTest {
 
   @Test
   void must_compute_cosine_similarity() {
-    final float[] v1 = { 1.5f, 3.0f, 4.75f, 6.5f, 8.75f, 10.75f, 13.0f, 14.75f, 17.0f, 19.75f };
-    final float[] v2 = { 1.6f, 2.9f, 4.7f, 6.55f, 8.7f, 10.73f, 13.3f, 14.5f, 17.1f, 16.75f };
+    final float[] v1 = {
+      1.5f,
+      3.0f,
+      4.75f,
+      6.5f,
+      8.75f,
+      10.75f,
+      13.0f,
+      14.75f,
+      17.0f,
+      19.75f,
+    };
+    final float[] v2 = {
+      1.6f,
+      2.9f,
+      4.7f,
+      6.55f,
+      8.7f,
+      10.73f,
+      13.3f,
+      14.5f,
+      17.1f,
+      16.75f,
+    };
     final float cosineSimilarity = INSTANCE.cosineSimilarity(v1, v2);
 
     assertTrue(cosineSimilarity >= 0.99);
@@ -51,7 +73,18 @@ public class MaskAwareSIMDMathTest {
 
   @Test
   void must_compute_mean() {
-    final float[] expected = { 1.5f, 3.0f, 4.75f, 6.5f, 8.75f, 10.75f, 13.0f, 14.75f, 17.0f, 19.75f };
+    final float[] expected = {
+      1.5f,
+      3.0f,
+      4.75f,
+      6.5f,
+      8.75f,
+      10.75f,
+      13.0f,
+      14.75f,
+      17.0f,
+      19.75f,
+    };
     final float[] mean = INSTANCE.mean(MATRIX);
 
     assertArrayEquals(expected, mean);
@@ -60,7 +93,18 @@ public class MaskAwareSIMDMathTest {
   @Test
   void must_compute_weighted_mean() {
     final float[] weights = { 1f, 2f, 3f, 4f, 5f, 7f, 8f, 9f, 10f, 11f };
-    final float[] expected = { 1.7f, 3.2f, 5.1f, 7.0f, 9.7f, 11.7f, 14.4f, 16.3f, 19.0f, 22.5f };
+    final float[] expected = {
+      1.7f,
+      3.2f,
+      5.1f,
+      7.0f,
+      9.7f,
+      11.7f,
+      14.4f,
+      16.3f,
+      19.0f,
+      22.5f,
+    };
     final float[] weightedMean = INSTANCE.weightedMean(MATRIX, weights);
 
     assertArrayEquals(expected, weightedMean);
@@ -69,7 +113,18 @@ public class MaskAwareSIMDMathTest {
   @Test
   void must_normalize() {
     final float[] vector = { 1f, 2f, 3f, 4f, 5f, 7f, 8f, 9f, 10f, 11f };
-    final float[] expected = { 0.05f, 0.1f, 0.14f, 0.19f, 0.24f, 0.33f, 0.37f, 0.42f, 0.47f, 0.51f };
+    final float[] expected = {
+      0.05f,
+      0.1f,
+      0.14f,
+      0.19f,
+      0.24f,
+      0.33f,
+      0.37f,
+      0.42f,
+      0.47f,
+      0.51f,
+    };
     final float[] normalize = INSTANCE.normalize(vector);
     assertArrayEquals(expected, ceil(normalize));
   }
@@ -98,7 +153,11 @@ public class MaskAwareSIMDMathTest {
 
     final float[] array = floatList
       .stream()
-      .collect(() -> FloatBuffer.allocate(floatList.size()), FloatBuffer::put, (left, right) -> {})
+      .collect(
+        () -> FloatBuffer.allocate(floatList.size()),
+        FloatBuffer::put,
+        (left, right) -> {}
+      )
       .array();
     assertEquals(10000, INSTANCE.max(array));
   }

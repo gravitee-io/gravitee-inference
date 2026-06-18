@@ -36,7 +36,10 @@ public class HttpEmbeddingConfig extends HttpConfig {
   ) {
     super(uri, method, headers, requestBodyTemplate);
     Objects.requireNonNull(inputLocation, "Input location cannot be null");
-    Objects.requireNonNull(outputEmbeddingLocation, "Output embedding location cannot be null");
+    Objects.requireNonNull(
+      outputEmbeddingLocation,
+      "Output embedding location cannot be null"
+    );
 
     this.inputLocation = inputLocation;
     this.outputEmbeddingLocation = outputEmbeddingLocation;
@@ -63,6 +66,10 @@ public class HttpEmbeddingConfig extends HttpConfig {
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), inputLocation, outputEmbeddingLocation);
+    return Objects.hash(
+      super.hashCode(),
+      inputLocation,
+      outputEmbeddingLocation
+    );
   }
 }

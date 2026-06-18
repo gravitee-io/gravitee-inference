@@ -31,7 +31,8 @@ import org.apache.commons.math3.util.FastMath;
  */
 public class MaskAwareSIMDMath implements GioMaths {
 
-  private static final VectorSpecies<Float> SPECIES = FloatVector.SPECIES_PREFERRED;
+  private static final VectorSpecies<Float> SPECIES =
+    FloatVector.SPECIES_PREFERRED;
 
   private MaskAwareSIMDMath() {}
 
@@ -40,7 +41,9 @@ public class MaskAwareSIMDMath implements GioMaths {
   @Override
   public float cosineSimilarity(float[] v1, float[] v2) {
     if (v1.length != v2.length) {
-      throw new IllegalArgumentException("Both vectors must have the same dimension.");
+      throw new IllegalArgumentException(
+        "Both vectors must have the same dimension."
+      );
     }
 
     int length = v1.length;
@@ -66,13 +69,16 @@ public class MaskAwareSIMDMath implements GioMaths {
       return 0.0f;
     }
 
-    return (float) (dotProduct / (FastMath.sqrt(magnitudeA) * FastMath.sqrt(magnitudeB)));
+    return (float) (dotProduct /
+      (FastMath.sqrt(magnitudeA) * FastMath.sqrt(magnitudeB)));
   }
 
   @Override
   public float euclideanDistance(float[] v1, float[] v2) {
     if (v1.length != v2.length) {
-      throw new IllegalArgumentException("Both vectors must have the same dimension.");
+      throw new IllegalArgumentException(
+        "Both vectors must have the same dimension."
+      );
     }
 
     FloatVector result = FloatVector.zero(SPECIES);
@@ -180,7 +186,11 @@ public class MaskAwareSIMDMath implements GioMaths {
     return computeMean(total, vector, vector);
   }
 
-  private static float[] computeMean(float total, float[] vector, float[] accumulator) {
+  private static float[] computeMean(
+    float total,
+    float[] vector,
+    float[] accumulator
+  ) {
     for (int i = 0; i < accumulator.length; i += SPECIES.length()) {
       var mask = SPECIES.indexInRange(i, accumulator.length);
       var v1 = FloatVector.fromArray(SPECIES, vector, i, mask);

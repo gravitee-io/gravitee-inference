@@ -27,7 +27,12 @@ public class HttpConfig extends RestConfig {
   private final Map<String, String> headers;
   private final String requestBodyTemplate;
 
-  public HttpConfig(URI uri, HttpMethod method, Map<String, String> headers, String requestBodyTemplate) {
+  public HttpConfig(
+    URI uri,
+    HttpMethod method,
+    Map<String, String> headers,
+    String requestBodyTemplate
+  ) {
     super(uri);
     this.method = method;
     this.headers = headers;
