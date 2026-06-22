@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -109,6 +110,38 @@ public abstract class OnnxBertInference<OUTPUT>
         inputs.put(TOKEN_TYPE_IDS, tokenTypeIdsTensor);
       }
       return new EncodingResults(List.of(encoding), session.run(inputs));
+    } catch (OrtException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
+
+  protected Result encode(long[] inputIds) {
+    long[] attentionMask = new long[inputIds.length];
+    Arrays.fill(attentionMask, 1L);
+
+    long[] shape = { 1, inputIds.length };
+
+    try (
+      var inputIdsTensor = createTensor(environment, wrap(inputIds), shape);
+      var attentionMaskTensor = createTensor(
+        environment,
+        wrap(attentionMask),
+        shape
+      );
+    ) {
+      var inputs = new HashMap<String, OnnxTensor>();
+      inputs.put(INPUT_IDS, inputIdsTensor);
+      inputs.put(ATTENTION_MASK, attentionMaskTensor);
+
+      if (hasTokenTypeIds) {
+        var tokenTypeIdsTensor = createTensor(
+          environment,
+          wrap(new long[inputIds.length]),
+          shape
+        );
+        inputs.put(TOKEN_TYPE_IDS, tokenTypeIdsTensor);
+      }
+      return session.run(inputs);
     } catch (OrtException e) {
       throw new IllegalArgumentException(e);
     }
