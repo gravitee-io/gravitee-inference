@@ -153,7 +153,7 @@ public abstract class OnnxBertInference<OUTPUT>
 
     for (String sentence : sentences) {
       var encoding = tokenizer.encode(sentence, true, false);
-      maxTokens += encoding.getIds().length;
+      maxTokens = Math.max(maxTokens, encoding.getIds().length);
       encodings.add(encoding);
     }
 
