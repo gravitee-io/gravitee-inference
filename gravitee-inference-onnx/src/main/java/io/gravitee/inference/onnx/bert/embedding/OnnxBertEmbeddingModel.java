@@ -56,6 +56,10 @@ public class OnnxBertEmbeddingModel
     final int partitionSize = config.get(MAX_SEQUENCE_LENGTH);
 
     long[] ids = tokenizer.encode(input, true, false).getIds();
+    if (ids.length <= 2) {
+      // no content tokens between [CLS] and [SEP] — nothing to embed
+      return new EmbeddingsWithWeights(new float[0][], new float[0]);
+    }
     final int lastIndex = ids.length - 1; // index of the [SEP] token
     final long clsId = ids[0];
     final long sepId = ids[lastIndex];
