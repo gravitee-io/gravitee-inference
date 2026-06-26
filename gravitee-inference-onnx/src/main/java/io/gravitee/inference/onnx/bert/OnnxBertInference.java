@@ -96,17 +96,15 @@ public abstract class OnnxBertInference<OUTPUT>
         wrap(attentionMask),
         shape
       );
+      var tokenTypeIdsTensor = hasTokenTypeIds
+        ? createTensor(environment, wrap(encoding.getTypeIds()), shape)
+        : null;
     ) {
       var inputs = new HashMap<String, OnnxTensor>();
       inputs.put(INPUT_IDS, inputIdsTensor);
       inputs.put(ATTENTION_MASK, attentionMaskTensor);
 
-      if (hasTokenTypeIds) {
-        var tokenTypeIdsTensor = createTensor(
-          environment,
-          wrap(encoding.getTypeIds()),
-          shape
-        );
+      if (tokenTypeIdsTensor != null) {
         inputs.put(TOKEN_TYPE_IDS, tokenTypeIdsTensor);
       }
       return new EncodingResults(List.of(encoding), session.run(inputs));
@@ -128,17 +126,15 @@ public abstract class OnnxBertInference<OUTPUT>
         wrap(attentionMask),
         shape
       );
+      var tokenTypeIdsTensor = hasTokenTypeIds
+        ? createTensor(environment, wrap(new long[inputIds.length]), shape)
+        : null;
     ) {
       var inputs = new HashMap<String, OnnxTensor>();
       inputs.put(INPUT_IDS, inputIdsTensor);
       inputs.put(ATTENTION_MASK, attentionMaskTensor);
 
-      if (hasTokenTypeIds) {
-        var tokenTypeIdsTensor = createTensor(
-          environment,
-          wrap(new long[inputIds.length]),
-          shape
-        );
+      if (tokenTypeIdsTensor != null) {
         inputs.put(TOKEN_TYPE_IDS, tokenTypeIdsTensor);
       }
       return session.run(inputs);
