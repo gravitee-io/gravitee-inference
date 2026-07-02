@@ -1,3 +1,16 @@
+## [2.0.1](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0...2.0.1) (2026-07-02)
+
+
+### Bug Fixes
+
+* close tokenTypeIds tensor and guard empty embeddings input ([ce1fbd7](https://github.com/gravitee-io/gravitee-inference/commit/ce1fbd72675e768380dacf078be92d6c009608bd))
+* partition long inputs correctly when computing embeddings ([2fbf64a](https://github.com/gravitee-io/gravitee-inference/commit/2fbf64a391c8ffa3ba85199565b5922946de67b1))
+
+
+### Performance Improvements
+
+* avoid quadratic batch tensor allocation in encodeAll ([8e4f3bb](https://github.com/gravitee-io/gravitee-inference/commit/8e4f3bbdc9a3c77e23f02ee07a4755de1fa910b2))
+
 # [2.0.0](https://github.com/gravitee-io/gravitee-inference/compare/1.5.1...2.0.0) (2026-06-18)
 
 
