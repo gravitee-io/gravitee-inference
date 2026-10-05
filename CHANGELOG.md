@@ -1,3 +1,26 @@
+# [3.0.0](https://github.com/gravitee-io/gravitee-inference/compare/2.0.1...3.0.0) (2026-10-05)
+
+
+### Bug Fixes
+
+* **onnxruntime:** ship the MIT license and third-party notices in every jar ([d411404](https://github.com/gravitee-io/gravitee-inference/commit/d4114046c5431512f765525cd922413aa5deb641))
+
+
+### Features
+
+* **onnx:** depend on the native-free ONNX Runtime jar ([875d900](https://github.com/gravitee-io/gravitee-inference/commit/875d9002ec2119a8e5bcd6068f84e02632aac2fe))
+* **onnxruntime:** publish ONNX Runtime natives as one jar per platform classifier ([63f2bc9](https://github.com/gravitee-io/gravitee-inference/commit/63f2bc9205c539d9713932d9af9396e092ae0bfd))
+
+
+### BREAKING CHANGES
+
+* **onnx:** gravitee-inference-onnx no longer brings the ONNX Runtime native libraries.
+Consumers must declare the gravitee-inference-onnxruntime jar of their platform (linux-x64,
+linux-aarch64 or osx-aarch64) at runtime scope, and drop any direct dependency on
+com.microsoft.onnxruntime:onnxruntime.
+
+https://gravitee.atlassian.net/browse/BX-423
+
 ## [2.0.1](https://github.com/gravitee-io/gravitee-inference/compare/2.0.0...2.0.1) (2026-07-02)
 
 
