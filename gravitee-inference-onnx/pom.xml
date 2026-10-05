@@ -33,16 +33,29 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <onnxruntime.version>1.22.0</onnxruntime.version>
     <jackson-databind.version>2.19.0</jackson-databind.version>
   </properties>
 
 
   <dependencies>
     <dependency>
-      <groupId>com.microsoft.onnxruntime</groupId>
-      <artifactId>onnxruntime</artifactId>
-      <version>${onnxruntime.version}</version>
+      <groupId>io.gravitee.inference.onnxruntime</groupId>
+      <artifactId>gravitee-inference-onnxruntime</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.gravitee.inference.onnxruntime</groupId>
+      <artifactId>gravitee-inference-onnxruntime</artifactId>
+      <version>${project.version}</version>
+      <classifier>linux-x64</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.gravitee.inference.onnxruntime</groupId>
+      <artifactId>gravitee-inference-onnxruntime</artifactId>
+      <version>${project.version}</version>
+      <classifier>linux-aarch64</classifier>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -83,4 +96,26 @@
       <version>${ai.djl.version}</version>
     </dependency>
   </dependencies>
+
+  <!-- Natives are only needed to run the tests; the packaging module of each consumer picks its own platform. -->
+  <profiles>
+    <profile>
+      <id>onnxruntime-natives-osx-aarch64</id>
+      <activation>
+        <os>
+          <family>mac</family>
+          <arch>aarch64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>io.gravitee.inference.onnxruntime</groupId>
+          <artifactId>gravitee-inference-onnxruntime</artifactId>
+          <version>${project.version}</version>
+          <classifier>osx-aarch64</classifier>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>
