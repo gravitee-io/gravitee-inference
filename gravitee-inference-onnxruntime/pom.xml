@@ -30,6 +30,15 @@
   <name>Gravitee.io Inference - ONNX Runtime</name>
   <description>ONNX Runtime Java API repackaged without native libraries, which are published as one jar per platform classifier</description>
 
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+      <comments>Repackaged from com.microsoft.onnxruntime:onnxruntime, Copyright (c) Microsoft Corporation</comments>
+    </license>
+  </licenses>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <onnxruntime.version>1.22.0</onnxruntime.version>
@@ -65,6 +74,27 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-onnxruntime-license</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${onnxruntime.unpack.directory}/META-INF</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/legal</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.5.0</version>
         <executions>
@@ -88,6 +118,8 @@
             <classesDirectory>${onnxruntime.unpack.directory}</classesDirectory>
             <includes>
               <include>ai/onnxruntime/native/linux-x64/**</include>
+              <include>META-INF/LICENSE</include>
+              <include>ThirdPartyNotices.txt</include>
             </includes>
             <excludes>
               <exclude>**/*.dSYM/**</exclude>
@@ -106,6 +138,8 @@
             <classesDirectory>${onnxruntime.unpack.directory}</classesDirectory>
             <includes>
               <include>ai/onnxruntime/native/linux-aarch64/**</include>
+              <include>META-INF/LICENSE</include>
+              <include>ThirdPartyNotices.txt</include>
             </includes>
             <excludes>
               <exclude>**/*.dSYM/**</exclude>
@@ -124,6 +158,8 @@
             <classesDirectory>${onnxruntime.unpack.directory}</classesDirectory>
             <includes>
               <include>ai/onnxruntime/native/osx-aarch64/**</include>
+              <include>META-INF/LICENSE</include>
+              <include>ThirdPartyNotices.txt</include>
             </includes>
             <excludes>
               <exclude>**/*.dSYM/**</exclude>
