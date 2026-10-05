@@ -51,6 +51,7 @@
     <modules>
         <module>gravitee-inference-math</module>
         <module>gravitee-inference-api</module>
+        <module>gravitee-inference-onnxruntime</module>
         <module>gravitee-inference-onnx</module>
         <module>gravitee-inference-rest</module>
     </modules>
