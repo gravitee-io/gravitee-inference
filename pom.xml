@@ -39,7 +39,7 @@
         <gravitee-bom.version>9.0.0</gravitee-bom.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <ai.djl.version>0.33.0</ai.djl.version>
-        <json-path.version>2.9.0</json-path.version>
+        <json-path.version>2.10.0</json-path.version>
 
         <gravitee.archrules.skip>true</gravitee.archrules.skip>
         <maven.compiler.release>21</maven.compiler.release>
