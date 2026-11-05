@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/gravitee-io/gravitee-inference/compare/3.0.0...3.0.1) (2026-11-05)
+
+
+### Bug Fixes
+
+* **onnx:** opt out of DJL telemetry before loading tokenizers ([d71eaf2](https://github.com/gravitee-io/gravitee-inference/commit/d71eaf2cc5bf9aefdfb6eb0a91374c711039b95f))
+
 # [3.0.0](https://github.com/gravitee-io/gravitee-inference/compare/2.0.1...3.0.0) (2026-10-05)
 
 
