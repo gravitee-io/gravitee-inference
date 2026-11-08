@@ -29,7 +29,10 @@ class DjlTelemetryTest {
 
   @BeforeEach
   void setUp() {
-    assumeTrue(System.getenv(OPT_OUT_TRACKING) == null, "OPT_OUT_TRACKING is set in the environment");
+    assumeTrue(
+      System.getenv(OPT_OUT_TRACKING) == null,
+      "OPT_OUT_TRACKING is set in the environment"
+    );
     previous = System.clearProperty(OPT_OUT_TRACKING);
   }
 
