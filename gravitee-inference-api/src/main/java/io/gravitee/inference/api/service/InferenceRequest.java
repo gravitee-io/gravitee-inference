@@ -21,4 +21,7 @@ import java.util.Map;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public record InferenceRequest(InferenceAction action, Map<String, Object> payload) {}
+public record InferenceRequest(
+  InferenceAction action,
+  Map<String, Object> payload
+) {}

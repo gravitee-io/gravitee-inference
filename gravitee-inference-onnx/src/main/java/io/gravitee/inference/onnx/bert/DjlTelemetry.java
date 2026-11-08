@@ -34,7 +34,10 @@ public final class DjlTelemetry {
   private DjlTelemetry() {}
 
   public static void optOut() {
-    if (System.getenv(OPT_OUT_TRACKING) == null && System.getProperty(OPT_OUT_TRACKING) == null) {
+    if (
+      System.getenv(OPT_OUT_TRACKING) == null &&
+      System.getProperty(OPT_OUT_TRACKING) == null
+    ) {
       System.setProperty(OPT_OUT_TRACKING, Boolean.TRUE.toString());
     }
   }

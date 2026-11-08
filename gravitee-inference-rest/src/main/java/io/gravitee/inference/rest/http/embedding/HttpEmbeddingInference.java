@@ -30,9 +30,12 @@ import io.vertx.rxjava3.ext.web.client.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpEmbeddingInference extends HttpInference<HttpEmbeddingConfig, String, EmbeddingTokenCount> {
+public class HttpEmbeddingInference
+  extends HttpInference<HttpEmbeddingConfig, String, EmbeddingTokenCount> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(HttpEmbeddingInference.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    HttpEmbeddingInference.class
+  );
   public static final String MEDIA_TYPE_JSON = "application/json";
   public static final String CONTENT_TYPE = "Content-Type";
 
@@ -43,33 +46,48 @@ public class HttpEmbeddingInference extends HttpInference<HttpEmbeddingConfig, S
   @Override
   protected Single<Buffer> prepareRequest(String input) {
     if (input == null || input.isBlank()) {
-      return Single.error(new IllegalArgumentException("Input cannot be null or empty"));
+      return Single.error(
+        new IllegalArgumentException("Input cannot be null or empty")
+      );
     }
 
     String inputLocation = getInputLocation();
     String requestBodyTemplate = getRequestBodyTemplate();
 
     if (requestBodyTemplate == null) {
-      return Single.error(new IllegalStateException("Request body template is not configured"));
+      return Single.error(
+        new IllegalStateException("Request body template is not configured")
+      );
     }
 
-    LOGGER.debug("Preparing request with input location: {} with template {}", inputLocation, requestBodyTemplate);
+    LOGGER.debug(
+      "Preparing request with input location: {} with template {}",
+      inputLocation,
+      requestBodyTemplate
+    );
     try {
-      return Single
-        .defer(() -> {
-          try {
-            return Single.just(JsonPath.parse(requestBodyTemplate));
-          } catch (JsonPathException e) {
-            return Single.error(new GraviteeInferenceHttpException("Invalid JSON template: " + e.getMessage()));
-          }
-        })
+      return Single.defer(() -> {
+        try {
+          return Single.just(JsonPath.parse(requestBodyTemplate));
+        } catch (JsonPathException e) {
+          return Single.error(
+            new GraviteeInferenceHttpException(
+              "Invalid JSON template: " + e.getMessage()
+            )
+          );
+        }
+      })
         .flatMap(ctx -> {
           try {
             return Single.just(ctx.set(inputLocation, input));
           } catch (JsonPathException e) {
             return Single.error(
               new GraviteeInferenceHttpException(
-                String.format("Cannot set input at location '%s': %s", inputLocation, e.getMessage())
+                String.format(
+                  "Cannot set input at location '%s': %s",
+                  inputLocation,
+                  e.getMessage()
+                )
               )
             );
           }
@@ -86,12 +104,18 @@ public class HttpEmbeddingInference extends HttpInference<HttpEmbeddingConfig, S
         );
     } catch (Exception e) {
       LOGGER.error("An error occurs while preparing request", e);
-      return Single.error(new GraviteeInferenceHttpException("An error occurs while preparing request"));
+      return Single.error(
+        new GraviteeInferenceHttpException(
+          "An error occurs while preparing request"
+        )
+      );
     }
   }
 
   @Override
-  protected Single<HttpResponse<Buffer>> executeHttpRequest(Buffer requestJson) {
+  protected Single<HttpResponse<Buffer>> executeHttpRequest(
+    Buffer requestJson
+  ) {
     HttpRequest<Buffer> request = webClient
       .requestAbs(config.getMethod(), config.getUri().toASCIIString())
       .followRedirects(true);
@@ -102,53 +126,76 @@ public class HttpEmbeddingInference extends HttpInference<HttpEmbeddingConfig, S
 
     request.putHeader(CONTENT_TYPE, MEDIA_TYPE_JSON);
 
-    LOGGER.debug("Executing HTTP request:\n{} {}\n\n{}\n", config.getMethod(), config.getUri(), request.headers());
+    LOGGER.debug(
+      "Executing HTTP request:\n{} {}\n\n{}\n",
+      config.getMethod(),
+      config.getUri(),
+      request.headers()
+    );
 
     return request
       .rxSendBuffer(requestJson)
-      .doOnError(error -> LOGGER.error("HTTP request failed for URI: {}", config.getUri()));
+      .doOnError(error ->
+        LOGGER.error("HTTP request failed for URI: {}", config.getUri())
+      );
   }
 
   @Override
   protected Maybe<EmbeddingTokenCount> parseResponse(Buffer responseJson) {
-    return Maybe
-      .defer(() -> {
-        String outputLocation = getOutputLocation();
+    return Maybe.defer(() -> {
+      String outputLocation = getOutputLocation();
 
-        if (outputLocation == null || outputLocation.trim().isEmpty()) {
-          return Maybe.error(new IllegalStateException("Output location is not configured"));
-        }
+      if (outputLocation == null || outputLocation.trim().isEmpty()) {
+        return Maybe.error(
+          new IllegalStateException("Output location is not configured")
+        );
+      }
 
-        String responseBody = responseJson.toString();
+      String responseBody = responseJson.toString();
 
-        LOGGER.debug("Extracting response from location: {}", outputLocation);
-        LOGGER.debug("Extracting response from input: {}", responseBody.substring(0, Math.min(60, responseBody.length())));
+      LOGGER.debug("Extracting response from location: {}", outputLocation);
+      LOGGER.debug(
+        "Extracting response from input: {}",
+        responseBody.substring(0, Math.min(60, responseBody.length()))
+      );
 
-        try {
-          DocumentContext responseContext = JsonPath.parse(responseBody);
-          float[] embedding = responseContext.read(outputLocation, float[].class);
+      try {
+        DocumentContext responseContext = JsonPath.parse(responseBody);
+        float[] embedding = responseContext.read(outputLocation, float[].class);
 
-          if (embedding == null || embedding.length == 0) {
-            return Maybe.error(
-              new GraviteeInferenceHttpException(String.format("No embedding data found at location: %s", outputLocation))
-            );
-          }
-          return Maybe.just(new EmbeddingTokenCount(embedding, -1));
-        } catch (JsonPathException e) {
+        if (embedding == null || embedding.length == 0) {
           return Maybe.error(
             new GraviteeInferenceHttpException(
-              String.format("Failed to extract embedding from location '%s': %s", outputLocation, e.getMessage())
-            )
-          );
-        } catch (ClassCastException e) {
-          return Maybe.error(
-            new GraviteeInferenceHttpException(
-              String.format("Data at location '%s' is not a valid float array: %s", outputLocation, e.getMessage())
+              String.format(
+                "No embedding data found at location: %s",
+                outputLocation
+              )
             )
           );
         }
-      })
-      .doOnError(error -> LOGGER.error("Failed to parse response", error));
+        return Maybe.just(new EmbeddingTokenCount(embedding, -1));
+      } catch (JsonPathException e) {
+        return Maybe.error(
+          new GraviteeInferenceHttpException(
+            String.format(
+              "Failed to extract embedding from location '%s': %s",
+              outputLocation,
+              e.getMessage()
+            )
+          )
+        );
+      } catch (ClassCastException e) {
+        return Maybe.error(
+          new GraviteeInferenceHttpException(
+            String.format(
+              "Data at location '%s' is not a valid float array: %s",
+              outputLocation,
+              e.getMessage()
+            )
+          )
+        );
+      }
+    }).doOnError(error -> LOGGER.error("Failed to parse response", error));
   }
 
   private String getRequestBodyTemplate() {

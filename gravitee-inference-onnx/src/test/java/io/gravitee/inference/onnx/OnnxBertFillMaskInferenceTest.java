@@ -35,38 +35,64 @@ import org.junit.jupiter.api.Test;
  */
 public class OnnxBertFillMaskInferenceTest extends OnnxBertBaseTest {
 
-  private static final String FILL_MASK_TOKENIZER_JSON = "google-bert-bert-base-uncased/tokenizer.json";
-  private static final String FILL_MASK_MODEL_ONNX = "google-bert-bert-base-uncased/model.onnx";
+  private static final String FILL_MASK_TOKENIZER_JSON =
+    "google-bert-bert-base-uncased/tokenizer.json";
+  private static final String FILL_MASK_MODEL_ONNX =
+    "google-bert-bert-base-uncased/model.onnx";
 
-  private static final String FILL_MASK_FILL_MASK_PATH = "google-bert/bert-base-uncased/resolve/main/";
+  private static final String FILL_MASK_FILL_MASK_PATH =
+    "google-bert/bert-base-uncased/resolve/main/";
 
-  protected static final String FILL_MASK_ONNX_DOWNLOAD = HF_URL + FILL_MASK_FILL_MASK_PATH + "model.onnx";
-  protected static final String FILL_MASK_TOKENIZER_DOWNLOAD = HF_URL + FILL_MASK_FILL_MASK_PATH + "tokenizer.json";
+  protected static final String FILL_MASK_ONNX_DOWNLOAD =
+    HF_URL + FILL_MASK_FILL_MASK_PATH + "model.onnx";
+  protected static final String FILL_MASK_TOKENIZER_DOWNLOAD =
+    HF_URL + FILL_MASK_FILL_MASK_PATH + "tokenizer.json";
 
-  private static final URI MODEL_ONNX = getUriIfExist(FILL_MASK_MODEL_ONNX, FILL_MASK_ONNX_DOWNLOAD);
-  private static final URI HF_TOKENIZER = getUriIfExist(FILL_MASK_TOKENIZER_JSON, FILL_MASK_TOKENIZER_DOWNLOAD);
-  private static final OnnxBertResource ONNX_BERT_RESOURCE = new OnnxBertResource(
-    Path.of(MODEL_ONNX),
-    Path.of(HF_TOKENIZER)
+  private static final URI MODEL_ONNX = getUriIfExist(
+    FILL_MASK_MODEL_ONNX,
+    FILL_MASK_ONNX_DOWNLOAD
   );
+  private static final URI HF_TOKENIZER = getUriIfExist(
+    FILL_MASK_TOKENIZER_JSON,
+    FILL_MASK_TOKENIZER_DOWNLOAD
+  );
+  private static final OnnxBertResource ONNX_BERT_RESOURCE =
+    new OnnxBertResource(Path.of(MODEL_ONNX), Path.of(HF_TOKENIZER));
 
   @Test
   public void must_fill_mask_for_one_input() {
-    var model = new OnnxBertFillMaskInference(new OnnxBertConfig(ONNX_BERT_RESOURCE, NativeMath.INSTANCE, Map.of()));
-    assertEquals("paris", model.infer("The capital of France is [MASK].").getFirst().label());
-    assertEquals("england", model.infer("The capital of [MASK] is London.").getFirst().label());
-    assertEquals("capital", model.infer("The [MASK] of Canada is Toronto.").getFirst().label());
+    var model = new OnnxBertFillMaskInference(
+      new OnnxBertConfig(ONNX_BERT_RESOURCE, NativeMath.INSTANCE, Map.of())
+    );
+    assertEquals(
+      "paris",
+      model.infer("The capital of France is [MASK].").getFirst().label()
+    );
+    assertEquals(
+      "england",
+      model.infer("The capital of [MASK] is London.").getFirst().label()
+    );
+    assertEquals(
+      "capital",
+      model.infer("The [MASK] of Canada is Toronto.").getFirst().label()
+    );
   }
 
   @Test
   public void must_fill_mask_for_inputs() {
-    var model = new OnnxBertFillMaskInference(new OnnxBertConfig(ONNX_BERT_RESOURCE, NativeMath.INSTANCE, Map.of()));
+    var model = new OnnxBertFillMaskInference(
+      new OnnxBertConfig(ONNX_BERT_RESOURCE, NativeMath.INSTANCE, Map.of())
+    );
     var expected = List.of("paris", "england", "capital");
 
     assertTrue(
       model
         .inferAll(
-          List.of("The capital of France is [MASK].", "The capital of [MASK] is London.", "The [MASK] of Canada is Toronto.")
+          List.of(
+            "The capital of France is [MASK].",
+            "The capital of [MASK] is London.",
+            "The [MASK] of Canada is Toronto."
+          )
         )
         .stream()
         .map(List::getFirst)

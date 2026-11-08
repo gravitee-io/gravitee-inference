@@ -17,7 +17,8 @@ package io.gravitee.inference.rest.openai;
 
 import io.gravitee.inference.rest.GraviteeInferenceRestException;
 
-public class GraviteeInferenceOpenaiException extends GraviteeInferenceRestException {
+public class GraviteeInferenceOpenaiException
+  extends GraviteeInferenceRestException {
 
   public GraviteeInferenceOpenaiException(String message) {
     super(message);

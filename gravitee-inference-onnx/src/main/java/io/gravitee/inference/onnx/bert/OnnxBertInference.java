@@ -41,7 +41,9 @@ import java.util.Set;
  * @author Rémi SULTAN (remi.sultan at graviteesource.com)
  * @author GraviteeSource Team
  */
-public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertConfig, String, OUTPUT> {
+public abstract class OnnxBertInference<OUTPUT>
+  extends OnnxInference<OnnxBertConfig, String, OUTPUT> {
+
   static {
     DjlTelemetry.optOut();
   }
@@ -72,7 +74,11 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
   private JsonNode getConfigJson() {
     try {
       Path configJson = this.config.getResource().getConfigJson();
-      return configJson == null ? null : objectMapper.readTree(String.join("", Files.readAllLines(configJson)));
+      return configJson == null
+        ? null
+        : objectMapper.readTree(
+          String.join("", Files.readAllLines(configJson))
+        );
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -88,14 +94,22 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
 
     try (
       var inputIdsTensor = createTensor(environment, wrap(inputIds), shape);
-      var attentionMaskTensor = createTensor(environment, wrap(attentionMask), shape);
+      var attentionMaskTensor = createTensor(
+        environment,
+        wrap(attentionMask),
+        shape
+      );
     ) {
       var inputs = new HashMap<String, OnnxTensor>();
       inputs.put(INPUT_IDS, inputIdsTensor);
       inputs.put(ATTENTION_MASK, attentionMaskTensor);
 
       if (hasTokenTypeIds) {
-        var tokenTypeIdsTensor = createTensor(environment, wrap(encoding.getTypeIds()), shape);
+        var tokenTypeIdsTensor = createTensor(
+          environment,
+          wrap(encoding.getTypeIds()),
+          shape
+        );
         inputs.put(TOKEN_TYPE_IDS, tokenTypeIdsTensor);
       }
       return new EncodingResults(List.of(encoding), session.run(inputs));
@@ -127,10 +141,28 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
       long[] sentenceTokenTypeIds = encoding.getTypeIds();
 
       int startIndex = i * maxTokens;
-      arraycopy(sentenceInputIds, 0, inputIds, startIndex, sentenceInputIds.length);
-      arraycopy(sentenceAttentionMask, 0, attentionMask, startIndex, sentenceAttentionMask.length);
+      arraycopy(
+        sentenceInputIds,
+        0,
+        inputIds,
+        startIndex,
+        sentenceInputIds.length
+      );
+      arraycopy(
+        sentenceAttentionMask,
+        0,
+        attentionMask,
+        startIndex,
+        sentenceAttentionMask.length
+      );
       if (hasTokenTypeIds) {
-        arraycopy(sentenceTokenTypeIds, 0, tokenTypeIds, startIndex, sentenceTokenTypeIds.length);
+        arraycopy(
+          sentenceTokenTypeIds,
+          0,
+          tokenTypeIds,
+          startIndex,
+          sentenceTokenTypeIds.length
+        );
       }
     }
 
@@ -138,14 +170,22 @@ public abstract class OnnxBertInference<OUTPUT> extends OnnxInference<OnnxBertCo
 
     try (
       var inputIdsTensor = createTensor(environment, wrap(inputIds), shape);
-      var attentionMaskTensor = createTensor(environment, wrap(attentionMask), shape);
+      var attentionMaskTensor = createTensor(
+        environment,
+        wrap(attentionMask),
+        shape
+      );
     ) {
       var inputs = new HashMap<String, OnnxTensor>();
       inputs.put(INPUT_IDS, inputIdsTensor);
       inputs.put(ATTENTION_MASK, attentionMaskTensor);
 
       if (session.getInputNames().contains(TOKEN_TYPE_IDS)) {
-        var tokenTypeIdsTensor = createTensor(environment, wrap(tokenTypeIds), shape);
+        var tokenTypeIdsTensor = createTensor(
+          environment,
+          wrap(tokenTypeIds),
+          shape
+        );
         inputs.put(TOKEN_TYPE_IDS, tokenTypeIdsTensor);
       }
       return new EncodingResults(encodings, session.run(inputs));

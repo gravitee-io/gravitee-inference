@@ -25,11 +25,14 @@ import io.vertx.rxjava3.ext.web.client.WebClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class RestInference<C extends RestConfig, I, O> extends InferenceModel<C, I, Maybe<O>> {
+public abstract class RestInference<C extends RestConfig, I, O>
+  extends InferenceModel<C, I, Maybe<O>> {
 
   private static final int HTTP_CODE_OK = 200;
   private static final int HTTP_CODE_REDIRECTION = 300;
-  private static final Logger LOGGER = LoggerFactory.getLogger(RestInference.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(
+    RestInference.class
+  );
   protected Vertx vertx;
   protected final WebClient webClient;
 
@@ -51,8 +54,17 @@ public abstract class RestInference<C extends RestConfig, I, O> extends Inferenc
     return prepareRequest(input)
       .flatMap(this::executeHttpRequest)
       .flatMapMaybe(response -> {
-        if (response.statusCode() < HTTP_CODE_OK || response.statusCode() >= HTTP_CODE_REDIRECTION) {
-          return Maybe.error(new RuntimeException("HTTP request failed" + response.statusCode() + response.bodyAsString()));
+        if (
+          response.statusCode() < HTTP_CODE_OK ||
+          response.statusCode() >= HTTP_CODE_REDIRECTION
+        ) {
+          return Maybe.error(
+            new RuntimeException(
+              "HTTP request failed" +
+                response.statusCode() +
+                response.bodyAsString()
+            )
+          );
         }
         return parseResponse(response.body());
       });
@@ -62,7 +74,9 @@ public abstract class RestInference<C extends RestConfig, I, O> extends Inferenc
 
   protected abstract Maybe<O> parseResponse(Buffer responseJson);
 
-  protected abstract Single<HttpResponse<Buffer>> executeHttpRequest(Buffer requestJson);
+  protected abstract Single<HttpResponse<Buffer>> executeHttpRequest(
+    Buffer requestJson
+  );
 
   @Override
   public void close() {

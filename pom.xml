@@ -23,7 +23,7 @@
     <parent>
         <groupId>io.gravitee</groupId>
         <artifactId>gravitee-parent</artifactId>
-        <version>23.4.1</version>
+        <version>23.5.0</version>
     </parent>
 
     <groupId>io.gravitee.inference</groupId>
@@ -36,7 +36,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <gravitee-bom.version>8.3.27</gravitee-bom.version>
+        <gravitee-bom.version>8.3.66</gravitee-bom.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <commons-math3.version>3.6.1</commons-math3.version>
@@ -138,16 +138,6 @@
                     <version>${maven-surefire-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>com.hubspot.maven.plugins</groupId>
-                    <artifactId>prettier-maven-plugin</artifactId>
-                    <version>${prettier-maven-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>com.mycila</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>${license-maven-plugin.version}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco-maven-plugin.version}</version>
@@ -157,44 +147,8 @@
 
         <plugins>
             <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
-                <configuration>
-                    <prettierJavaVersion>${prettier-maven-plugin.prettierJavaVersion}</prettierJavaVersion>
-                    <printWidth>125</printWidth>
-                    <skip>${skip.validation}</skip>
-                    <inputGlobs>
-                        <inputGlob>src/{main,test}/**/*.java</inputGlob>
-                        <inputGlob>.github/*.json</inputGlob>
-                    </inputGlobs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-            </plugin>
-
-            <plugin>
-                <groupId>com.hubspot.maven.plugins</groupId>
-                <artifactId>prettier-maven-plugin</artifactId>
-                <configuration>
-                    <prettierJavaVersion>${prettier-maven-plugin.prettierJavaVersion}</prettierJavaVersion>
-                    <printWidth>125</printWidth>
-                    <skip>${skip.validation}</skip>
-                    <inputGlobs>
-                        <inputGlob>src/{main,test}/**/*.java</inputGlob>
-                        <inputGlob>.github/*.json</inputGlob>
-                    </inputGlobs>
-                </configuration>
             </plugin>
 
             <plugin>
