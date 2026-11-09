@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/gravitee-io/gravitee-inference/compare/1.5.1...1.5.2) (2026-11-09)
+
+
+### Bug Fixes
+
+* **onnx:** opt out of DJL telemetry before loading tokenizers ([cca0df9](https://github.com/gravitee-io/gravitee-inference/commit/cca0df93ef256272e12ba00ea994eedf44fdc6ba))
+
 ## [1.5.1](https://github.com/gravitee-io/gravitee-inference/compare/1.5.0...1.5.1) (2026-04-23)
 
 
