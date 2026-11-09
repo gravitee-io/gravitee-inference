@@ -19,6 +19,7 @@ import static io.gravitee.inference.api.Constants.MAX_SEQUENCE_LENGTH_DEFAULT_VA
 import static io.gravitee.inference.api.Constants.POOLING_MODE;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import io.gravitee.inference.api.Constants;
 import io.gravitee.inference.api.embedding.EmbeddingTokenCount;
@@ -135,6 +136,16 @@ public class OnnxBertEmbeddingInferenceTest extends OnnxBertBaseTest {
     OnnxBertConfig
   > params_that_must_return_embedding_with_mean() {
     return ONNX_BERT_CONFIG_STREAM_MEAN.stream();
+  }
+
+  @Test
+  public void loading_a_model_must_opt_out_of_djl_telemetry() {
+    assumeTrue(System.getenv("OPT_OUT_TRACKING") == null);
+
+    var model = new OnnxBertEmbeddingModel(ONNX_BERT_CONFIG_STREAM_MEAN.get(0));
+    model.close();
+
+    assertEquals("true", System.getProperty("OPT_OUT_TRACKING"));
   }
 
   @Test
